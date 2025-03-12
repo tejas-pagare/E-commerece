@@ -1,0 +1,53 @@
+<nav class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-4">
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between mb-4">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <img src="/images/logo.svg" alt="SwiftMart" class="h-8">
+                <span class="ml-2 text-2xl font-bold text-green-600">SwiftMart</span>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="flex-1 max-w-2xl mx-8">
+                <div class="relative">
+                    <input type="text" placeholder="Search for products"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <button class="absolute right-3 top-2">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Icons -->
+            <div class="flex items-center space-x-6">
+
+                <div class="flex items-center space-x-4">
+
+                    <button class="relative">
+                        <i class="far fa-user text-xl"></i>
+                    </button>
+                    <button class="relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span
+                            class="absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex items-center space-x-6">
+            <button class="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center">
+                <i class="fas fa-bars mr-2"></i>
+                All Departments
+            </button>
+            <a href="/" class="text-gray-700 hover:text-green-500">Home</a>
+            <a href="/shop" class="text-gray-700 hover:text-green-500">Shop</a>
+            <a href="/blog" class="text-gray-700 hover:text-green-500">Blog</a>
+            <a href="/contact" class="text-gray-700 hover:text-green-500">About us</a>
+            <a href="/login" class="text-gray-700 hover:text-green-500">Login</a>
+
+        </nav>
+    </div>
+</nav>

@@ -1,0 +1,271 @@
+@import url(https://fonts.googleapis.com/css?family=Space%20Grotesk);
+@import url(https://fonts.googleapis.com/css?family=Poppins);
+@import url(https://fonts.googleapis.com/css?family=Inter);
+body{text-align: center;}
+.nav-bar{
+    height:60px;
+    width:100%;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    display:flex;
+    justify-content: space-evenly;
+    font-family: 'Space Grotesk'
+}
+.logo{
+    height:24px ;
+    width:105px ;
+}
+
+.middlepart{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    width :326px;
+    height :24px ;
+    font-family: 'Space Grotesk';
+    gap:40px;
+}
+.Home{
+    width:38px;
+    height:24px;
+    font-weight: 500;
+    font-size: 14px;
+    color:#141718;
+    
+}
+.shop,.product{
+    width:38px;
+    height:24px;
+    font-weight: 500;
+    font-size: 14px;
+    color:#6C7275;
+    
+
+}
+.contact{
+    width:76px;
+    height:24px;
+    font-weight: 500;
+    font-size: 14px;
+    color:#6C7275;
+    padding-top: 18px;
+    padding-bottom: 18px;
+    
+}
+#search,#prof,#img_shop{
+    height: 20px;
+    width:20px ;
+}
+#img_shop_2{
+    height: 4px;
+    width: 6px;
+}
+.lastpart{
+    height:28px;
+    width:138px ;
+    display:flex ;
+    justify-content: space-evenly;
+}
+
+#shop_2{
+    position:relative;
+   right:22px ;
+   bottom:9px;
+}
+#cnt{
+    height:20px ;
+    width:20px ;
+    color:white ;
+    display:flex ;
+    justify-content: center;
+    align-items: center;
+    background-color: #141718;
+    border-radius: 50%;
+    position:relative;
+    right:23px
+}
+.body-part{
+    width:832px;
+    height:164px ;
+    display:flex;
+    justify-content: center;
+   font-family: 'Space Grotesk'
+}
+.status{
+    display:flex;
+    justify-content: space-evenly;
+
+}
+
+#complete{
+
+font-size:54px ;
+font-family:'Poppins';
+display:flex;
+justify-content: center;
+text-align: center;
+margin-bottom:34px ;
+margin-top:26px;
+}
+.progress-bar{
+    text-align: center;
+    display:flex;
+    justify-content: center;
+    gap: 35px;
+    font-family: 'Inter'
+}
+
+.shop_cart{
+    display: flex;
+    height:66px;
+    width:256px;
+    align-items: center;
+    gap: 17px;
+    color: #45B26B;
+    margin-bottom:26px ;
+    border-bottom: 2px solid #45B26B;
+}
+.checkout{
+    display: flex;
+    height:66px;
+    width:256px;
+    align-items: center;
+    gap: 17px;
+    color: #45B26B;
+    margin-bottom:26px ;
+    border-bottom: 2px solid #45B26B;
+}
+.ordercomp{
+    display: flex;
+    height:66px;
+    width:256px;
+    align-items: center;
+    gap: 17px;
+    margin-bottom:26px ;
+    border-bottom: 2px solid black;
+
+}
+.check{
+    height:40px;
+    width:40px;
+    background-color: #45B26B;
+    border-radius: 50%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.tree{
+    height:40px;
+    width:40px;
+    background-color: black;
+    color:white;
+    border-radius: 50%;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+
+.order-box {
+    
+    
+    background: white;
+    padding: 30px;
+    width: 50%;
+    margin: auto;
+    margin-top:70px ;
+    margin-bottom:70px ;
+    border-radius: 8px;
+    box-shadow: 0px 16px 32px rgba(0, 0, 0, 0.15);
+}
+h3 {
+    font-family: 'Poppins';
+    font-size: 24px;
+    color :#6C7275;
+    
+}
+h4{
+   
+    font-family: 'Poppins';
+    font-size: 40px ;
+    line-height: 44px;
+    letter-spacing: -0.4px;
+    font-weight:500px; 
+    padding-left:121px ;
+    padding-right:121px ;
+    margin-top: 0px;;
+}
+
+
+.order-items {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.item {
+    position: relative;
+}
+
+.item img {
+    width: 60px;
+    height: 60px;
+    border-radius: 5px;
+}
+
+.count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: black;
+    color: white;
+    font-size: 14px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-details {
+    font-family: 'Inter', sans-serif;
+    color: #6C7275;
+    font-size: 14px;
+    font-weight: 600;
+    max-width: 400px;
+    margin: auto;
+}
+
+.order-details p {
+    display: flex;
+    justify-content: space-between;
+}
+
+#info {
+    color: black;
+}
+
+#info{
+    padding-left:80px ;
+}
+
+
+.purchase-btn {
+    background: black;
+    color: white;
+    gap:8px ;
+    padding: 12px 40px 12px 40px;
+    border: none;
+    font-family:'Inter';
+    border-radius: 80px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    
+}
+

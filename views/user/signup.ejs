@@ -1,0 +1,59 @@
+<body >
+  <div class="min-h-screen flex items-center justify-center bg-gray-50">
+
+    <div class="container mx-auto p-6 lg:flex lg:items-center lg:justify-between">
+  
+      <!-- Illustration Section -->
+      <div class="hidden lg:block w-1/2">
+        <img src="https://freshcart-next-js.vercel.app/images/svg-graphics/signup-g.svg" alt="Sign Up Illustration" class="max-w-full h-auto">
+      </div>
+  
+      <!-- Form Section -->
+      <div class="w-full lg:w-1/2 max-w-md mx-auto">
+        <h1 class="text-3xl font-bold mb-4">Get Start Shopping</h1>
+        <p class="text-gray-600 mb-8">Welcome to FreshCart! Enter your email to get started.</p>
+  
+        <form class="space-y-4" action="#" method="POST">
+          <div>
+            <label for="firstName" class="block text-sm font-medium">First Name</label>
+            <input type="text" id="firstName" name="firstName" required class="mt-1 p-2 w-full border rounded-lg">
+          </div>
+  
+          <div>
+            <label for="lastName" class="block text-sm font-medium">Last Name</label>
+            <input type="text" id="lastName" name="lastName" required class="mt-1 p-2 w-full border rounded-lg">
+          </div>
+  
+          <div>
+            <label for="email" class="block text-sm font-medium">Email</label>
+            <input type="email" id="email" name="email" required class="mt-1 p-2 w-full border rounded-lg">
+          </div>
+  
+          <div>
+            <label for="password" class="block text-sm font-medium">Password</label>
+            <div class="relative">
+              <input type="password" id="password" name="password" required class="mt-1 p-2 w-full border rounded-lg pr-10">
+              <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                👁️
+              </button>
+            </div>
+          </div>
+  
+          <button type="submit" class="w-full bg-green-600 text-white p-2 rounded-lg hover:bg-green-700">Register</button>
+        </form>
+  
+        <p class="text-xs text-gray-500 mt-4">By continuing, you agree to our <a href="#" class="text-green-600 underline">Terms of Service</a> & <a href="#" class="text-green-600 underline">Privacy Policy</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+
+    togglePassword.addEventListener('click', () => {
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+    });
+  </script>
+</body>

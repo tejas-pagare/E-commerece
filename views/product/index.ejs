@@ -1,0 +1,87 @@
+<body class="bg-gray-100">
+
+    <div class=" mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+        <!-- Breadcrumb -->
+        <nav class="text-sm text-gray-500 mb-4">
+            <a href="#" class="hover:underline">Home</a> / <a href="#" class="hover:underline">Shop</a> / <span
+                class="text-gray-700">Haldiram's Sev Bhujia</span>
+        </nav>
+
+        <!-- Product Display -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <img src=<%=product.image%>
+                    alt="Product Image" class="w-72 h-72 object-cover rounded-lg">
+                <div class="flex mt-4 space-x-2">
+                    <img src="https://images.pexels.com/photos/3819969/pexels-photo-3819969.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                        class="w-16 h-16 rounded-lg border cursor-pointer">
+                    <img src="https://images.pexels.com/photos/3819969/pexels-photo-3819969.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                        class="w-16 h-16 rounded-lg border cursor-pointer">
+                    <img src="https://images.pexels.com/photos/3819969/pexels-photo-3819969.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+                        class="w-16 h-16 rounded-lg border cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div>
+                <h2 class="text-2xl font-bold"><%=product.title%></h2>
+                <div class="flex items-center space-x-2 mt-2">
+                    <span class="text-yellow-400">★★★★☆</span>
+                    <span class="text-gray-500 text-sm"><%=product.rating.rate%></span>
+                </div>
+                <div class="mt-2 text-lg font-semibold text-green-600">$21.6 <span
+                        class="text-gray-500 line-through">$24</span> <span class="text-red-500">10% off</span></div>
+
+               
+
+                <div class="mt-4 flex space-x-4">
+                    <button class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">Add to Cart</button>
+                    <input type="number" min="1" value="1" class="w-12 border text-center rounded-lg">
+                </div>
+
+                <div class="mt-6 text-sm text-gray-600">
+                    <p><span class="font-semibold">Product Code:</span> FBB00235</p>
+                    <p><span class="font-semibold">Availability:</span> In Stock</p>
+                    <p><span class="font-semibold">Type:</span> Snacks</p>
+                    <p><span class="font-semibold">Shipping:</span> Free Shipping</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="mt-10">
+            <h3 class="text-xl font-bold">Nutrient Value & Benefits</h3>
+            <p class="text-gray-600 mt-2">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla facilisi.
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Consequatur eum fuga ea eius provident omnis
+                eligendi, harum atque error dolore cum, quia ipsum repudiandae minima explicabo placeat magni illo esse.
+            </p>
+
+            <h3 class="text-xl font-bold mt-6">Storage Tips</h3>
+            <p class="text-gray-600 mt-2">
+                Store in a cool, dry place.
+            </p>
+        </div>
+
+        <!-- Related Products -->
+        <h3 class="text-2xl font-bold mt-10">Related Items</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
+            <% for (let i=0; i < filteredProducts.length; i++) { %>
+            <div class="bg-white shadow-lg rounded-lg p-4">
+                <img  src=<%=
+                filteredProducts[i].image
+                %>
+                    class="w-48 h-48 rounded-lg">
+                <h4 class="text-sm font-bold mt-2"><%=
+                    filteredProducts[i].title
+                    %></h4>
+                <p class="text-green-600 font-semibold"> Rs.<%=
+                    filteredProducts[i].price
+                    %></p>
+                <button class="mt-2 w-full py-2 bg-green-600 text-white rounded-lg text-sm">Add</button>
+            </div>
+            <% } %>
+        </div>
+    </div>
+
+</body>

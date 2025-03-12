@@ -1,0 +1,425 @@
+<body class="bg-gray-50">
+    <!-- Header -->
+
+
+    <!-- Hero Section -->
+    <section class="relative bg-green-50 overflow-hidden">
+        <div class="container mx-auto px-4 py-16">
+            <div class="flex items-center">
+                <!-- Left Content -->
+                <div class="w-1/2 relative z-10">
+                    <div class="bg-yellow-400 text-sm font-semibold px-3 py-1 rounded-full inline-block mb-4">
+                        Opening Sale Discount 50%
+                    </div>
+                    <h1 class="text-5xl font-bold mb-4">Onestop For<br>all your needs</h1>
+                    <p class="text-gray-600 mb-8">
+                        Introduced a new model for shopping<br>
+                        and convenient home delivery.
+                    </p>
+                    <button class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors">
+                        Shop Now <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+
+                <!-- Right Content -->
+                <div class="w-1/2 relative">
+                    <div class="absolute top-0 right-0 bg-green-600 rounded-full w-96 h-96 bg-cover bg-center"
+                        style="background-image: url('https://freshcart-next-js.vercel.app/images/slider/slide-1.jpg')">
+                    </div>
+
+                    <!-- Product Cards -->
+                    <div class="absolute bottom-8 right-8 bg-white p-4 rounded-lg shadow-lg">
+                        <img src="/images/avocado.jpg" alt="Avocado" class="w-16 h-16 object-cover rounded">
+                        <p class="mt-2 font-semibold">Avocado</p>
+                        <div class="flex text-yellow-400 text-sm">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Badge -->
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                                bg-white px-4 py-2 rounded-full shadow-lg flex items-center">
+                        <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                        Delivery Done!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Categories Section -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Fashion & Clothing Banner -->
+                <div class="relative overflow-hidden rounded-lg bg-gray-100">
+                    <div class="flex p-8">
+                        <div class="w-1/2">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Fashion & Clothing</h3>
+                            <p class="text-gray-600 mb-4">Get Upto 40% Off</p>
+                            <button
+                                class="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">
+                                Shop Now
+                            </button>
+                        </div>
+                        <div class="w-1/2">
+                            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+                                alt="Fashion Collection" class="object-cover w-full h-48 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Home Appliances Banner -->
+                <div class="relative overflow-hidden rounded-lg bg-gray-100">
+                    <div class="flex p-8">
+                        <div class="w-1/2">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-2">Home Appliances</h3>
+                            <p class="text-gray-600 mb-4">Get Upto 35% Off</p>
+                            <button
+                                class="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">
+                                Shop Now
+                            </button>
+                        </div>
+                        <div class="w-1/2">
+                            <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+                                alt="Home Appliances" class="object-cover w-full h-48 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Products Section -->
+    <section class="py-12">
+        <div class="container mx-auto px-4">
+            <h2 class="text-2xl font-bold mb-8">Popular Products</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- iPhone 14 Pro -->
+                <% for (let i=0; i < products.length; i++) { %>
+                    <a href=<%= `/product/${products[i].id}` %>>
+                        <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow w-80 h-[480px] flex flex-col">
+                            <div class="relative h-64">
+                                <img src=<%= products[i].image %> alt="iPhone 14 Pro" class="w-full h-full object-top object-cover rounded-t-lg">
+                                <div class="absolute top-3 left-3">
+                                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded">New Launch</span>
+                                </div>
+                            </div>
+                            <div class="p-4 flex-grow flex flex-col justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-500"><%=products[i].category%></p>
+                                    <h3 class="font-medium text-gray-800 tracking-tighter"><%= products[i].title %></h3>
+                                    <div class="flex items-center mb-2">
+                                        <div class="flex text-yellow-400">
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-500 ml-2"><%=products[i].rating.rate%></span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between mt-4">
+                                    <div>
+                                        <span class="text-lg font-bold">Rs.<%=products[i].price%></span>
+                                        
+                                    </div>
+                                    <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    <!-- <a href="/product/12">
+                        <div class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                            <div class="relative min-h-76">
+                                <img src=<%= products[i].image %>
+                                    alt="iPhone 14 Pro" class="w-full h-56 object-top object-cover rounded-t-lg">
+                                <div class="absolute top-3 left-3">
+                                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded">New Launch</span>
+                                </div>
+                            </div>
+                            <div class="p-4">
+                                <p class="text-sm text-gray-500">Smartphones</p>
+                                <h3 class="font-medium text-gray-800  tracking-tighter"><%= products[i].title %></h3>
+                                <div class="flex items-center mb-2">
+                                    <div class="flex text-yellow-400">
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <span class="text-sm text-gray-500 ml-2">4.9 (128)</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <span class="text-lg font-bold">$999</span>
+                                        <span class="text-sm text-gray-500 line-through ml-2">$1099</span>
+                                    </div>
+                                    <button
+                                        class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                                        Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </a> -->
+                    <% } %>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-lg">
+            <!-- Cart Header -->
+            <div class="p-4 border-b">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold">Shop Cart</h2>
+                    <button id="closeCart" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <p class="text-sm text-gray-600">Location in 382480</p>
+            </div>
+
+            <!-- Free Delivery Notice -->
+            <div class="bg-pink-50 p-4">
+                <p class="text-sm text-pink-600">You've got FREE delivery. Start checkout now!</p>
+            </div>
+
+            <!-- Cart Items -->
+            <div id="cartItems" class="overflow-y-auto h-[calc(100vh-300px)] p-4">
+                <!-- Cart items will be dynamically added here -->
+            </div>
+
+            <!-- Cart Footer -->
+            <div class="absolute bottom-0 left-0 right-0 bg-white border-t p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="font-bold">Total:</span>
+                    <span id="cartTotal" class="font-bold text-xl">$0.00</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="continueShopping"
+                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        Continue Shopping
+                    </button>
+                    <button class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                        Proceed To Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Item Template (hidden) -->
+    <template id="cartItemTemplate">
+        <div class="flex items-center py-4 border-b cart-item">
+            <img class="w-20 h-20 object-cover rounded" src="" alt="">
+            <div class="flex-1 ml-4">
+                <div class="flex justify-between">
+                    <div>
+                        <h3 class="font-medium text-gray-800 product-name"></h3>
+                        <p class="text-sm text-gray-500 product-weight"></p>
+                    </div>
+                    <button class="remove-item text-gray-400 hover:text-red-500">
+                        <i class="fas fa-trash"></i>
+                        <span class="text-sm ml-1">Remove</span>
+                    </button>
+                </div>
+                <div class="flex items-center justify-between mt-2">
+                    <div class="flex items-center border rounded">
+                        <button class="decrease-qty px-3 py-1 hover:bg-gray-100">-</button>
+                        <span class="quantity px-3 py-1 border-x">1</span>
+                        <button class="increase-qty px-3 py-1 hover:bg-gray-100">+</button>
+                    </div>
+                    <span class="font-bold product-price"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            // Add smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Cart state
+            let cart = [];
+
+            // DOM Elements
+            const cartModal = document.getElementById('cartModal');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            const cartCount = document.querySelector('.fa-shopping-cart + span');
+            const cartItemTemplate = document.getElementById('cartItemTemplate');
+
+            // Open cart when clicking cart icon
+            document.querySelector('.fa-shopping-cart').parentElement.addEventListener('click', () => {
+                cartModal.classList.remove('hidden');
+            });
+
+            // Close cart
+            document.getElementById('closeCart').addEventListener('click', () => {
+                cartModal.classList.add('hidden');
+            });
+
+            document.getElementById('continueShopping').addEventListener('click', () => {
+                cartModal.classList.add('hidden');
+            });
+
+            // Close cart when clicking outside
+            cartModal.addEventListener('click', (e) => {
+                if (e.target === cartModal) {
+                    cartModal.classList.add('hidden');
+                }
+            });
+
+            // Add to cart functionality
+            document.querySelectorAll('button').forEach(button => {
+                if (button.textContent.trim() === 'Add') {
+                    button.addEventListener('click', (e) => {
+                        const productCard = e.target.closest('.bg-white');
+                        const product = {
+                            id: Date.now(),
+                            name: productCard.querySelector('h3').textContent,
+                            category: productCard.querySelector('.text-sm.text-gray-500').textContent,
+                            price: parseFloat(productCard.querySelector('.font-bold').textContent.replace('$', '')),
+                            image: productCard.querySelector('img').src,
+                            quantity: 1
+                        };
+
+                        addToCart(product);
+                        updateCartUI();
+                        updateCartCount();
+                        showNotification(`${product.name} added to cart`);
+                        cartModal.classList.remove('hidden');
+                    });
+                }
+            });
+
+            // Update addToCart function to handle duplicates better
+            function addToCart(product) {
+                const existingItem = cart.find(item => item.name === product.name);
+                if (existingItem) {
+                    existingItem.quantity++;
+                    showNotification(`Added another ${product.name} (${existingItem.quantity} total)`);
+                } else {
+                    cart.push(product);
+                }
+                updateCartCount();
+                saveCartToLocalStorage();
+            }
+
+            // Add local storage functionality
+            function saveCartToLocalStorage() {
+                localStorage.setItem('freshcart', JSON.stringify(cart));
+            }
+
+            function loadCartFromLocalStorage() {
+                const savedCart = localStorage.getItem('freshcart');
+                if (savedCart) {
+                    cart = JSON.parse(savedCart);
+                    updateCartUI();
+                    updateCartCount();
+                }
+            }
+
+            // Initialize cart from local storage
+            loadCartFromLocalStorage();
+
+            // Update updateCartUI function to handle empty cart state
+            function updateCartUI() {
+                cartItems.innerHTML = '';
+                let total = 0;
+
+                if (cart.length === 0) {
+                    cartItems.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full py-8">
+                        <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">Your cart is empty</p>
+                    </div>
+                `;
+                } else {
+                    cart.forEach(item => {
+                        const cartItem = cartItemTemplate.content.cloneNode(true);
+
+                        // Update item details
+                        cartItem.querySelector('img').src = item.image;
+                        cartItem.querySelector('.product-name').textContent = item.name;
+                        cartItem.querySelector('.product-weight').textContent = item.category;
+                        cartItem.querySelector('.quantity').textContent = item.quantity;
+                        cartItem.querySelector('.product-price').textContent = `$${(item.price * item.quantity).toFixed(2)}`;
+
+                        // Add event listeners for quantity controls
+                        const itemElement = cartItem.querySelector('.cart-item');
+                        itemElement.querySelector('.increase-qty').addEventListener('click', () => {
+                            item.quantity++;
+                            updateCartUI();
+                            updateCartCount();
+                            saveCartToLocalStorage();
+                        });
+
+                        itemElement.querySelector('.decrease-qty').addEventListener('click', () => {
+                            if (item.quantity > 1) {
+                                item.quantity--;
+                                updateCartUI();
+                                updateCartCount();
+                                saveCartToLocalStorage();
+                            }
+                        });
+
+                        itemElement.querySelector('.remove-item').addEventListener('click', () => {
+                            cart = cart.filter(cartItem => cartItem.id !== item.id);
+                            updateCartUI();
+                            updateCartCount();
+                            saveCartToLocalStorage();
+                            showNotification(`${item.name} removed from cart`);
+                        });
+
+                        cartItems.appendChild(cartItem);
+                        total += item.price * item.quantity;
+                    });
+                }
+
+                cartTotal.textContent = `$${total.toFixed(2)}`;
+            }
+
+            function updateCartCount() {
+                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+                cartCount.textContent = totalItems;
+            }
+
+            // Show notification function
+            function showNotification(message) {
+                const notification = document.createElement('div');
+                notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 translate-y-0';
+                notification.textContent = message;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.classList.add('translate-y-full');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+            }
+        }); </script>
+</body>
