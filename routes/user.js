@@ -1,10 +1,11 @@
-const express = require('express');
+import express from 'express';
+import path from 'path';
+import { promises as fs } from 'fs';
+import products from '../data/products.js';
+import { error } from 'console';
+
+
 const router = express.Router();
-const path = require('path');
-const fs = require('fs/promises');
-const { error } = require('console');
-const products = require('../data/products.json');
-const { title } = require('process');
 router.get("/login", (req, res) => {
   res.render('user/login.ejs', { title: 'login', error: "" })
 })
@@ -156,4 +157,4 @@ router.get("/cart", async (req, res) => {
 
 })
 
-module.exports = router;
+export default router;
