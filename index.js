@@ -6,7 +6,8 @@ import products from './data/products.js';
 import userController from "./routes/user.js"
 import dbConnection from "./config/db.js"
 import { fileURLToPath } from 'url';
-
+import dotenv from "dotenv";
+dotenv.config({});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
