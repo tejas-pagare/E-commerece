@@ -1,0 +1,32 @@
+[
+  {
+    "id": "31231",
+    "firstName": "tejas",
+    "lastName": "pagare",
+    "email": "rock12@gmail.com",
+    "password": "fdssf",
+    "cart": [
+      {
+        "productId": 16,
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "id": "1233",
+    "email": "kirat@gmail.com",
+    "password": "dasdas",
+    "cart": [],
+    "profilePhoto": "http://myprofile.png",
+    "address": "DDCC Bank colony"
+  },
+  {
+    "firstName": "Rakesh",
+    "lastName": "Sharma",
+    "email": "rock12@gmail.com",
+    "password": "Rakesh123",
+    "cart": [],
+    "profilePhoto": "",
+    "address": ""
+  }
+]

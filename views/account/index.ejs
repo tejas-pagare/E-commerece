@@ -1,0 +1,59 @@
+<body class="bg-gray-100 text-gray-800">
+    <main class="flex">
+        <aside class="w-64 min-h-screen bg-green-200 p-6 rounded-lg text-center shadow-md">
+            <div class="profile mb-4">
+                <img src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid" alt="Profile Picture" class="w-20 h-20 rounded-full object-cover mx-auto"/>
+                <h2 class="text-lg font-semibold mt-2">Sofia Havertz</h2>
+            </div>
+            <nav class="space-y-2">
+                <a href="/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
+                <a href="/account/address" class="block py-2 font-medium text-black hover:text-green-700">Address</a>
+                <a href="#" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
+                <a href="/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
+                <a href="/api/v1/user/login" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
+            </nav>
+        </aside>
+
+        <section class="flex-1  p-6 bg-white rounded-lg shadow-md">
+            <h1 class="text-2xl font-bold mb-6">My Account</h1>
+            <hr class="mb-6">
+
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-4">Account Details</h2>
+                <label class="block font-bold">First Name *</label>
+                <input type="text" placeholder="First name" class="w-full p-2 mt-1 border border-gray-300 rounded">
+
+                <label class="block font-bold mt-4">Last Name *</label>
+                <input type="text" placeholder="Last name" class="w-full p-2 mt-1 border border-gray-300 rounded">
+
+                <label class="block font-bold mt-4">Display Name *</label>
+                <input type="text" placeholder="Display name" class="w-full p-2 mt-1 border border-gray-300 rounded">
+                <p class="text-sm text-gray-500 mt-1">This will be how your name is displayed in the account section and
+                    in reviews.</p>
+
+                <label class="block font-bold mt-4">Email *</label>
+                <input type="email" placeholder="Email" class="w-full p-2 mt-1 border border-gray-300 rounded">
+            </div>
+
+            <hr class="mb-6">
+
+            <div>
+                <h2 class="text-xl font-semibold mb-4">Password</h2>
+                <label class="block font-bold">Old Password</label>
+                <input type="password" placeholder="Old password"
+                    class="w-full p-2 mt-1 border border-gray-300 rounded">
+
+                <label class="block font-bold mt-4">New Password</label>
+                <input type="password" placeholder="New password"
+                    class="w-full p-2 mt-1 border border-gray-300 rounded">
+
+                <label class="block font-bold mt-4">Repeat New Password</label>
+                <input type="password" placeholder="Repeat new password"
+                    class="w-full p-2 mt-1 border border-gray-300 rounded">
+
+                <button id="saveChanges" class="mt-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Save
+                    changes</button>
+            </div>
+        </section>
+    </main>
+</body>
