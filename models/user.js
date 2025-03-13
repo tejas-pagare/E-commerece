@@ -1,11 +1,7 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
+  name: {
     type: String,
     required: true,
   },
@@ -14,35 +10,39 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  profilePhoto: {
-    type: String,
-  },
-  address: {
-    type: String,
-  },
   password: {
     type: String,
     required: true,
   },
-  cart: [
+  role: {
+    type: String,
+    enum: ['user', 'seller'],
+    required: true,
+  },
+  products: [
     {
-      productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-        required: true,
-      },
-      quantity: {
-        type: Number,
-        default: 1,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
     },
   ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    immutable: true,
+  },
   updatedAt: {
     type: Date,
     default: Date.now,
   },
-}, { timestamps: true });
+});
+
+// Hash password before saving
+userSchema.pre('save', async function (next) {
+ 
+  this.updatedAt = Date.now();
+  next();
+});
 
 const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+export default User;
