@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Sidebar -->
+  <div class="flex h-screen">
+    <aside id="sidebar" class="bg-white w-64 p-4 fixed lg:block hidden shadow-lg">
+      <h2 class="text-2xl font-bold mb-8 text-green-600">Dashboard</h2>
+      <nav>
+        <ul class="space-y-6">
+          <li><a href="#" class="text-gray-700 hover:text-green-500">Dashboard</a></li>
+          <li><a href="#" class="text-gray-700 hover:text-green-500">Products</a></li>
+          <li><a href="#" class="text-gray-700 hover:text-green-500">Categories</a></li>
+          <li><a href="#" class="text-gray-700 hover:text-green-500">Orders</a></li>
+          <li><a href="#" class="text-gray-700 hover:text-green-500">Customers</a></li>
+          <li><a href="#" class="text-gray-700 hover:text-green-500">Reports</a></li>
+          <li><a href="#" class="text-gray-700 hover:text-green-500">Settings</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex flex-col flex-grow ml-auto lg:ml-64 p-6 space-y-8">
+      <!-- Navbar -->
+      <header class="flex justify-between items-center bg-white p-4 rounded-lg shadow-md">
+        <input type="text" placeholder="Search..." class="border rounded-lg px-4 py-2 w-full max-w-md">
+        <div class="flex items-center space-x-6">
+          <span class="text-gray-600">🔔 Notifications</span>
+          <img src="https://via.placeholder.com/40" alt="User" class="w-10 h-10 rounded-full">
+        </div>
+      </header>
+
+      <!-- Welcome Banner -->
+      <div class="bg-green-100 p-8 rounded-lg flex justify-between items-center shadow-lg">
+        <h1 class="text-3xl font-bold">Welcome Back!</h1>
+        <button class="bg-green-500 text-white px-6 py-3 rounded-lg">Create Product</button>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-gray-600 text-lg font-bold">Earnings</h2>
+          <p class="text-2xl font-semibold">$93,438.78</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-gray-600 text-lg font-bold">Orders</h2>
+          <p class="text-2xl font-semibold">42,339</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-gray-600 text-lg font-bold">Customers</h2>
+          <p class="text-2xl font-semibold">39,354</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md">
+          <h2 class="text-gray-600 text-lg font-bold">Total Sales</h2>
+          <p class="text-2xl font-semibold">9,600</p>
+        </div>
+      </div>
+
+      <!-- Revenue Graph -->
+      <div class="bg-white p-8 rounded-lg shadow-md">
+        <h3 class="text-lg font-bold mb-4">Revenue Graph (+63% from last year)</h3>
+        <canvas id="revenueChart" class="h-48"></canvas>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar Toggle Button -->
+    <button id="toggleSidebar" class="lg:hidden fixed top-4 left-4 bg-green-500 text-white px-4 py-2 rounded-full shadow-md">
+      ☰
+    </button>
+
+  </div>
+
+  <!-- JavaScript for Sidebar Toggle and Chart -->
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const toggleButton = document.getElementById('toggleSidebar');
+
+    toggleButton.addEventListener('click', () => {
+      sidebar.classList.toggle('hidden');
+    });
+
+    // Chart.js for Revenue Graph
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+        datasets: [{
+          label: 'Revenue ($)',
+          data: [12000, 19000, 30000, 50000, 20000, 30000],
+          borderColor: 'rgba(34, 197, 94, 1)',
+          backgroundColor: 'rgba(34, 197, 94, 0.2)',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
