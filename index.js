@@ -7,6 +7,7 @@ import userController from "./routes/user.js"
 import dbConnection from "./config/db.js"
 import { fileURLToPath } from 'url';
 import dotenv from "dotenv";
+import { title } from 'process';
 dotenv.config({});
 
 const __filename = fileURLToPath(import.meta.url);
@@ -45,6 +46,9 @@ app.get("/account/address", (req, res) => {
   res.render("account_address/index.ejs", { title: 'Account Address' });
 })
 
+app.get("/product",(req,res)=>{
+  res.render("seller/Product/index.ejs",{title:"Create a new Product"})
+})
 app.get('/product/:id', (req, res) => {
   const { id } = req.params;
   const product = products.find(product => product.id === Number(id));

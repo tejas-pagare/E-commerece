@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  name: {
+  firstname: {
+    type: String,
+    required: true,
+  },
+  lastname: {
     type: String,
     required: true,
   },
@@ -25,6 +29,12 @@ const userSchema = new mongoose.Schema({
       ref: 'Product',
     },
   ],
+  cart: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
@@ -38,7 +48,7 @@ const userSchema = new mongoose.Schema({
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {
- 
+
   this.updatedAt = Date.now();
   next();
 });

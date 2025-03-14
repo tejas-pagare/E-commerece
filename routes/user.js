@@ -3,158 +3,105 @@ import path from 'path';
 import { promises as fs } from 'fs';
 import products from '../data/products.js';
 import { error } from 'console';
-
-
+import User from '../models/user.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 const router = express.Router();
 router.get("/login", (req, res) => {
   res.render('user/login.ejs', { title: 'login', error: "" })
 })
+
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
   try {
-
-    const filePath = path.join('C:/Users/HP/Desktop/FFSD/FFSD main project/data/user.json');
-    const fileData = await fs.readFile(filePath, 'utf-8');
-    const users = JSON.parse(fileData || '[]');
-    const user = users.find(user => user.email === email && user.password === password);
-    if (!user) {
-      return res.render("user/login", { title: 'login', error: "Invalid email or password" });
+    const { email, password } = req.body;
+    const userCheck = await User.findOne({ email });
+    if (!userCheck) {
+      return res.status(404).json({
+        message: "User Don't exists",
+        success: false
+      })
     }
-    console.log('User logged in:', user);
-    return res.render("homepage/index.ejs", { products, title: "Homepage" });
+
+    const token = jwt.sign({ userId: userCheck._id }, "JWT_SECRET");
+    res.cookie.token = token;
+    res.status(200).json({
+      message: "Logged in successfully",
+      success: true,
+      user: userCheck,
+      token
+    })
+
+
   } catch (error) {
-    console.error("Error during login:", error);
-    return res.status(500).send("Internal Server Error");
+    console.log(error)
+    res.status(500).json({
+      message: "Error logging in",
+      success: false
+    })
   }
-});
+})
+
+
 
 router.get("/signup", (req, res) => {
   res.render('user/signup.ejs', { title: 'signup' })
 })
+
 router.post("/signup", async (req, res) => {
-  const filePath = path.join('C:/Users/HP/Desktop/FFSD/FFSD main project/data/user.json');
-  let newUser = req.body;
-  newUser = { ...newUser, cart: [], profilePhoto: "", address: "" }
   try {
-    let users = [];
-    try {
-      const existingData = await fs.readFile(filePath, 'utf-8');
-      users = JSON.parse(existingData);
-    } catch (error) {
-      console.log('user.json not found or empty, initializing a new one.');
+    const { firstname, lastname, password, email, role } = req.body;
+    const userCheck = await User.findOne({ email });
+    if (userCheck) {
+      return res.status(404).json({
+        message: "User already exists",
+        success: false
+      })
     }
-    users.push(newUser);
-    await fs.writeFile(filePath, JSON.stringify(users, null, 2));
 
-    console.log('New user saved:', newUser);
-    return res.redirect("/");
-  } catch (error) {
-    console.error('Error writing to user.json:', error);
-    return res.status(500).send("Internal Server Error");
-  }
-});
+    const hashPassword = await bcrypt.hash(password, 10);
+    console.log(hashPassword);
+    const user = User.create({
+      firstname, lastname, password: hashPassword, email, role: role.toLowerCase()
+    });
+    (await user).save()
 
-router.post("/update", async (req, res) => {
-  const { userId, firstName, lastName, email, profilePhoto, address } = req.body;
-  try {
-    const filePath = path.join('C:/Users/HP/Desktop/FFSD/FFSD main project/data/user.json');
-    const fileData = await fs.readFile(filePath, 'utf-8');
-
-    const users = JSON.parse(fileData || '[]');
-
-    // Find the user by userId
-    const userIndex = users.findIndex(user => user.id === userId);
-    users[userIndex] = { ...users[userIndex], firstName, lastName, email, profilePhoto, address };
-    await fs.writeFile(filePath, JSON.stringify(users, null, 2));
     return res.status(200).json({
-      message: "User details updated successfully",
-      user: users[userIndex]
+      message: "Account created successfully  ",
+      success: true,
+      user
     })
-
-  } catch {
-    console.error('Error writing to user.json:', error);
-    return res.status(500).send("Internal Server Error");
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Error creating account",
+      success: false
+    })
   }
 })
 
-router.post("/cart/:id", async (req, res) => {
+
+router.get("/cart/add/:id", (req, res) => {
   try {
-    const productId = parseInt(req.params.id);
-    const { userId, method } = req.body;
-
-    const filePath = path.join('C:/Users/HP/Desktop/FFSD/FFSD main project/data/user.json');
-    const fileData = await fs.readFile(filePath, 'utf-8');
-
-    const users = JSON.parse(fileData || '[]');
-
-    // Find the user by userId
-    const userIndex = users.findIndex(user => user.id === userId);
-
-    if (userIndex === -1) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Check if the product is already in the cart
-    const cartItem = users[userIndex].cart.find(item => item.productId === productId);
-
-    if (method === 'add') {
-      if (cartItem) {
-        // Increase quantity if product already in cart
-        cartItem.quantity += 1;
-      } else {
-        // Add new product with quantity 1 if not in cart
-        users[userIndex].cart.push({ productId, quantity: 1 });
-      }
-    } else if (method === 'decrease') {
-      if (cartItem) {
-        if (cartItem.quantity > 1) {
-          // Decrease quantity if greater than 1
-          cartItem.quantity -= 1;
-        } else {
-          // Remove product if quantity is 1
-          users[userIndex].cart = users[userIndex].cart.filter(item => item.productId !== productId);
-        }
-      } else {
-        return res.status(400).json({ message: 'Product not found in cart' });
-      }
-    } else {
-      return res.status(400).json({ message: 'Invalid method' });
-    }
-
-    // Save updated users array to file
-    await fs.writeFile(filePath, JSON.stringify(users, null, 2));
-
-    return res.status(200).json({ message: 'Cart updated successfully', cart: users[userIndex].cart });
 
   } catch (error) {
-    console.error('Error updating cart:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+
   }
 })
 
-router.get("/cart", async (req, res) => {
-
-  const { userId } = req.body;
-
-  const filePath = path.join('C:/Users/HP/Desktop/FFSD/FFSD main project/data/user.json');
+router.get("/cart/remove/:id", (req, res) => {
   try {
 
-    const fileData = await fs.readFile(filePath, 'utf-8');
-
-    const users = JSON.parse(fileData || '[]');
-
-    // Find the user by userId
-    const userIndex = users.findIndex(user => user.id === userId);
-    return res.status(200).json({
-      cart: users[userIndex].cart,
-      message: "cart retireved successfully"
-    })
   } catch (error) {
-    console.error('Error updating cart:', error);
-    return res.status(500).json({ message: 'Internal server error' });
-  }
 
+  }
+})
+
+router.delete("/cart/remove/:id", (req, res) => {
+  try {
+
+  } catch (error) {
+
+  }
 })
 
 export default router;

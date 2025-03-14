@@ -1,0 +1,82 @@
+<body>
+  
+  <div class="bg-gray-100 p-6">
+  
+    <!-- Header Section -->
+    <header class="mb-8">
+        <nav class="text-sm text-gray-500 mb-4">Dashboard &gt; Products &gt; Add Product</nav>
+        <h1 class="text-3xl font-bold text-gray-800">Add New Product</h1>
+    </header>
+  
+    <form class="bg-white p-8 rounded-lg shadow-md space-y-8">
+  
+        <!-- Product Information Section -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Product Information</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="text" placeholder="Title (Product Name)" class="p-3 border rounded-lg w-full" required>
+  
+                <select class="p-3 border rounded-lg w-full" required>
+                    <option value="">Select Category</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="accessories">Accessories</option>
+                </select>
+  
+                <input type="number" placeholder="Quantity" class="p-3 border rounded-lg w-full">
+  
+            </div>
+<!--   
+            <div class="mt-6 border-2 border-dashed border-gray-300 p-6 text-center rounded-lg">
+                <p class="text-gray-500">Drag & drop images here or <span class="text-blue-600 cursor-pointer">browse</span></p>
+            </div> -->
+            <input type="text" placeholder="Photo Link" class="p-3 mt-4 border rounded-lg w-full" required>
+  
+
+        </section>
+  
+        <!-- Product Descriptions Section -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Product Description</h2>
+            <textarea placeholder="Enter product description" class="p-3 border rounded-lg w-full h-32"></textarea>
+        </section>
+  
+        <!-- Stock and Status Section -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Stock and Status</h2>
+           
+  
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="text" placeholder="Product Code" class="p-3 border rounded-lg w-full">
+                <input type="text" placeholder="Product SKU" class="p-3 border rounded-lg w-full">
+  
+            </div>
+        </section>
+  
+        <!-- Pricing Section -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Pricing</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="number" placeholder="Regular Price" class="p-3 border rounded-lg w-full">
+                <input type="number" placeholder="Sale Price" class="p-3 border rounded-lg w-full">
+            </div>
+        </section>
+  
+        <!-- Meta Data Section -->
+        <section>
+            <h2 class="text-xl font-semibold mb-4">Meta Data</h2>
+            <input type="text" placeholder="Meta Title" class="p-3 border rounded-lg w-full mb-6">
+            <textarea placeholder="Meta Description" class="p-3 border rounded-lg w-full h-24"></textarea>
+        </section>
+  
+        <!-- Footer Section -->
+        <footer class="flex justify-between mt-8">
+            <button type="button" class="text-gray-600 hover:underline">Back to Product</button>
+            <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700">Create Product</button>
+        </footer>
+  
+    </form>
+  
+  </div>
+
+</body>
