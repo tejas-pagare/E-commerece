@@ -99,6 +99,7 @@ Once you've made further changes to the repository (such as editing or adding fi
 ```bash
 git status  # Check the changes
 git pull origin master
+in staring of  your work everytime
 git add .  # Stage changes
 git commit -m "Your commit message"  # Commit changes
 git push origin branch-name  # Push changes to your fork
