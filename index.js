@@ -3,6 +3,7 @@ const app = express();
 import path from "path"
 import expressLayouts from 'express-ejs-layouts'
 import products from './data/products.js';
+import blogPosts from "./data/blogId.json" assert { type: "json" };
 import userController from "./routes/user.js"
 import productRouter from "./routes/product.js"
 import dbConnection from "./config/db.js"
@@ -44,7 +45,16 @@ app.get("/account", (req, res) => {
   res.render("account/index.ejs", { title: 'Account' });
 })
 
+app.get("/blog/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const blog = blogPosts.find(post => post.id === id);
 
+  if (!blog) {
+      return res.status(404).send("Blog post not found");
+  }
+
+  res.render("blog_post/article.ejs", {title:"Blog Article"  , blog });
+});
 
 app.get("/account/address", (req, res) => {
   res.render("account_address/index.ejs", { title: 'Account Address' });

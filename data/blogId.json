@@ -1,0 +1,124 @@
+[
+    {
+        "id": 1,
+        "title": "Latest iPhone 15 Pro - Revolutionary Camera",
+        "image": "https://imgs.search.brave.com/IqBfT2RYlBl8sW8_OFG0Jh-a_cGI0CT1YMgYgEBBFOU/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMubWFjcnVtb3Jz/LmNvbS9hcnRpY2xl/LW5ldy8yMDIyLzA1/L2lwaG9uZS0xNS1z/aXplcy5qcGc",
+        "date": "January 15, 2024",
+        "description": "The iPhone 15 Pro is a game-changer, featuring an industry-leading triple-lens camera with cutting-edge periscope zoom technology. Capture professional-quality photos with ultra-high resolution and stunning night mode enhancements. Powered by the A17 Bionic chip, it offers blazing-fast performance and AI-enhanced imaging. The titanium frame ensures durability while keeping the phone lightweight. If you're looking for innovation, performance, and style, the iPhone 15 Pro is your ultimate smartphone.",
+        "category": "Technology",
+        "author": "John Doe",
+        "readingTime": "5 min"
+    },
+    {
+        "id": 2,
+        "title": "Professional Gaming Setup Collection",
+        "image": "https://imgs.search.brave.com/-jEzrCajphhuRUWCpoMgA-LUYlX4qTUJKK_9Kb4_nME/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly93d3cu/c3R1ZGVudGJlYW5z/LmNvbS9ibG9nL3dw/LWNvbnRlbnQvdXBs/b2Fkcy8yMDI0LzEx/L2Jlbi1pd2FyYS1w/czUtc2V0dXAtZTE3/MzE5MjY3NTczMDEu/anBn",
+        
+        "date": "January 14, 2024",
+        "description": "Elevate your gaming experience with a top-tier professional setup! Featuring an ultra-responsive mechanical keyboard, a high-DPI gaming mouse, and a 240Hz curved monitor, this collection is built for speed and precision. With an ergonomic gaming chair and immersive RGB lighting, your gaming space will be both stylish and comfortable. Get ready to dominate the competition with next-level equipment designed for peak performance!",
+        "category": "Gaming",
+        "author": "Jane Smith",
+        "readingTime": "7 min"
+    },
+    {
+        "id": 3,
+        "title": "Premium Fitness Equipment Set",
+        "image": "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=800&auto=format",
+        "date": "January 12, 2024",
+        "description": "Take your fitness journey to the next level with this premium workout set. Featuring adjustable dumbbells, resistance bands, a smart treadmill, and an AI-powered personal trainer, this collection is designed for serious fitness enthusiasts. Whether you're focusing on strength, cardio, or flexibility, this equipment ensures maximum results with minimal effort. Achieve your dream physique from the comfort of your home!",
+        "category": "Health & Fitness",
+        "author": "Mike Johnson",
+        "readingTime": "6 min"
+    },
+    {
+        "id": 4,
+        "title": "Smart 4K OLED TV - Cinema Experience",
+        "image": "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800&auto=format",
+        "date": "January 10, 2024",
+        "description": "Immerse yourself in a next-gen cinematic experience with the latest Smart 4K OLED TV. Featuring ultra-rich contrast, stunning colors, and Dolby Atmos surround sound, this TV transforms your living room into a theater. AI-powered upscaling ensures all your favorite content looks sharper than ever. Whether you're streaming, gaming, or watching live sports, this OLED TV delivers unmatched visual and audio quality.",
+        "category": "Entertainment",
+        "author": "Emily Davis",
+        "readingTime": "4 min"
+    },
+    {
+        "id": 5,
+        "title": "Professional DSLR Camera Kit",
+        "image": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format",
+        "date": "January 8, 2024",
+        "description": "Unleash your inner photographer with this high-performance DSLR camera kit. Equipped with a powerful sensor, multiple lenses, and advanced stabilization technology, this kit allows you to capture stunning landscapes, portraits, and action shots. Perfect for both beginners and professionals, this camera setup offers endless creative possibilities!",
+        "category": "Photography",
+        "author": "Daniel Lee",
+        "readingTime": "6 min"
+    },
+    {
+        "id": 6,
+        "title": "Limited Edition Sports Sneakers",
+        "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format",
+        "date": "January 5, 2024",
+        "description": "Step up your game with these limited-edition sports sneakers. Designed for both style and performance, these shoes feature ultra-lightweight materials, shock-absorbing soles, and breathable mesh fabric. Whether you're running, training, or just making a fashion statement, these sneakers provide the perfect blend of comfort and durability.",
+        "category": "Fashion",
+        "author": "Sarah Wilson",
+        "readingTime": "5 min"
+    },
+    {
+        "id": 7,
+        "title": "Best Laptops for Productivity in 2024",
+        "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format",
+        "date": "January 3, 2024",
+        "description": "Discover the best laptops of 2024, optimized for productivity and efficiency. From ultra-portable models with long battery life to powerhouse machines with high-end graphics, this guide helps you choose the perfect laptop for work, gaming, or creativity. Stay ahead of the curve with cutting-edge technology and premium performance!",
+        "category": "Technology",
+        "author": "Chris Evans",
+        "readingTime": "6 min"
+    },
+    {
+        "id": 8,
+        "title": "Must-Have Accessories for Your PC",
+        "image": "https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?w=800&auto=format",
+        "date": "January 1, 2024",
+        "description": "Boost your PC experience with these must-have accessories! From high-speed external storage to ergonomic peripherals and customizable RGB lighting, these gadgets will enhance your setup. Whether you’re a gamer, a designer, or a casual user, these accessories ensure maximum efficiency and convenience.",
+        "category": "Gadgets",
+        "author": "David Brown",
+        "readingTime": "5 min"
+    },
+    {
+        "id": 9,
+        "title": "Top 10 Travel Destinations for 2024",
+        "image": "https://imgs.search.brave.com/3GVMWcgUizSnup7m_onGyEa8HldwTACN1FZs_hpOsjE/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzU0LzNj/L2VlLzU0M2NlZTJi/MTYyOTZkZWY3ZjYz/ZTE2NGI2NjgyMjlm/LmpwZw",
+        
+        "date": "December 30, 2023",
+        "description": "Pack your bags and get ready for an adventure! Explore the top 10 must-visit destinations of 2024, featuring breathtaking landscapes, vibrant cultures, and unforgettable experiences. Whether you love tropical beaches, historic cities, or thrilling outdoor escapades, this list has something for every traveler!",
+        "category": "Travel",
+        "author": "Olivia Carter",
+        "readingTime": "7 min"
+    },
+    {
+        "id": 10,
+        "title": "The Future of AI in Everyday Life",
+        "image": "https://images.unsplash.com/photo-1556740714-a8395b3bf30f?w=800&auto=format",
+        "date": "December 28, 2023",
+        "description": "AI is transforming our world! From smart assistants and self-driving cars to personalized recommendations and medical innovations, artificial intelligence is making life easier and more efficient. Learn how AI is shaping the future and how you can take advantage of these groundbreaking advancements.",
+        "category": "Science & Tech",
+        "author": "Sophia Miller",
+        "readingTime": "6 min"
+    },
+    {
+        "id": 11,
+        "title": "Essential Kitchen Gadgets for 2024",
+        "image":"https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800&auto=format",
+        "date": "December 25, 2023",
+        "description": "Upgrade your cooking game with these essential kitchen gadgets! From smart blenders to automated coffee makers, these tools make meal preparation faster and easier. Perfect for food lovers, home chefs, and busy individuals who love convenience in the kitchen!",
+        "category": "Lifestyle",
+        "author": "James Anderson",
+        "readingTime": "5 min"
+    },
+    {
+        "id": 12,
+        "title": "Best Books to Read in 2024",
+        "image": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&auto=format",
+        "date": "December 22, 2023",
+        "description": "Expand your mind with the best books of 2024! From thrilling fiction to insightful self-development reads, this curated list offers something for every book lover. Whether you love novels, business strategies, or history, these books will inspire and entertain you.",
+        "category": "Books",
+        "author": "Emma Wilson",
+        "readingTime": "6 min"
+    }
+]
