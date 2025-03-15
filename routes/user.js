@@ -13,7 +13,7 @@ const router = express.Router();
 router.get('/', isAuthenticated,async (req, res) => {
   try {
     const products = await Product.find({});
-    res.render('homepage/index.ejs', { title: 'Home', products });
+    res.render('homepage/index.ejs', { title: 'Home', products,role:req.role });
 
   } catch (error) {
     console.log(error);
@@ -21,7 +21,7 @@ router.get('/', isAuthenticated,async (req, res) => {
 }
 )
 router.get("/login", (req, res) => {
-  res.render('user/login.ejs', { title: 'login', error: "" })
+  res.render('user/login.ejs', { title: 'login', error: "" ,role:"admin" });
 })
 
 router.post("/login", async (req, res) => {
@@ -32,7 +32,7 @@ router.post("/login", async (req, res) => {
      return res.redirect("/api/v1/user/login")
     }
 
-    const token = jwt.sign({ userId: userCheck._id }, "JWT_SECRET", { expiresIn: "1h" });
+    const token = jwt.sign({ userId: userCheck._id }, "JWT_SECRET", { expiresIn: "5h" });
 
     console.log(token);
 
@@ -55,7 +55,11 @@ router.post("/login", async (req, res) => {
 
 
 router.get("/signup", (req, res) => {
+
+  res.render('user/signup.ejs', { title: 'signup',role:"admin" })
+
   res.render('user/signup.ejs', { title: 'signup' })
+
 })
 
 router.post("/signup", async (req, res) => {
@@ -81,11 +85,12 @@ router.post("/signup", async (req, res) => {
 });
 
 router.get("/logout",isAuthenticated,(req,res)=>{
-
+  res.clearCookie("token");
+return res.redirect("/api/v1/user/login");
 })
 
 router.get("/cart",(req,res)=>{
-  res.render("cart/index.ejs",{title:"Cart"});
+  res.render("cart/index.ejs",{title:"Cart",role:req.role});
 })
 router.post("/cart",isAuthenticated,async(req,res)=>{
   try {
@@ -213,6 +218,8 @@ router.delete("/cart/remove/:id", isAuthenticated, async (req, res) => {
       messag: "Server error"
     })
   }
-})
+});
+
+
 
 export default router;
