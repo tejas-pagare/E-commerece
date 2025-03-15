@@ -46,7 +46,7 @@ app.get("/account", isAuthenticated,(req, res) => {
   res.render("account/index.ejs", { title: 'Account',role:req.role });
 })
 
-app.get("/blog/:id", (req, res) => {
+app.get("/blog/:id", isAuthenticated,(req, res) => {
   const id = parseInt(req.params.id);
   const blog = blogPosts.find(post => post.id === id);
 
@@ -54,7 +54,7 @@ app.get("/blog/:id", (req, res) => {
       return res.status(404).send("Blog post not found");
   }
 
-  res.render("blog_post/article.ejs", {title:"Blog Article"  , blog });
+  res.render("blog_post/article.ejs", {title:"Blog Article"  , blog,role:req.role });
 });
 
 app.get("/account/address", isAuthenticated,(req, res) => {
@@ -72,11 +72,11 @@ app.get('/product/:id', (req, res) => {
   res.render('product/index.ejs', { title: 'Product page', product, filteredProducts })
 });
 
-app.get('/blog', (req, res) => res.render('blog/index.ejs', { title: 'Blog Page' }));
-app.get('/contact', (req, res) => res.render('contact/index.ejs', { title: 'Contact Page' }));
+app.get('/blog',isAuthenticated, (req, res) => res.render('blog/index.ejs', { title: 'Blog Page',role:req.role }));
+app.get('/contact',isAuthenticated, (req, res) => res.render('contact/index.ejs', { title: 'Contact Page',role:req.role }));
 
-app.get("/dashboard",(req,res)=>{
-  res.render("admin/dashboard/index.ejs",{title: 'Dashboard'});
+app.get("/dashboard",isAuthenticated,(req,res)=>{
+  res.render("admin/dashboard/index.ejs",{title: 'Dashboard',role:req.role});
 })
 const PORT = 8000;
 app.listen(PORT, () => {
