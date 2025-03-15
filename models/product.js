@@ -55,6 +55,10 @@ const productSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  stock:{
+    type:Boolean,
+    default:true
+  }
 });
 
 // Middleware to update 'updatedAt' before saving

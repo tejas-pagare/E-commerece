@@ -12,6 +12,7 @@ import { title } from 'process';
 import cors from "cors"
 import cookieParser  from "cookie-parser";
 import Product from './models/product.js';
+import isAuthenticated from './middleware]/isAuthenticated.js';
 dotenv.config({});
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,14 +41,14 @@ app.use("/api/v1/product",productRouter);
 
 
 
-app.get("/account", (req, res) => {
-  res.render("account/index.ejs", { title: 'Account' });
+app.get("/account", isAuthenticated,(req, res) => {
+  res.render("account/index.ejs", { title: 'Account',role:req.role });
 })
 
 
 
-app.get("/account/address", (req, res) => {
-  res.render("account_address/index.ejs", { title: 'Account Address' });
+app.get("/account/address", isAuthenticated,(req, res) => {
+  res.render("account_address/index.ejs", { title: 'Account Address',role:req.role });
 })
 
 app.get("/product",(req,res)=>{
