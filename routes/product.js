@@ -32,7 +32,7 @@ router.post("/create", isAuthenticated,async (req, res) => {
     const user = await User.findById(userId);
     user.products.push(newProduct);
     await user.save();
-    return res.redirect("/api/v1/user");
+    return res.redirect("/api/v1/product");
 
 
   } catch (error) {
@@ -46,12 +46,11 @@ router.post("/create", isAuthenticated,async (req, res) => {
 
 router.get("/",isAuthenticated,async(req,res)=>{
 try {
-  console.log("/ post")
+  
   const userId = req.userId;
   const productListed = await User.findById(userId).populate("products").select("products");
-  res.json({
-    productListed:productListed.products,
-  })
+ console.log(productListed)
+  return res.render("seller/listedProduct/index.ejs",{title:"Listed Product",role:req?.role,productListed:productListed?.products})
 } catch (error) {
   res.json({
     message:"Intenal error"

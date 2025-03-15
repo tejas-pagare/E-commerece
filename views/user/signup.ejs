@@ -17,22 +17,25 @@
         <h1 class="text-3xl font-bold mb-4">Get Start Shopping</h1>
         <p class="text-gray-600 mb-8">Welcome to SwiftMart! Enter your email to get started.</p>
   
-        <form class="space-y-4" action="/api/v1/user/signup" method="POST">
+        <form class="space-y-4" action="/api/v1/user/signup" method="POST" id="signupForm">
           <div>
             <label for="firstName" class="block text-sm font-medium">First Name</label>
             <input type="text" id="firstName" name="firstname" required class="mt-1 p-2 w-full border rounded-lg">
+            <p class="text-red-500 text-sm mt-1 hidden" id="firstNameError"></p>
           </div>
-  
+
           <div>
             <label for="lastName" class="block text-sm font-medium">Last Name</label>
             <input type="text" id="lastName" name="lastname" required class="mt-1 p-2 w-full border rounded-lg">
+            <p class="text-red-500 text-sm mt-1 hidden" id="lastNameError"></p>
           </div>
-  
+
           <div>
             <label for="email" class="block text-sm font-medium">Email</label>
             <input type="email" id="email" name="email" required class="mt-1 p-2 w-full border rounded-lg">
+            <p class="text-red-500 text-sm mt-1 hidden" id="emailError"></p>
           </div>
-  
+
           <div>
             <label for="password" class="block text-sm font-medium">Password</label>
             <div class="relative">
@@ -41,6 +44,7 @@
                 👁️
               </button>
             </div>
+            <p class="text-red-500 text-sm mt-1 hidden" id="passwordError"></p>
           </div>
           <div class="relative inline-block w-64">
             <label for="role" class="block mb-2 text-sm font-medium text-gray-700">Select Role</label>
@@ -64,8 +68,60 @@
     const togglePassword = document.getElementById('togglePassword');
 
     togglePassword.addEventListener('click', () => {
-      const type = passwordInput.type === 'password' ? 'text' : 'password';
-      passwordInput.type = type;
+      passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+    });
+
+    document.getElementById('signupForm').addEventListener('submit', (event) => {
+      let isValid = true;
+
+      const firstName = document.getElementById('firstName');
+      const lastName = document.getElementById('lastName');
+      const email = document.getElementById('email');
+      const password = document.getElementById('password');
+
+      const firstNameError = document.getElementById('firstNameError');
+      const lastNameError = document.getElementById('lastNameError');
+      const emailError = document.getElementById('emailError');
+      const passwordError = document.getElementById('passwordError');
+
+      // Clear previous errors
+      firstNameError.classList.add('hidden');
+      lastNameError.classList.add('hidden');
+      emailError.classList.add('hidden');
+      passwordError.classList.add('hidden');
+
+      // Validation patterns
+      const namePattern = /^[a-z]+$/i;
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!namePattern.test(firstName.value.trim())) {
+        firstNameError.textContent = "First Name should contain only letters.";
+        firstNameError.classList.remove('hidden');
+        isValid = false;
+      }
+
+      if (!namePattern.test(lastName.value.trim())) {
+        lastNameError.textContent = "Last Name should contain only letters.";
+        lastNameError.classList.remove('hidden');
+        isValid = false;
+      }
+
+      if (!emailPattern.test(email.value.trim())) {
+        emailError.textContent = "Invalid email address.";
+        emailError.classList.remove('hidden');
+        isValid = false;
+      }
+
+      if (password.value.length < 8) {
+        passwordError.textContent = "Password must be at least 8 characters long.";
+        passwordError.classList.remove('hidden');
+        isValid = false;
+      }
+
+      // Prevent form submission if validation fails
+      if (!isValid) {
+        event.preventDefault();
+      }
     });
   </script>
 </body>

@@ -1,0 +1,46 @@
+<body>
+    <div class="bg-gray-100">
+        <div class="w-full h-screen mx-auto bg-white p-6 rounded-lg shadow-md">
+            <h1 class="text-2xl font-bold mb-4">Products</h1>
+            <div class="flex justify-between items-center mb-4">
+                <input type="text" placeholder="Search Products" class="p-2 border rounded w-1/3">
+                <a href="/api/v1/product/create">
+
+                    <button class="bg-green-500 text-white px-4 py-2 rounded">Add Product</button>
+                </a>
+            </div>
+            <table class="w-full  border-collapse bg-white">
+                <thead>
+                    <tr class="bg-gray-200 text-left">
+                        <th class="p-3 border">Image</th>
+                        <th class="p-3 border">Product Name</th>
+                        <th class="p-3 border">Category</th>
+                        <th class="p-3 border">Status</th>
+                        <th class="p-3 border">Price</th>
+                        <th class="p-3 border">Create at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% productListed.map(product => { %>
+                        <tr class="border-t">
+                            <td class="p-3 border"><img src=<%= product.image %> alt="Product" class="w-16 h-16"></td>
+                            <td class="p-3 border"><%= product.title %></td>
+                            <td class="p-3 border"><%= product.category %></td>
+                            <td class="p-3 border"><span class="bg-green-200 text-green-700 px-2 py-1 rounded">Active</span>
+                            </td>
+                            <td class="p-3 border"><%= product.price %></td>
+                            <td class="p-3 border"><%= (product.createdAt).toString().split("T")?.[0] %></td>
+                        </tr>
+                     <% }) %>
+                     <% if(productListed.length===0){ %>
+                        <div>
+                            No Product listed yet
+                        </div>
+                        <% } %>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</body>

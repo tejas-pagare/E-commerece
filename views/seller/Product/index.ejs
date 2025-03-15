@@ -73,7 +73,7 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch("/api/v1/product", {
+                const response = await fetch("/api/v1/product/create", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
