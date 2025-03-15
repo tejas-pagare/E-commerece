@@ -4,6 +4,7 @@ import path from "path"
 import expressLayouts from 'express-ejs-layouts'
 import products from './data/products.js';
 import userController from "./routes/user.js"
+import productRouter from "./routes/product.js"
 import dbConnection from "./config/db.js"
 import { fileURLToPath } from 'url';
 import dotenv from "dotenv";
@@ -22,6 +23,7 @@ app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 
 app.use("/api/v1/user", userController);
+app.use("/api/v1/product",productRouter);
 app.get('/', async (req, res) => {
   try {
     console.log(products);
@@ -60,6 +62,9 @@ app.get('/product/:id', (req, res) => {
 app.get('/blog', (req, res) => res.render('blog/index.ejs', { title: 'Blog Page' }));
 app.get('/contact', (req, res) => res.render('contact/index.ejs', { title: 'Contact Page' }));
 
+app.get("/dashboard",(req,res)=>{
+  res.render("admin/dashboard/index.ejs",{title: 'Dashboard'});
+})
 const PORT = 8000;
 app.listen(PORT, () => {
   dbConnection();

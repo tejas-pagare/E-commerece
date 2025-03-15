@@ -24,20 +24,13 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign({ userId: userCheck._id }, "JWT_SECRET");
     res.cookie.token = token;
-    res.status(200).json({
-      message: "Logged in successfully",
-      success: true,
-      user: userCheck,
-      token
-    })
+    
+    res.redirect("/")
 
 
   } catch (error) {
     console.log(error)
-    res.status(500).json({
-      message: "Error logging in",
-      success: false
-    })
+    res.redirect("/api/v1/user/login")
   }
 })
 
@@ -52,10 +45,7 @@ router.post("/signup", async (req, res) => {
     const { firstname, lastname, password, email, role } = req.body;
     const userCheck = await User.findOne({ email });
     if (userCheck) {
-      return res.status(404).json({
-        message: "User already exists",
-        success: false
-      })
+      return res.redirect("/api/v1/user/signup")
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -64,18 +54,11 @@ router.post("/signup", async (req, res) => {
       firstname, lastname, password: hashPassword, email, role: role.toLowerCase()
     });
     (await user).save()
-
-    return res.status(200).json({
-      message: "Account created successfully  ",
-      success: true,
-      user
-    })
+   
+      return res.redirect("/api/v1/user/login");
   } catch (error) {
     console.log(error);
-    return res.status(500).json({
-      message: "Error creating account",
-      success: false
-    })
+    return res.redirect("/api/v1/user/signup")
   }
 })
 

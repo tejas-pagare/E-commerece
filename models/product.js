@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
-  id: {
-    type: Number,
+  sellerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
-    unique: true,
   },
   title: {
     type: String,
@@ -26,16 +26,26 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  rating: {
-    rate: {
-      type: Number,
-      required: true,
-    },
-    count: {
-      type: Number,
-      required: true,
-    },
+  ratingCount: {
+
+    type: Number,
+    default: 0,
+
+
   },
+
+  reviewers: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      },
+      rating: {
+        type: Number,
+        default: 0
+      }
+    }
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

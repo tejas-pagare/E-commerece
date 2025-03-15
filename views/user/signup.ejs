@@ -20,12 +20,12 @@
         <form class="space-y-4" action="/api/v1/user/signup" method="POST">
           <div>
             <label for="firstName" class="block text-sm font-medium">First Name</label>
-            <input type="text" id="firstName" name="firstName" required class="mt-1 p-2 w-full border rounded-lg">
+            <input type="text" id="firstName" name="firstname" required class="mt-1 p-2 w-full border rounded-lg">
           </div>
   
           <div>
             <label for="lastName" class="block text-sm font-medium">Last Name</label>
-            <input type="text" id="lastName" name="lastName" required class="mt-1 p-2 w-full border rounded-lg">
+            <input type="text" id="lastName" name="lastname" required class="mt-1 p-2 w-full border rounded-lg">
           </div>
   
           <div>
@@ -41,6 +41,13 @@
                 👁️
               </button>
             </div>
+          </div>
+          <div class="relative inline-block w-64">
+            <label for="role" class="block mb-2 text-sm font-medium text-gray-700">Select Role</label>
+            <select id="role" name="role" class="w-full p-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="user">User</option>
+              <option value="seller">Seller</option>
+            </select>
           </div>
   
           <button type="submit" class="w-full bg-green-600 text-white p-2 rounded-lg hover:bg-green-700">Register</button>
