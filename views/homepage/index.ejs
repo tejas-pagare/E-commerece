@@ -103,7 +103,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     <!-- iPhone 14 Pro -->
                     <% for (let i=0; i < products.length; i++) { %>
-                        <a href=<%=`/product/${products[i].id}` %>>
+                        <a href=<%=`/api/v1/product/${products[i].id}` %>>
                             <div
                                 class="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow w-80 h-[480px] flex flex-col ">
                                 <div class="relative h-64">
@@ -129,9 +129,7 @@
                                                 <i class="fas fa-star"></i>
                                                 <i class="fas fa-star"></i>
                                             </div>
-                                            <span class="text-sm text-gray-500 ml-2">
-                                                <%=products[i].rating.rate%>
-                                            </span>
+                                         
                                         </div>
                                     </div>
                                     <div class="flex flex-col gap-3 items-start justify-between mt-4">

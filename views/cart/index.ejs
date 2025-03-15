@@ -1,48 +1,130 @@
 <body>
-  
-  <div class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-gray-100 flex items-center justify-center min-h-screen w-full">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full min-h-screen">
-        <h2 class="text-2xl font-bold mb-4">Shop Cart</h2>
-        <div class="bg-red-100 text-red-700 p-3 rounded-md mb-8 w-[40%] ">
-            You've got FREE delivery. Start <span class="font-bold">checkout now!</span>
-        </div>
-        <div class="space-y-4">
-            <div class="flex justify-between items-center border-b pb-4">
-              <div class="w-[100px] h-[100px] overflow-hidden">
-                <img class="h-full w-full object-cover object-top" src="https://fakestoreapi.com/img/51Y5NI-I5jL._AC_UX679_.jpg" alt="">
-              </div>
-                <div>
-                    <p class="font-semibold">BIYLACLESEN Women's 3-in-1 Snowboard Jacket Winter Coats</p>
-                    <button class="text-red-600 text-sm">🗑 Remove</button>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button class="px-2 py-1 bg-gray-200 rounded" onclick="updateQuantity('qty1', -1)">-</button>
-                    <span id="qty1" class="px-4">1</span>
-                    <button class="px-2 py-1 bg-gray-200 rounded" onclick="updateQuantity('qty1', 1)">+</button>
-                </div>
-                <p class="font-semibold">$21.60</p>
-            </div>
-            <div class="flex justify-between items-center border-b pb-4">
-              <div class="w-[100px] h-[100px] overflow-hidden">
-                <img class="h-full w-full object-cover object-top" src="https://fakestoreapi.com/img/71HblAHs5xL._AC_UY879_-2.jpg" alt="">
-              </div>
-                <div>
-                    <p class="font-semibold">Rain Jacket Women Windbreaker Striped Climbing Raincoats</p>
-                    <button class="text-red-600 text-sm">🗑 Remove</button>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button class="px-2 py-1 bg-gray-200 rounded" onclick="updateQuantity('qty2', -1)">-</button>
-                    <span id="qty2" class="px-4">1</span>
-                    <button class="px-2 py-1 bg-gray-200 rounded" onclick="updateQuantity('qty2', 1)">+</button>
-                </div>
-                <p class="font-semibold">$24.00</p>
-            </div>
-        </div>
-        <div class="flex justify-between mt-6">
-          <a href="/">  <button class="bg-green-600 text-white px-4 py-2 rounded">Continue Shopping</button></a>
-            <button class="bg-black text-white px-4 py-2 rounded">Proceed To Checkout</button>
-        </div>
+      <h2 class="text-2xl font-bold mb-4">Shop Cart</h2>
+
+      <div class="bg-red-100 text-red-700 p-3 rounded-md mb-8 w-[40%]">
+        You've got FREE delivery. Start <span class="font-bold">checkout now!</span>
+      </div>
+
+      <!-- Cart Items Container (Dynamically Updated) -->
+      <div id="cart-items" class="space-y-4"></div>
+
+      <!-- Actions -->
+      <div class="flex justify-between mt-6">
+        <a href="/">
+          <button class="bg-green-600 text-white px-4 py-2 rounded">Continue Shopping</button>
+        </a>
+        <button class="bg-black text-white px-4 py-2 rounded">Proceed To Checkout</button>
+      </div>
     </div>
   </div>
 
+  <script>
+    // Fetch and display cart items
+    async function fetchCart() {
+      try {
+        const response = await fetch("http://localhost:8000/api/v1/user/cart", {
+          method: "POST",
+          credentials: "include",
+        });
+
+        const data = await response.json();
+        console.log("Cart Data:", data);
+
+        if (data.cart) {
+          renderCart(data.cart);
+        }
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+      }
+    }
+
+    // Render cart dynamically
+    function renderCart(cart) {
+      const cartContainer = document.getElementById("cart-items");
+      cartContainer.innerHTML = ""; // Clear previous items
+      if(cart.length===0){
+        cartContainer.innerHTML += `
+        <img class="w-[200px] h-[200px]" src="https://media.istockphoto.com/id/898475764/vector/shopping-trolley-cart-icon-in-green-circle-vector.jpg?s=612x612&w=0&k=20&c=W_b90qFRpj_FyLyI19xWqB6EoNSuJYwMSN9nnKkE9Hk="/>
+        <div class="font-bold text-xl ">
+          Cart is Empty
+        </div>
+        `
+      }else{
+        cart.forEach((item, index) => {
+          cartContainer.innerHTML += `
+            <div class="grid grid-cols-4 items-center gap-4 border-b pb-4">
+              <!-- Product Image -->
+              <div class="w-[100px] h-[100px] overflow-hidden">
+                <img class="h-full w-full object-cover object-top rounded" src="${item.productId.image}" alt="">
+              </div>
+  
+              <!-- Product Info -->
+              <div>
+                <p class="font-semibold tracking-tighter text-sm">${item.productId.title}</p>
+                <button class="text-red-600 text-sm" onclick="removeFromCartPermanent('${item.productId._id}')">🗑 Remove</button>
+              </div>
+  
+              <!-- Quantity Control -->
+              <div class="flex items-center space-x-2">
+                <button class="px-2 py-1 bg-gray-200 rounded" onclick="removeFromCart('${item.productId._id}')">-</button>
+                <span id="qty-${item.productId._id}" class="px-4">${item.quantity}</span>
+                <button class="px-2 py-1 bg-gray-200 rounded" onclick="AddToCart('${item.productId._id}')">+</button>
+              </div>
+  
+              <!-- Product Price -->
+              <p class="font-semibold text-lg">Rs. ${item.productId.price*item.quantity}</p>
+            </div>
+          `;
+        });
+        
+      }
+    }
+
+    // Add item to cart
+    async function AddToCart(productId) {
+      console.log(productId);
+      await fetch(`http://localhost:8000/api/v1/user/cart/add/${productId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      console.log("called")
+      setTimeout(()=>{
+        fetchCart(); // Refresh cart after updating
+
+      },100); // Refresh cart after updating
+    }
+
+    // Remove item from cart
+    async function removeFromCart(productId) {
+      console.log(productId);
+      await fetch(`http://localhost:8000/api/v1/user/cart/remove/${productId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      setTimeout(()=>{
+        fetchCart(); // Refresh cart after updating
+
+      },100);
+    }
+
+    async function removeFromCartPermanent(productId) {
+      console.log(productId);
+      await fetch(`http://localhost:8000/api/v1/user/cart/remove/${productId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      setTimeout(()=>{
+        fetchCart(); // Refresh cart after updating
+
+      },100);
+    }
+
+    // Fetch cart on page load
+    window.onload = fetchCart;
+  </script>
 </body>
