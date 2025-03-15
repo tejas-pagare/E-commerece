@@ -3,7 +3,7 @@ const app = express();
 import path from "path"
 import expressLayouts from 'express-ejs-layouts'
 import products from './data/products.js';
-import blogPosts from "./data/blogId.json" assert { type: "json" };
+import blogPosts from "./data/blogId.json" with { type: "json" };
 import userController from "./routes/user.js"
 import productRouter from "./routes/product.js"
 import dbConnection from "./config/db.js"
@@ -14,6 +14,7 @@ import cors from "cors"
 import cookieParser  from "cookie-parser";
 import Product from './models/product.js';
 import isAuthenticated from './middleware]/isAuthenticated.js';
+import User from './models/user.js';
 dotenv.config({});
 
 const __filename = fileURLToPath(import.meta.url);
@@ -75,9 +76,44 @@ app.get('/product/:id', (req, res) => {
 app.get('/blog',isAuthenticated, (req, res) => res.render('blog/index.ejs', { title: 'Blog Page',role:req.role }));
 app.get('/contact',isAuthenticated, (req, res) => res.render('contact/index.ejs', { title: 'Contact Page',role:req.role }));
 
-app.get("/dashboard",isAuthenticated,(req,res)=>{
-  res.render("admin/dashboard/index.ejs",{title: 'Dashboard',role:req.role});
-})
+app.get("/dashboard", isAuthenticated, async (req, res) => {
+  try {
+    const users = await User.find({}).populate(["cart.productId", "products"]);
+    const products = await Product.find({}).populate("sellerId");
+    let totalCartAmount = 0;
+    let customerOrders = 0;
+    let sellerOrders = 0;
+    let UserCount =0;
+    users.forEach(user => {
+      if (user.role === "user") {
+        // Sum up cart value for customers
+        UserCount+=1;
+        user.cart.forEach(cartItem => {
+          if (cartItem.productId) {
+            totalCartAmount += cartItem.productId.price * cartItem.quantity;
+          }
+        });
+        customerOrders += user.cart.length;
+      } else if (user.role === "seller") {
+        // Count seller orders based on products sold
+        sellerOrders += user.products.length;
+      }
+    });
+
+    res.render("admin/dashboard/index.ejs", {
+      title: "Dashboard",
+      role: req.role,
+      totalCartAmount,
+      customerOrders,
+      CustomerCount:UserCount,
+      registeredProducts:products
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 const PORT = 8000;
 app.listen(PORT, () => {
   dbConnection();
