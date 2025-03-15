@@ -29,7 +29,7 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
     const userCheck = await User.findOne({ email });
     if (!userCheck) {
-      res.redirect("/api/v1/user/login")
+     return res.redirect("/api/v1/user/login")
     }
 
     const token = jwt.sign({ userId: userCheck._id }, "JWT_SECRET", { expiresIn: "1h" });
@@ -54,7 +54,7 @@ router.post("/login", async (req, res) => {
 
 
 
-router.get("/signup",isAuthenticated, (req, res) => {
+router.get("/signup", (req, res) => {
   res.render('user/signup.ejs', { title: 'signup' })
 })
 
