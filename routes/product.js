@@ -3,20 +3,22 @@ import Product from "../models/product.js";
 
 const router = express.Router();
 
+
+
+
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
     const product = await Product.findOne({ _id: id });
+    console.log(product);
     if (!product) {
       return res.json({
         messag: "No such product"
       });
     }
 
-    return res.json({
-      product
-    })
+    res.render('product/index.ejs', { title: 'Product page', product, filteredProducts:product })
 
   } catch (error) {
     return res.json({
