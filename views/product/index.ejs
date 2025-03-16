@@ -41,12 +41,7 @@
     
              
                 <!-- Quantity Selector -->
-                <div class="flex items-center mt-6">
-                    <button onclick="removeFromCart(`<%= product._id.toString() %>`)"  class="bg-gray-200 text-xl px-4 py-2 rounded-l-lg">-</button>
-                    <span id="quantity" class="px-6 py-2 border-t border-b border-gray-300">1</span>
-                    <button onclick="AddToCart(`<%= product._id.toString() %>`)"  class="bg-gray-200 text-xl px-4 py-2 rounded-r-lg">+</button>
-                </div>
-    
+               
                 <button onclick="AddToCart(`<%= product._id.toString() %>`)" class="mt-8 bg-green-600 text-white text-lg px-6 py-3 rounded-lg hover:bg-green-700">Add to Cart</button>
     
                 <!-- Additional Info -->
@@ -99,7 +94,7 @@
     <script>
         function AddToCart(productId){
             console.log(productId)
-            fetch(`http://localhost:8000/api/v1/user/cart/add/${productId}`,{
+            fetch(`https://e-commerece-7y4h.onrender.com/api/v1/user/cart/add/${productId}`,{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -110,7 +105,7 @@
 
         function removeFromCart(productId){
             console.log(productId)
-            fetch(`http://localhost:8000/api/v1/user/cart/remove/${productId}`,{
+            fetch(`https://e-commerece-7y4h.onrender.com/api/v1/user/cart/remove/${productId}`,{
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
