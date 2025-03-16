@@ -76,38 +76,53 @@ app.get('/product/:id', (req, res) => {
 app.get('/blog',isAuthenticated, (req, res) => res.render('blog/index.ejs', { title: 'Blog Page',role:req.role }));
 app.get('/contact',isAuthenticated, (req, res) => res.render('contact/index.ejs', { title: 'Contact Page',role:req.role }));
 
-app.get("/dashboard", isAuthenticated, async (req, res) => {
-  try {
-    const users = await User.find({}).populate(["cart.productId", "products"]);
-    const products = await Product.find({}).populate("sellerId");
-    let totalCartAmount = 0;
-    let customerOrders = 0;
-    let sellerOrders = 0;
-    let UserCount =0;
-    users.forEach(user => {
-      if (user.role === "user") {
-        // Sum up cart value for customers
-        UserCount+=1;
-        user.cart.forEach(cartItem => {
-          if (cartItem.productId) {
-            totalCartAmount += cartItem.productId.price * cartItem.quantity;
-          }
-        });
-        customerOrders += user.cart.length;
-      } else if (user.role === "seller") {
-        // Count seller orders based on products sold
-        sellerOrders += user.products.length;
-      }
-    });
+app.get("/api/v1/admin/login",(req,res)=>{
+  return res.render('admin/login/index.ejs', { title: 'login',role:"admin"})
+})
 
-    res.render("admin/dashboard/index.ejs", {
-      title: "Dashboard",
-      role: req.role,
-      totalCartAmount,
-      customerOrders,
-      CustomerCount:UserCount,
-      registeredProducts:products
-    });
+app.get("/api/v1/admin/dashboard",async(req,res)=>{
+
+  const users = await User.find({}).populate(["cart.productId", "products"]);
+  const products = await Product.find({}).populate("sellerId");
+  let totalCartAmount = 0;
+  let customerOrders = 0;
+  let sellerOrders = 0;
+  let UserCount =0;
+  users.forEach(user => {
+    if (user.role === "user") {
+      // Sum up cart value for customers
+      UserCount+=1;
+      user.cart.forEach(cartItem => {
+        if (cartItem.productId) {
+          totalCartAmount += cartItem.productId.price * cartItem.quantity;
+        }
+      });
+      customerOrders += user.cart.length;
+    } else if (user.role === "seller") {
+      // Count seller orders based on products sold
+      sellerOrders += user.products.length;
+    }
+  });
+
+  res.render("admin/dashboard/index.ejs", {
+    title: "Dashboard",
+    role: "admin",
+    totalCartAmount,
+    customerOrders,
+    CustomerCount:UserCount,
+    registeredProducts:products
+  });
+})
+app.post("/api/v1/admin/dashboard", async (req, res) => {
+  try {
+    const {email,password} = req.body;
+    console.log(email,password)
+    if(email!=="adminLogin@gmail.com"&&password!=="swiftmart"){
+      res.redirect("/api/v1/user/login");
+    }
+console.log("jii")
+    
+    res.redirect("/api/v1/admin/dashboard");
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");

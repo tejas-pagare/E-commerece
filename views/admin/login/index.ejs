@@ -1,0 +1,100 @@
+<body class="flex items-center justify-center min-h-screen bg-gray-100 w-screen min-h-screen">
+  <div class="flex flex-col lg:flex-row items-center justify-center bg-white rounded-2xl shadow-lg overflow-hidden w-screen min-h-screen mx-auto">
+
+      <!-- Left Section: SVG Image -->
+      <div class=" sm:w-1/2 hidden md:flex items-center justify-center ">
+          <img src="https://freshcart-next-js.vercel.app/images/svg-graphics/signin-g.svg" alt="Sign in"
+              class="w-full h-auto">
+      </div>
+
+      <!-- Right Section: Login Form -->
+      <div class="w-full max-w-2xl mx-auto  p-8 flex flex-col justify-center">
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome Admin</h2>
+          <p class="text-gray-600 mb-8">Please Enter your credentials</p>
+
+          <form action="/api/v1/admin/dashboard" method="post" id="loginForm">
+              <div class="mb-4">
+                  <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                  <input name="email" type="email" id="email" placeholder="Enter your email"
+                      class="mt-1 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <p class="text-red-500 text-sm mt-1 hidden" id="emailError"></p>
+              </div>
+
+              <div class="mb-4 relative">
+                  <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                  <input name="password" type="password" id="password" placeholder="Enter your password"
+                      class="mt-1 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                  <button type="button" id="togglePassword"
+                      class="absolute right-3 top-10 text-gray-600 hover:text-gray-800">👁️</button>
+                  <p class="text-red-500 text-sm mt-1 hidden" id="passwordError"></p>
+              </div>
+          
+                      <button type="submit" id="submit-btn"
+                          class=" w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">Sign
+                          In</button>
+          </form>
+
+          <p class="mt-6 text-center text-gray-700">Don't have an account? <a href="/api/v1/user/signup"
+                  class="text-green-600 hover:underline">Sign Up</a></p>
+          <p class="mt-6 text-center text-gray-700">Are you admin?<a href="/api/v1/admin/login"
+                  class="text-green-600 hover:underline">Admin Sign Up</a></p>
+      </div>
+  </div>
+
+  <script>
+
+      // Toggle password visibility
+      const passwordInput = document.getElementById('password');
+      const togglePassword = document.getElementById('togglePassword');
+
+      togglePassword.addEventListener('click', () => {
+          passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+      });
+
+      // Auto-hide toast after 4 seconds
+      // window.addEventListener('DOMContentLoaded', () => {
+      //     const toast = document.getElementById('toast');
+      //     if (toast) {
+      //         setTimeout(() => toast.style.opacity = '0', 4000);
+      //     }
+      // });
+
+
+      document.getElementById('loginForm').addEventListener('submit', (event) => {
+          let isValid = true;
+
+          const email = document.getElementById('email');
+          const password = document.getElementById('password');
+
+
+          const emailError = document.getElementById('emailError');
+          const passwordError = document.getElementById('passwordError');
+
+          emailError.classList.add('hidden');
+          passwordError.classList.add('hidden');
+
+          const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+          if (!emailPattern.test(email.value.trim())) {
+              emailError.textContent = "Invalid email address.";
+              emailError.classList.remove('hidden');
+              isValid = false;
+          }
+
+          if (password.value.length < 2) {
+              passwordError.textContent = "Password must be at least 2 characters long.";
+              passwordError.classList.remove('hidden');
+              isValid = false;
+          }
+
+          // Prevent form submission if validation fails
+          if (!isValid) {
+              event.preventDefault();
+          }
+      });
+      // Handle form submission without page refresh
+
+
+  </script>
+</body>

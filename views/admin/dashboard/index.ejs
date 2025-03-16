@@ -10,10 +10,15 @@
       <div class="p-4">
         <div class="bg-gray-100 rounded-lg p-8 mb-6 flex items-center"
           style="background-image: url('/api/placeholder/800/200'); background-size: cover; background-position: right;">
-          <div class="w-1/2">
-            <h1 class="text-3xl font-bold text-gray-800">Welcome back! SwiftMart</h1>
-            <p class="text-gray-600 my-2">SwiftMart is simple & clean design for developer and designer.</p>
-
+          <div class="flex justify-between w-full">
+            <div class="w-1/2">
+              <h1 class="text-3xl font-bold text-gray-800">Welcome back! SwiftMart</h1>
+              <p class="text-gray-600 my-2">SwiftMart is simple & clean design for developer and designer.</p>
+             
+            </div>
+            <form action="/api/v1/user/logout" method="get">
+              <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Logout</button>
+            </form>
           </div>
         </div>
 
@@ -27,7 +32,9 @@
                 <i class="fas fa-dollar-sign"></i>
               </div>
             </div>
-            <h3 class="text-3xl font-bold text-gray-800"><%= Math.round(totalCartAmount) %></h3>
+            <h3 class="text-3xl font-bold text-gray-800">
+              <%= Math.round(totalCartAmount) %>
+            </h3>
             <p class="text-gray-500 text-sm">Monthly revenue</p>
           </div>
 
@@ -39,7 +46,9 @@
                 <i class="fas fa-shopping-cart"></i>
               </div>
             </div>
-            <h3 class="text-3xl font-bold text-gray-800"><%= customerOrders %></h3>
+            <h3 class="text-3xl font-bold text-gray-800">
+              <%= customerOrders %>
+            </h3>
             <p class="text-gray-500 text-sm">35+ New Sales</p>
           </div>
 
@@ -51,7 +60,9 @@
                 <i class="fas fa-users"></i>
               </div>
             </div>
-            <h3 class="text-3xl font-bold text-gray-800"> <%= CustomerCount %></h3>
+            <h3 class="text-3xl font-bold text-gray-800">
+              <%= CustomerCount %>
+            </h3>
             <p class="text-gray-500 text-sm">30+ new in 2 days</p>
           </div>
         </div>
@@ -263,20 +274,26 @@
                 </tr>
               </thead>
               <tbody>
-                <% registeredProducts.forEach(product => { %>
+                <% registeredProducts.forEach(product=> { %>
 
                   <tr class="border-b">
                     <td class="p-3 text-sm text-gray-700">
-                      <img src=<%= product.image %> alt="Haldiram's Sev Bhujia" class="w-10 h-10 rounded">
+                      <img src=<%=product.image %> alt="Haldiram's Sev Bhujia" class="w-10 h-10 rounded">
                     </td>
-                    <td class="p-3 text-sm text-gray-700"><%= product.title %> </td>
-                    <td class="p-3 text-sm text-gray-700"><%= (product.createdAt ).toString().split("T")?.[0]%> </td>
-                    <td class="p-3 text-sm text-gray-700"><%= product.price %> </td>
+                    <td class="p-3 text-sm text-gray-700">
+                      <%= product.title %>
+                    </td>
+                    <td class="p-3 text-sm text-gray-700">
+                      <%= (product.createdAt ).toString().split("T")?.[0]%>
+                    </td>
+                    <td class="p-3 text-sm text-gray-700">
+                      <%= product.price %>
+                    </td>
                   </tr>
                   <% }); %>
-               
+
               </tbody>
-              
+
             </table>
           </div>
         </div>

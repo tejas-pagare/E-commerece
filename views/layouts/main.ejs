@@ -15,7 +15,7 @@
 </head>
 
 <body>
-    <% if (!(title==="login" ||title==="signup" || role==="seller" )) { %>
+    <% if (!(title==="login" ||title==="signup" || role==="seller"||role==="admin" )) { %>
         <div>
             <header class="bg-white shadow-sm">
                 <div class="container mx-auto px-4 py-4">
@@ -115,6 +115,8 @@
                     </div>
                 </header>
             </div>
+            <% }else{ %>
+
             <% } %>
                 <main>
                     <div>
