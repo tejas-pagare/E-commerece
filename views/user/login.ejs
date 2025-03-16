@@ -17,7 +17,7 @@
                     <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                     <input name="email" type="email" id="email" placeholder="Enter your email"
                         class="mt-1 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <p class="text-red-500 text-sm mt-1 hidden" id="emailError"></p>
+                    <p class="text-red-500 text-sm mt-1 hidden" id="emailError"></p>
                 </div>
 
                 <div class="mb-4 relative">
@@ -26,7 +26,7 @@
                         class="mt-1 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                     <button type="button" id="togglePassword"
                         class="absolute right-3 top-10 text-gray-600 hover:text-gray-800">👁️</button>
-                        <p class="text-red-500 text-sm mt-1 hidden" id="passwordError"></p>
+                    <p class="text-red-500 text-sm mt-1 hidden" id="passwordError"></p>
                 </div>
                 <% if (error) { %>
                     <p style="color: red;">
@@ -64,38 +64,38 @@
 
 
         document.getElementById('loginForm').addEventListener('submit', (event) => {
-      let isValid = true;
+            let isValid = true;
 
-      const email = document.getElementById('email');
-      const password = document.getElementById('password');
-
-  
-      const emailError = document.getElementById('emailError');
-      const passwordError = document.getElementById('passwordError');
-
-      emailError.classList.add('hidden');
-      passwordError.classList.add('hidden');
-
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
 
 
-      if (!emailPattern.test(email.value.trim())) {
-        emailError.textContent = "Invalid email address.";
-        emailError.classList.remove('hidden');
-        isValid = false;
-      }
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
 
-      if (password.value.length < 2) {
-        passwordError.textContent = "Password must be at least 2 characters long.";
-        passwordError.classList.remove('hidden');
-        isValid = false;
-      }
+            emailError.classList.add('hidden');
+            passwordError.classList.add('hidden');
 
-      // Prevent form submission if validation fails
-      if (!isValid) {
-        event.preventDefault();
-      }
-    });
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+            if (!emailPattern.test(email.value.trim())) {
+                emailError.textContent = "Invalid email address.";
+                emailError.classList.remove('hidden');
+                isValid = false;
+            }
+
+            if (password.value.length < 2) {
+                passwordError.textContent = "Password must be at least 2 characters long.";
+                passwordError.classList.remove('hidden');
+                isValid = false;
+            }
+
+            // Prevent form submission if validation fails
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
         // Handle form submission without page refresh
 
 

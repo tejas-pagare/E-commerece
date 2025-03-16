@@ -28,7 +28,7 @@
                         </div>
 
                         <!-- Search Bar -->
-                        <div class="flex-1 max-w-2xl mx-8">
+                        <div class="hidden sm:block flex-1 max-w-2xl mx-8">
                             <div class="relative">
                                 <input type="text" placeholder="Search for products"
                                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
@@ -53,13 +53,17 @@
                                             class="absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
                                     </button>
                                 </a>
+                                <form action="/api/v1/user/logout" method="get">
+                                    <button type="submit"
+                                        class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Logout</button>
+                                </form>
                             </div>
                         </div>
                     </div>
 
                     <!-- Navigation -->
                     <nav class="flex items-center space-x-6">
-                        <button class="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center">
+                        <button class="hidden md:block bg-green-500 text-white px-4 py-2 rounded-lg flex items-center">
                             <i class="fas fa-bars mr-2"></i>
                             All Departments
                         </button>
