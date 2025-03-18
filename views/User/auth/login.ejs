@@ -1,5 +1,6 @@
 <body class="flex items-center justify-center min-h-screen bg-gray-100 w-screen min-h-screen">
-    <div class="flex flex-col lg:flex-row items-center justify-center bg-white rounded-2xl shadow-lg overflow-hidden w-screen min-h-screen mx-auto">
+    <div
+        class="flex flex-col lg:flex-row items-center justify-center bg-white rounded-2xl shadow-lg overflow-hidden w-screen min-h-screen mx-auto">
 
         <!-- Left Section: SVG Image -->
         <div class=" sm:w-1/2 hidden md:flex items-center justify-center ">
@@ -55,14 +56,6 @@
         togglePassword.addEventListener('click', () => {
             passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
         });
-
-        // Auto-hide toast after 4 seconds
-        // window.addEventListener('DOMContentLoaded', () => {
-        //     const toast = document.getElementById('toast');
-        //     if (toast) {
-        //         setTimeout(() => toast.style.opacity = '0', 4000);
-        //     }
-        // });
 
 
         document.getElementById('loginForm').addEventListener('submit', (event) => {

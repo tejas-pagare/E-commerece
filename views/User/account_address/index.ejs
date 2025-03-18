@@ -12,10 +12,10 @@
           <a href="/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
           <a href="/account/address" class="block py-2 font-medium text-black hover:text-green-700">Address</a>
           <% if ( role==="user" ) { %>
-            <a href="#" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
-            <a href="/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
-            
-            <% }%>
+              <a href="#" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
+              <a href="/api/v1/user/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
+              
+              <% }%>
           <a href="/api/v1/user/logout" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
       </nav>
       </aside>

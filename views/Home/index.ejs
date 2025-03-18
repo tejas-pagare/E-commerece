@@ -1,0 +1,25 @@
+<body class="flex items-center justify-center min-h-screen bg-green-100">
+  <div class="text-center bg-white p-10 rounded-lg shadow-lg">
+    <h1 class="text-4xl font-bold text-green-600 mb-6">Welcome to SwiftMart</h1>
+    <div class="space-y-4">
+      <button onclick="redirect('/api/v1/admin/login')"
+        class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">
+        Admin Login
+      </button>
+      <button onclick="redirect('/api/v1/user/login')"
+        class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">
+        User Login
+      </button>
+      <button onclick="redirect('/api/v1/seller/login')"
+        class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">
+        Seller Login
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function redirect(url) {
+      window.location.href = url;
+    }
+  </script>
+</body>

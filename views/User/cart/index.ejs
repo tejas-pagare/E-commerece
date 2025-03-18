@@ -24,7 +24,7 @@
     // Fetch and display cart items
     async function fetchCart() {
       try {
-        const response = await fetch("https://e-commerece-7y4h.onrender.com/api/v1/user/cart", {
+        const response = await fetch("http://localhost:8000/api/v1/user/cart", {
           method: "POST",
           credentials: "include",
         });
@@ -36,7 +36,7 @@
           renderCart(data.cart);
         }
       } catch (error) {
-        console.error("Error fetching cart:", error);
+        console.log(error);
       }
     }
 
@@ -85,43 +85,40 @@
     // Add item to cart
     async function AddToCart(productId) {
       console.log(productId);
-      await fetch(`https://e-commerece-7y4h.onrender.com/api/v1/user/cart/add/${productId}`, {
+      await fetch(`http://localhost:8000/api/v1/user/cart/add/${productId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
       console.log("called")
-      setTimeout(()=>{
+      
         fetchCart(); // Refresh cart after updating
-
-      },100); // Refresh cart after updating
+ // Refresh cart after updating
     }
 
     // Remove item from cart
     async function removeFromCart(productId) {
       console.log(productId);
-      await fetch(`https://e-commerece-7y4h.onrender.com/api/v1/user/cart/remove/${productId}`, {
+      await fetch(`http://localhost:8000/api/v1/user/cart/remove/${productId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
-      setTimeout(()=>{
+      
         fetchCart(); // Refresh cart after updating
 
-      },100);
     }
 
     async function removeFromCartPermanent(productId) {
       console.log(productId);
-      await fetch(`https://e-commerece-7y4h.onrender.com/api/v1/user/cart/remove/${productId}`, {
+      await fetch(`http://localhost:8000/api/v1/user/cart/remove/${productId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
-      setTimeout(()=>{
+      
         fetchCart(); // Refresh cart after updating
 
-      },100);
     }
 
     // Fetch cart on page load

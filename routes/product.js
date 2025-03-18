@@ -1,16 +1,16 @@
 import express from "express";
 import Product from "../models/product.js";
-import isAuthenticated from "../middleware]/isAuthenticated.js";
+import isAuthenticated from "../middleware/isAuthenticated.js";
 import User from "../models/user.js";
 
 const router = express.Router();
 
-router.get("/create",isAuthenticated,(req,res)=>{
+router.get("/create", isAuthenticated, (req, res) => {
   console.log(req.role)
 
-return res.render("seller/Product/index.ejs",{title:'Create Product',role:req.role});
+  return res.render("seller/Product/index.ejs", { title: 'Create Product', role: req.role });
 })
-router.post("/create", isAuthenticated,async (req, res) => {
+router.post("/create", isAuthenticated, async (req, res) => {
   try {
     console.log("/create post")
     const { title, price, description, category, image } = req.body;
@@ -21,7 +21,7 @@ router.post("/create", isAuthenticated,async (req, res) => {
       });
     }
     const newProduct = await Product.create({
-      sellerId:userId,
+      sellerId: userId,
       title,
       price,
       description,
@@ -44,18 +44,18 @@ router.post("/create", isAuthenticated,async (req, res) => {
 });
 
 
-router.get("/",isAuthenticated,async(req,res)=>{
-try {
-  
-  const userId = req.userId;
-  const productListed = await User.findById(userId).populate("products").select("products");
- console.log(productListed)
-  return res.render("seller/listedProduct/index.ejs",{title:"Listed Product",role:req?.role,productListed:productListed?.products})
-} catch (error) {
-  res.json({
-    message:"Intenal error"
-  })
-}
+router.get("/", isAuthenticated, async (req, res) => {
+  try {
+
+    const userId = req.userId;
+    const productListed = await User.findById(userId).populate("products").select("products");
+    console.log(productListed)
+    return res.render("seller/listedProduct/index.ejs", { title: "Listed Product", role: req?.role, productListed: productListed?.products })
+  } catch (error) {
+    res.json({
+      message: "Intenal error"
+    })
+  }
 })
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
@@ -69,7 +69,7 @@ router.get("/:id", async (req, res) => {
       });
     }
 
-    res.render('product/index.ejs', { title: 'Product page', product, filteredProducts:product,role:req.role })
+    res.render('User/product/index.ejs', { title: 'Product page', product, filteredProducts: product, role: "user" })
 
   } catch (error) {
     return res.json({
