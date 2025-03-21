@@ -223,7 +223,7 @@ const accountRenderController =async(req, res) => {
 
 const addressRenderController = async(req, res) => {
   const user = await User.findById(req.userId);
-  res.render("User/account_address/index.ejs", { title: 'Account Address', role: req.role,user });
+  res.render("User/accountAddress/index.ejs", { title: 'Account Address', role: req.role,user });
 }
 
 const blogController = (req, res) => {

@@ -1,0 +1,57 @@
+<body>
+  <div class="bg-gray-100 text-gray-800 flex items-center justify-center w-screen">
+    <main class="flex w-full h-full">
+      <aside class="w-64 h-screen bg-green-200 p-6 rounded-lg text-center shadow-md">
+        <div class="profile mb-4">
+          <img src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid" 
+               alt="Profile Picture" 
+               class="w-20 h-20 rounded-full object-cover mx-auto"/>
+          <h3 class="text-lg font-semibold mt-2"><%= user.firstname %></h3>
+        </div>
+        <nav class="space-y-2">
+          <a href="/api/v1/user/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
+          <a href="/account/address" class="block py-2 font-medium text-black hover:text-green-700">Address</a>
+          <% if (role === "user") { %>
+            <a href="#" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
+            <a href="/api/v1/user/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
+          <% } %>
+          <a href="/api/v1/user/logout" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
+        </nav>
+      </aside>
+
+      <section class="flex-1 w-screen h-screen p-6 bg-white rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6">My Account</h1>
+        <hr class="mb-6">
+
+        <div class="address-section">
+          <h2 class="text-xl font-semibold mb-4">Address</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Billing Address -->
+            <div class="bg-white p-6 border border-gray-300 rounded-lg shadow-sm">
+              <div class="flex justify-between items-center font-semibold mb-2">
+                <strong>Billing Address</strong>
+                <span class="text-green-600 cursor-pointer hover:underline" onclick="redirectToUpdate()">✎ Edit</span>
+              </div>
+              <p class="mb-2"><span class="font-bold">PlotNo: </span><%= user.Address.plotno %></p>
+              <p class="mb-2"><span class="font-bold">Street: </span><%= user.Address.street %></p>
+              <p class="mb-2"><span class="font-bold">City: </span><%= user.Address.city %></p>
+              <p class="mb-2"><span class="font-bold">State: </span><%= user.Address.state %></p>
+              <p class="mb-2"><span class="font-bold">Pincode: </span> <%= user.Address.pincode %></p>
+              <p class="mb-2"><span class="font-bold">Phone: </span><%= user.Address.phone %></p>
+            </div>
+
+            <!-- Shipping Address -->
+           
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    function redirectToUpdate() {
+      window.location.href = "/api/v1/user/account/update/address";
+    }
+  </script>
+</body>

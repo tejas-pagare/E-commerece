@@ -1,82 +1,124 @@
-<body class="bg-gray-100 p-6">
-  <div class="max-w-6xl mx-auto bg-white p-6 shadow-lg rounded-lg">
-      <h1 class="text-2xl font-bold">Checkout</h1>
-      <p class="text-sm">Already have an account? <a href="#" class="text-green-600">Sign in</a>.</p>
-      
-      <div class="mt-4">
-          <h2 class="text-lg font-semibold">Add delivery address</h2>
-          <div class="flex gap-4 mt-2">
-              <div class="border p-4 rounded-lg w-1/2">
-                  <input type="radio" name="address" checked class="mr-2">
-                  <strong>Home</strong>
-                  <p>Jitu Chauhan</p>
-                  <p>4450 North Avenue Oakland, Nebraska United States</p>
-                  <p>402-776-1106</p>
-                  <p class="text-red-600 mt-2">Default address</p>
-                  <button class="text-blue-600">Edit</button>
-                  <button class="text-red-600 ml-2">Delete</button>
-              </div>
-              <div class="border p-4 rounded-lg w-1/2">
-                  <input type="radio" name="address" class="mr-2">
-                  <strong>Office</strong>
-                  <p>Nitu Chauhan</p>
-                  <p>3853 Coal Road, Tannersville Pennsylvania 18372 United States</p>
-                  <p>402-776-1106</p>
-                  <p class="text-green-600 mt-2">Set as Default</p>
-                  <button class="text-blue-600">Edit</button>
-                  <button class="text-red-600 ml-2">Delete</button>
-              </div>
-          </div>
-          <button class="mt-4 px-4 py-2 bg-green-500 text-white rounded">Add a new address</button>
-      </div>
-      
-      <div class="mt-4 border-t pt-4">
-          <h2 class="text-lg font-semibold">Delivery time</h2>
-          <p class="text-gray-600">Select your preferred delivery time.</p>
-      </div>
+<body>
+    <div class="bg-green-100 p-4">
+        <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-green-700 mb-4">Checkout</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                
+                <!-- Order Summary -->
+                <div class="bg-green-50 p-4 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-green-700 mb-2">Order Summary</h3>
+                    <% user.cart.map((e)=>{%>
+                        <div class="border-b pb-2 mb-2">
+                            <div class="flex justify-between items-center">
+                                <img src=<%= e.productId.image %> alt="Product" class="w-12 h-12 rounded">
+                                <div class="flex-1 ml-3 text-xs">
+                                    <p class="font-medium"><%=e.productId.title%></p>
+                                    <p class="text-sm text-gray-500">Rs <%=e.productId.price%> x <%=e.quantity%></p>
+                                </div>
+                                <p class="font-medium">Rs <%=e.productId.price * e.quantity%></p>
+                            </div>
+                        </div>
+                    <% }) %>
+                    <div class="flex justify-between font-bold text-lg text-green-700">
+                        <p>Total:</p>
+                        <p>Rs <%= total %></p>
+                    </div>
+                </div>
+                
+                <!-- User Details -->
+                <div>
+                    <h3 class="text-lg font-semibold text-green-700 mb-2">User Details</h3>
+                    <div class="w-full p-2 mb-2 border rounded"><%= user.firstname %> <%= user.lastname %></div>
+                    <div class="w-full p-2 mb-2 border rounded"><%= user.email %></div>
+                    <div class="w-full p-2 mb-2 border rounded"><%= user.Address.phone %></div>
+                </div>
+            </div>
+            
+            <!-- Billing Address with Edit Button -->
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold text-green-700 mb-2">Billing Address</h3>
+                <div id="address-view">
+                    <p class="p-2 border rounded mb-2"><%= user.Address.plotno %>, <%= user.Address.street %>, <%= user.Address.city %>, <%= user.Address.state %> - <%= user.Address.pincode %></p>
+                    <button id="edit-address" class="bg-blue-500 text-white py-1 px-3 rounded">Edit</button>
+                </div>
+                <div id="address-edit" class="hidden">
+                    <input id="plotno" name="plotno" value="<%= user.Address.plotno %>" type="text" class="w-full p-2 mb-2 border rounded" required>
+                    <input id="street" name="street" value="<%= user.Address.street %>" type="text" class="w-full p-2 mb-2 border rounded" required>
+                    <input id="city" name="city" value="<%= user.Address.city %>" type="text" class="w-full p-2 mb-2 border rounded" required>
+                    <input id="state" name="state" value="<%= user.Address.state %>" type="text" class="w-full p-2 mb-2 border rounded" required>
+                    <input id="pincode" name="pincode" value="<%= user.Address.pincode %>" type="text" class="w-full p-2 mb-2 border rounded" required pattern="\d{6}">
+                    <button id="save-address" class="bg-green-500 text-white py-1 px-3 rounded">Save</button>
+                </div>
+            </div>
 
-      <div class="mt-4 border-t pt-4">
-          <h2 class="text-lg font-semibold">Delivery instructions</h2>
-          <p class="text-gray-600">Provide any special instructions for the delivery.</p>
-      </div>
-      
-      <div class="mt-4 border-t pt-4">
-          <h2 class="text-lg font-semibold">Payment Method</h2>
-          <div class="flex gap-4 mt-2">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Card Payment" class="w-12 h-8">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="w-12 h-8">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/2/27/UPI-Logo-vector.svg" alt="UPI" class="w-12 h-8">
-          </div>
-      </div>
+            <!-- Payment Options -->
+           <!-- Payment Options -->
+<div class="mt-6">
+    <h3 class="text-lg font-semibold text-green-700 mb-4">Payment Options</h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        
+        <!-- COD -->
+        <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition">
+            <input type="radio" name="payment" value="COD" class="hidden peer">
+            <img src="https://media.istockphoto.com/id/537487845/vector/payment-by-cash.jpg?s=612x612&w=0&k=20&c=ikEp0CWBCwizA4xdzFGUw1QO0FBGfjE1_iq-aOco8Dg=" alt="COD" class="w-14 h-14">
+            <span class="text-sm font-medium mt-2 peer-checked:text-green-700">Cash on Delivery</span>
+        </label>
 
-      <div class="mt-6 border-t pt-4">
-          <h2 class="text-lg font-semibold">Order Details</h2>
-          <div class="mt-2">
-              <ul class="space-y-2">
-                  <li class="flex justify-between items-center">
-                      <img src="https://m.media-amazon.com/images/I/81NijNdfULL._SX679_.jpg" alt="Haldiram's Sev Bhujia" class="w-10 h-10">
-                      <span>Haldiram's Sev Bhujia</span>
-                      <span>$21.60</span>
-                  </li>
-                  <li class="flex justify-between items-center">
-                      <img src="https://m.media-amazon.com/images/I/81Uhv4CdTxL._SX679_.jpg" alt="NutriChoice Digestive" class="w-10 h-10">
-                      <span>NutriChoice Digestive</span>
-                      <span>$24.00</span>
-                  </li>
-                  <li class="flex justify-between items-center">
-                      <img src="https://m.media-amazon.com/images/I/61U9wCevcmL._SX679_.jpg" alt="Cadbury 5 Star Chocolate" class="w-10 h-10">
-                      <span>Cadbury 5 Star Chocolate</span>
-                      <span>$33.25</span>
-                  </li>
-              </ul>
-              <div class="border-t mt-2 pt-2">
-                  <p class="flex justify-between font-semibold">Item Subtotal <span>$128.55</span></p>
-                  <p class="flex justify-between">Shipping Fee <span>$0.00</span></p>
-                  <p class="flex justify-between">Tax VAT 18% <span>$23.14</span></p>
-                  <p class="flex justify-between font-bold text-lg">Grand Total <span>$151.69</span></p>
-              </div>
-              <button class="mt-4 w-full bg-blue-500 text-white py-2 rounded text-lg font-semibold">Pay Now</button>
-          </div>
-      </div>
-  </div>
+        <!-- Credit Card -->
+        <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition">
+            <input type="radio" name="payment" value="Credit Card" class="hidden peer">
+            <img src="https://cdn1.vectorstock.com/i/1000x1000/76/35/hand-with-credit-card-for-payment-mobile-vector-19987635.jpg" alt="Credit Card" class="w-14 h-14">
+            <span class="text-sm font-medium mt-2 peer-checked:text-green-700">Credit Card</span>
+        </label>
+
+        <!-- UPI -->
+        <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition">
+            <input type="radio" name="payment" value="UPI" class="hidden peer">
+            <img src="https://m.economictimes.com/thumb/msid-74960608,width-1200,height-900,resizemode-4,imgsize-49172/upi-twitter.jpg" alt="UPI" class="w-14 h-14">
+            <span class="text-sm font-medium mt-2 peer-checked:text-green-700">UPI</span>
+        </label>
+
+        <!-- Net Banking -->
+        <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition">
+            <input type="radio" name="payment" value="Net Banking" class="hidden peer">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwvjrjoZnord6W3t9JtI44aUE2-LLtXruvbw&s" alt="Net Banking" class="w-14 h-14">
+            <span class="text-sm font-medium mt-2 peer-checked:text-green-700">Net Banking</span>
+        </label>
+        
+    </div>
+</div>
+
+        </div>
+    </div>
+    <script>
+        document.getElementById("edit-address").addEventListener("click", function () {
+            document.getElementById("address-view").classList.add("hidden");
+            document.getElementById("address-edit").classList.remove("hidden");
+        });
+
+        document.getElementById("save-address").addEventListener("click", function () {
+            let plotno = document.getElementById("plotno").value.trim();
+            let street = document.getElementById("street").value.trim();
+            let city = document.getElementById("city").value.trim();
+            let state = document.getElementById("state").value.trim();
+            let pincode = document.getElementById("pincode").value.trim();
+
+            if (!plotno || !street || !city || !state || !pincode) {
+                alert("All address fields are required!");
+                return;
+            }
+
+            document.getElementById("address-view").innerHTML = `
+                <p class="p-2 border rounded mb-2">${plotno}, ${street}, ${city}, ${state} - ${pincode}</p>
+                <button id="edit-address" class="bg-blue-500 text-white py-1 px-3 rounded">Edit</button>
+            `;
+            document.getElementById("address-view").classList.remove("hidden");
+            document.getElementById("address-edit").classList.add("hidden");
+
+            document.getElementById("edit-address").addEventListener("click", function () {
+                document.getElementById("address-view").classList.add("hidden");
+                document.getElementById("address-edit").classList.remove("hidden");
+            });
+        });
+    </script>
 </body>

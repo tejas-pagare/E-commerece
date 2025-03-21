@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  
+
   products: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -46,10 +46,18 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  sellProduct:[{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"SellProduct"
-  }]
+  sellProduct: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "SellProduct"
+  }],
+  Address: {
+    plotno: { type: String },
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    pincode: { type: Number },
+    phone: { type: String },
+  }
 });
 
 // Hash password before saving

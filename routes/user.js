@@ -72,7 +72,42 @@ router.post("/sell", async (req, res) => {
   }
 });
 
-router.get("/account/address", isAuthenticated, addressRenderController)
+router.get("/account/address", isAuthenticated, addressRenderController);
+router.get("/account/update/address",isAuthenticated,async(req,res)=>{
+  const user = await User.findById(req.userId);
+  console.log(user);
+  res.render("User/accountAddress/edit.ejs", { title: 'Update Account Address', role: "user",user });
+})
+router.post( "/account/update/address",isAuthenticated,async(req,res)=>{
+
+try {
+  
+  const {plotno,street,city,state,pincode,phone} = req.body;
+  if(!plotno||!street||!city||!state||!pincode||!phone){
+    return res.status(400).json({
+      messag:"Enter all fields",
+      success:false
+    })
+  }
+  const user = await User.findById(req.userId);
+  if(plotno) user.Address.plotno = plotno;
+  if(street) user.Address.street = street;
+  if(city) user.Address.city = city;
+  if(state) user.Address.state = state;
+  if(pincode) user.Address.pincode = pincode;
+  if(phone) user.Address.phone = phone;
+  await user.save();
+  res.status(200).json({
+    message:"Address updated sucessfully",
+    success:true
+  })
+} catch (error) {
+  res.status(500).json({
+    message:"Something went Wrong",
+    success:false
+  })
+}
+})
 router.get("/blog/:id", isAuthenticated, blogController);
 router.get("/shop", isAuthenticated, shopController);
 router.get("/vendors", isAuthenticated, vendorsController)
@@ -83,6 +118,17 @@ router.post("/cart", isAuthenticated, renderCartController)
 router.post("/cart/add/:id", isAuthenticated, addToCartController)
 router.post("/cart/remove/:id", isAuthenticated, removeFromCartController)
 router.delete("/cart/remove/:id", isAuthenticated, deleteFromCartController);
+router.get("/checkout",isAuthenticated,async(req,res)=>{
+  const user = await User.findById(req.userId).populate("cart.productId");
+  console.log(user.cart[0]);
+  let total =0;
+  user.cart.forEach((e)=>{
+    total += Math.round(e.productId.price)*e.quantity
+  })
+  return res.render("User/payment/index.ejs",{title:"Checkout Page",role:"user",user,total})
+});
+
+
 router.get('/', isAuthenticated, HomePageController);
 
 

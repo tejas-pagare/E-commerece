@@ -6,46 +6,35 @@ const orderSchema = new mongoose.Schema({
     ref: "User", // Reference to the user who placed the order
     required: true,
   },
-  sellers: [
+
+  products: [
     {
-      sellerId: {
+      productId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Seller", // Reference to the seller fulfilling the order
+        ref: "Product", // Reference to the purchased product
         required: true,
       },
-      products: [
-        {
-          productId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Product", // Reference to the purchased product
-            required: true,
-          },
-          quantity: {
-            type: Number,
-            required: true,
-            default: 1,
-          },
-          price: {
-            type: Number,
-            required: true,
-          },
-        },
-      ],
-      subtotal: {
-        type: Number, // Total amount for this seller's products
+      quantity: {
+        type: Number,
         required: true,
+        default: 1,
       },
-      orderStatus: {
-        type: String,
-        enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Returned"],
-        default: "Pending",
-      },
-      trackingId: {
-        type: String, // Store tracking number for this seller's shipment
-        default: null,
-      },
+      price: {
+        type: Number,
+        required: true,
+      }
     },
   ],
+
+  orderStatus: {
+    type: String,
+    enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Returned"],
+    default: "Pending",
+  },
+  trackingId: {
+    type: String, // Store tracking number for this seller's shipment
+    default: null,
+  },
   totalAmount: {
     type: Number,
     required: true,
