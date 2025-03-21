@@ -26,13 +26,6 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  ratingCount: {
-
-    type: Number,
-    default: 0,
-
-
-  },
 
   reviewers: [
     {
@@ -55,9 +48,17 @@ const productSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  stock:{
-    type:Boolean,
-    default:true
+  stock: {
+    type: Boolean,
+    default: true
+  },
+  verified: {
+    type: Boolean,
+    default: false
+  },
+  quantity:{
+    type: Number,
+    default: 0
   }
 });
 

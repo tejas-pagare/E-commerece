@@ -91,11 +91,12 @@ router.get("/create", isAuthenticated, (req, res) => {
 router.post("/create", isAuthenticated, async (req, res) => {
   try {
 
-    const { title, price, description, category, image } = req.body;
+    const { title, price, description, category, image,quantity,stock } = req.body;
     const userId = req.userId;
-    if (!title || !price || !description || !category || !image) {
+    if (!title || !price || !description || !category || !image||!quantity) {
       return res.json({
-        message: "All fields are required"
+        message: "All fields are required",
+        success:false
       });
     }
     const newProduct = await Product.create({
@@ -104,7 +105,9 @@ router.post("/create", isAuthenticated, async (req, res) => {
       price,
       description,
       category,
-      image
+      image,
+      quantity,
+      stock
     });
 
     const seller = await Seller.findById(userId);
@@ -114,7 +117,10 @@ router.post("/create", isAuthenticated, async (req, res) => {
     console.log(seller)
     seller.products.push(newProduct);
     await seller.save();
-    res.redirect("/api/v1/seller");
+    return res.json({
+      message:"Create Product",
+      success:true
+    })
     // res.json({
     //   message:"Product added sucessfully"
     // })
@@ -123,29 +129,75 @@ router.post("/create", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.json({
-      message: "Server error"
+      message: "Server error",
+      success:false
+    })
+  }
+});
+
+router.get("/update/:id",isAuthenticated,async(req,res)=>{
+  try {
+    const id = req.params.id;
+    const product = await Product.findById(id);
+    res.render("seller/updateProduct/index.ejs",{title:"Update Product",role:"seller",product});
+    return;
+  } catch (error) {
+    res.redirect("/api/v1/seller");
+    return;
+  }
+})
+router.post("/update/:id", isAuthenticated, async (req, res) => {
+  try {
+    console.log("/update");
+    const id = req.params.id;
+    const { title, price, description,image,quantity,stock } = req.body;
+    const product = await Product.findById(id);
+    if(title)product.title=title;
+    if(price)product.price=price;
+    if(description)product.description = description;
+    if(image)product.image=image;
+    if(quantity)product.quantity=quantity;
+    if(stock!==(null||undefined))product.stock=stock
+    await product.save();
+    return res.json({
+      message:"product updated successfully",
+      success:true
+    });
+
+
+  } catch (error) {
+    console.log(error);
+    return res.json({
+      message: "Server error",
+      success:false
     })
   }
 });
 
 router.delete("/product/:id", isAuthenticated, async (req, res) => {
   try {
-    const id = req.params;
+    const id = req.params.id;
+  //  console.log("ProductsId",id)
     const seller = await Seller.findById(req.userId);
+  //  console.log(seller)
     const checkProducts = seller.products.find((e) => (e).toString() === id);
+    
     if (!checkProducts) {
-      res.json({
+    return  res.json({
         message: "Error in removing product"
       })
     }
-    seller.products = seller.products((e) => (e).toString() !== id);
-    (await seller).save();
-    res.json({
-      message: "Products removed successfully"
+ 
+    await Promise.all([Seller.findOneAndUpdate({_id:req.userId},{$pull:{"products":id}},{new:true}),Product.findByIdAndDelete(id)]);
+    console.log("sucess")
+   return res.json({
+      message: "Products removed successfully",
+      success:true
     })
   } catch (error) {
     res.json({
-      message: "Internal server error"
+      message: "Internal server error",
+      success:false
     })
   }
 })

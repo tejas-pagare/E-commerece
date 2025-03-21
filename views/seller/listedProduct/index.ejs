@@ -5,42 +5,86 @@
             <div class="flex justify-between items-center mb-4">
                 <input type="text" placeholder="Search Products" class="p-2 border rounded w-1/3">
                 <a href="/api/v1/seller/create">
-
                     <button class="bg-green-500 text-white px-4 py-2 rounded">Add Product</button>
                 </a>
             </div>
-            <table class="w-full  border-collapse bg-white">
+            <table class="w-full border-collapse bg-white">
                 <thead>
                     <tr class="bg-gray-200 text-left">
                         <th class="p-3 border">Image</th>
                         <th class="p-3 border">Product Name</th>
+                        <th class="p-3 border">Quantity</th>
                         <th class="p-3 border">Category</th>
                         <th class="p-3 border">Status</th>
                         <th class="p-3 border">Price</th>
-                        <th class="p-3 border">Create at</th>
+                        <th class="p-3 border">Created At</th>
+                        <th class="p-3 border">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% productListed.map(product => { %>
+                    <% productListed.map(product=> { %>
                         <tr class="border-t">
-                            <td class="p-3 border"><img src=<%= product.image %> alt="Product" class="w-16 h-16"></td>
-                            <td class="p-3 border"><%= product.title %></td>
-                            <td class="p-3 border"><%= product.category %></td>
-                            <td class="p-3 border"><span class="bg-green-200 text-green-700 px-2 py-1 rounded">Active</span>
+                            <td class="p-3 border"><img src="<%= product.image %>" alt="Product" class="w-16 h-16"></td>
+                            <td class="p-3 border">
+                                <%= product.title %>
                             </td>
-                            <td class="p-3 border"><%= product.price %></td>
-                            <td class="p-3 border"><%= (product.createdAt).toString().split("T")?.[0] %></td>
-                        </tr>
-                     <% }) %>
-                     <% if(productListed.length===0){ %>
-                        <div>
-                            No Product listed yet
-                        </div>
-                        <% } %>
+                            <td class="p-3 border">
+                                <%= 10%>
+                            </td>
+                            <td class="p-3 border">
+                                <%= product.category %>
+                            </td>
+                            <td class="p-3 border"><span class="bg-green-200 text-green-700 px-2 py-1 rounded">
+                                    <% if( product.stock){%>
+                                        Active
+                                        <% } else{%>
+                                            Not Active
+                                            <% } %>
 
+                                </span></td>
+                            <td class="p-3 border">
+                                <%= product.price %>
+                            </td>
+                            <td class="p-3 border">
+                                <%= (product.createdAt).toString().split("T")?.[0] %>
+                            </td>
+                            <td class="p-3  flex space-x-2  flex items-center justify-start">
+                                <a href="/api/v1/seller/update/<%= product.id %>">
+                                    <button class="bg-blue-500 text-white px-3 py-1 rounded">Edit</button>
+                                </a>
+                                <button onclick="deleteProduct('<%= product.id %>')"
+                                    class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
+                            </td>
+                        </tr>
+                        <% }) %>
+                            <% if (productListed.length===0) { %>
+                                <tr>
+                                    <td colspan="7" class="p-3 text-center">No Product listed yet</td>
+                                </tr>
+                                <% } %>
                 </tbody>
             </table>
         </div>
-
     </div>
+
+    <script>
+        function deleteProduct(productId) {
+            if (confirm("Are you sure you want to delete this product?")) {
+                fetch(`/api/v1/seller/product/${productId}`, {
+                    method: "DELETE",
+                    credentials: "include"
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+
+                        } else {
+                            alert("Failed to delete product.");
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            }
+        }
+    </script>
 </body>

@@ -18,11 +18,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  role: {
-    type: String,
-    enum: ['user', 'seller'],
-    required: true,
-  },
+  
   products: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -50,6 +46,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  sellProduct:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"SellProduct"
+  }]
 });
 
 // Hash password before saving

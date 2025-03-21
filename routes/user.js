@@ -1,12 +1,7 @@
 import express from 'express';
-import { accountRenderController, addressRenderController, addToCartController, blogController, blogRenderController, cartRenderController, deleteFromCartController, HomePageController, loginController, loginPageRenderController, logoutController, removeFromCartController, renderCartController, shopController, signupController, signupPageRenderController, vendorsController } from '../controller/user.js';
-import { error } from 'console';
+import { accountRenderController, accountShowRenderController, addressRenderController, addToCartController, blogController, blogRenderController, cartRenderController, deleteFromCartController, HomePageController, loginController, loginPageRenderController, logoutController, removeFromCartController, renderCartController, shopController, signupController, signupPageRenderController, vendorsController } from '../controller/user.js';
 import User from '../models/user.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import Product from '../models/product.js';
 import isAuthenticated from '../middleware/isAuthenticated.js';
-import { title } from 'process';
 
 
 const router = express.Router();
@@ -16,7 +11,22 @@ router.post("/login", loginController)
 router.get("/signup", signupPageRenderController)
 router.post("/signup",signupController);
 router.get("/logout", isAuthenticated, logoutController);
-router.get("/account", isAuthenticated, accountRenderController)
+router.get("/account", isAuthenticated, accountShowRenderController);
+router.get("/account/update", isAuthenticated, accountRenderController);
+router.post("/account/update", isAuthenticated, async(req,res)=>{
+  const {firstname,lastname, email} = req.body;
+  
+  try {
+    if(!email || !firstname || !lastname){
+      return res.redirect("/api/v1/user/account");
+    }
+    await User.findByIdAndUpdate(req.userId, {firstname,lastname,email})
+    res.redirect("/api/v1/user/account");
+    return;
+  } catch (error) {
+    return res.redirect("/api/v1/user/account");
+  }
+});
 router.get("/account/address", isAuthenticated,addressRenderController)
 router.get("/blog/:id", isAuthenticated, blogController);
 router.get("/shop",isAuthenticated,shopController)

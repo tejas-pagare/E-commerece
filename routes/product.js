@@ -43,6 +43,42 @@ router.post("/create", isAuthenticated, async (req, res) => {
   }
 });
 
+router.get("/update/:id",isAuthenticated,async(req,res)=>{
+  try {
+    const id = req.params.id;
+    const product = await Product.findById(id);
+    res.render("seller/updateProduct/index.ejs",{title:"Update Product",role:"seller"});
+    return;
+  } catch (error) {
+    res.redirect("/api/v1/seller");
+    return;
+  }
+})
+router.post("/update/:id", isAuthenticated, async (req, res) => {
+  try {
+    console.log("/update");
+    const id = req.params.id;
+    const { title, price, description } = req.body;
+    const product = await Product.findById(id);
+    if(title)product.title=title;
+    if(price)product.price=price;
+    if(description)product.description = description;
+    await product.save();
+    return res.json({
+      message:"product updated successfully",
+      success:true
+    });
+
+
+  } catch (error) {
+    console.log(error);
+    return res.json({
+      message: "Server error",
+      success:false
+    })
+  }
+});
+
 
 router.get("/", isAuthenticated, async (req, res) => {
   try {

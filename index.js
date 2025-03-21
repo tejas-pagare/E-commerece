@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url';
 import dotenv from "dotenv";
 import cors from "cors"
 import cookieParser from "cookie-parser";
-
+import multer from "multer"
 dotenv.config({});
 
 const __filename = fileURLToPath(import.meta.url);
@@ -41,7 +41,7 @@ app.use(expressLayouts);
 app.set('layout', 'layouts/main');
 app.use("/api/v1/user", userController);
 app.use("/api/v1/product", productRouter);
-app.use("/api/v1/seller", sellerRouter);
+app.use("/api/v1/seller",sellerRouter);
 app.use("/api/v1/admin", adminRouter);
 
 

@@ -18,7 +18,7 @@ const loginController = async (req, res) => {
     const { email, password } = req.body;
     const userCheck = await User.findOne({ email });
     if (!userCheck) {
-      return res.redirect("/api/v1/user/login")
+      return res.redirect("/api/v1/user/login");
     }
 
     const token = jwt.sign({ userId: userCheck._id, role: "user" }, "JWT_SECRET", { expiresIn: "5h" });
@@ -52,31 +52,27 @@ const signupPageRenderController = (req, res) => {
 }
 const signupController =  async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { firstname, lastname, password, email } = req.body;
     const userCheck = await User.findOne({ email });
-    if (!userCheck) {
-      return res.redirect("/api/v1/user/login")
+    if (userCheck) {
+      return res.redirect("/api/v1/user/signup")
     }
 
-    const token = jwt.sign({ userId: userCheck._id, role: "user" }, "JWT_SECRET", { expiresIn: "5h" });
-
-    console.log(token);
-
-    // Set token as a cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      maxAge: 3600000,
+    const hashPassword = await bcrypt.hash(password, 10);
+    console.log(hashPassword);
+    const user = User.create({
+      firstname, lastname, password: hashPassword, email
     });
+    (await user).save()
 
-    res.redirect("/api/v1/user/")
-
-
+    return res.redirect("/api/v1/user/login");
   } catch (error) {
-    console.log(error)
-    res.redirect("/api/v1/user/login")
+    console.log(error);
+    return res.redirect("/api/v1/user/signup")
   }
 }
+
+
 
 const logoutController = (req, res) => {
   res.clearCookie("token");
@@ -215,12 +211,19 @@ const deleteFromCartController = async (req, res) => {
 }
 
 
-const accountRenderController =(req, res) => {
-  res.render("User/account/index.ejs", { title: 'Account', role: req.role });
+const accountShowRenderController =async(req, res) => {
+  const user = await User.findById(req.userId);
+  res.render("User/account/show.ejs", { title: 'Account', role: req.role,user });
+}
+const accountRenderController =async(req, res) => {
+  const user = await User.findById(req.userId);
+  res.render("User/account/index.ejs", { title: 'Account', role: req.role,user });
 }
 
-const addressRenderController = (req, res) => {
-  res.render("User/account_address/index.ejs", { title: 'Account Address', role: req.role });
+
+const addressRenderController = async(req, res) => {
+  const user = await User.findById(req.userId);
+  res.render("User/account_address/index.ejs", { title: 'Account Address', role: req.role,user });
 }
 
 const blogController = (req, res) => {
@@ -245,4 +248,4 @@ const vendorsController = (req,res)=>{
 
 const blogRenderController = (req, res) => res.render('User/blog/index.ejs', { title: 'Blog Page', role: req.role })
 
-export {loginController ,signupController,logoutController,renderCartController,addToCartController,removeFromCartController,deleteFromCartController,loginPageRenderController,signupPageRenderController,accountRenderController,addressRenderController,blogController,shopController,vendorsController,blogRenderController,cartRenderController,HomePageController}
+export {loginController ,signupController,logoutController,renderCartController,addToCartController,removeFromCartController,deleteFromCartController,loginPageRenderController,signupPageRenderController,accountRenderController,addressRenderController,blogController,shopController,vendorsController,blogRenderController,cartRenderController,HomePageController,accountShowRenderController}

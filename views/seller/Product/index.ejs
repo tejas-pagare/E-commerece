@@ -82,10 +82,19 @@
                     body: JSON.stringify(data)
                 });
 
+                console.log(response);
+                if(response.ok){
+                    window.location.href="/api/v1/seller/"
+                }else{
+                    if(response.ok){
+                    window.location.href="/api/v1/seller/create"
+                }
+                }
 
             } catch (error) {
                 console.error("Error submitting form:", error);
                 alert("Failed to submit form");
+                   window.location.href="/api/v1/seller/create"
             }
         }
     </script>

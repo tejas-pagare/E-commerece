@@ -4,6 +4,7 @@ import User from "../models/user.js";
 import Seller from "../models/seller.js";
 const isAuthenticated = async (req, res, next) => {
   try {
+    
     const token = req.cookies.token;
     
     if (!token) {
@@ -27,6 +28,7 @@ const isAuthenticated = async (req, res, next) => {
     
     req.role = decode.role || "admin";
     req.userId = decode.userId;
+   
     next();
   } catch (error) {
     console.log(error);
