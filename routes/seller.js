@@ -4,6 +4,7 @@ import Seller from '../models/seller.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
 import Product from '../models/product.js';
+import cloudinary, { upload } from '../config/cloudinary.js';
 const router = express.Router();
 
 router.get("/login", (req, res) => {
@@ -88,24 +89,35 @@ router.get("/create", isAuthenticated, (req, res) => {
 
   return res.render("seller/Product/index.ejs", { title: 'Create Product', role: "seller" });
 })
-router.post("/create", isAuthenticated, async (req, res) => {
+router.post("/create", upload.single("img"),isAuthenticated, async (req, res) => {
   try {
 
-    const { title, price, description, category, image,quantity,stock } = req.body;
+    const { title, price, description, category,quantity,stock } = req.body;
     const userId = req.userId;
-    if (!title || !price || !description || !category || !image||!quantity) {
+    if (!title || !price || !description || !category ||!quantity) {
       return res.json({
         message: "All fields are required",
         success:false
       });
-    }
+    };
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "uploads", resource_type: "auto" },
+        (error, uploadedFile) => {
+          if (error) return reject(error);
+          resolve(uploadedFile);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
+    console.log(result.secure_url)
     const newProduct = await Product.create({
       sellerId: userId,
       title,
       price,
       description,
       category,
-      image,
+      image:result.secure_url||"https://fakestoreapi.com/img/81XH0e8fefL._AC_UY879_.jpg",
       quantity,
       stock
     });

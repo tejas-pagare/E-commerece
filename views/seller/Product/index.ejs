@@ -16,15 +16,17 @@
                         class="p-3 border rounded-lg w-full" required>
                     <select name="category" class="p-3 border rounded-lg w-full" required>
                         <option value="">Select Category</option>
-                        <option value="electronics">Silk</option>
-                        <option value="clothing">Fabric</option>
-                        <option value="accessories">Cotton</option>
-                        <option value="accessories">Wool </option>
-                        <option value="accessories">Linen</option>
-                        <option value="accessories">Cashmere</option>
+                        <option value="silk">Silk</option>
+                        <option value="fabric">Fabric</option>
+                        <option vaue="cotton">Cotton</option>
+                        <option value="wool">Wool</option>
+                        <option value="linen">Linen</option>
+                        <option value="cashmere">Cashmere</option>
+
                     </select>
                 </div>
-                <input name="image" type="text" placeholder="Photo Link" class="p-3 mt-4 border rounded-lg w-full"
+
+                <input name="img" type="file" placeholder="Photo Link" class="p-3 mt-4 border rounded-lg w-full"
                     required>
             </section>
 
@@ -70,34 +72,39 @@
             event.preventDefault(); // Prevent default form submission
 
             const form = document.querySelector(".product-form");
-            const formData = new FormData(form);
+            const formData = new FormData(form); // Keeps files and text fields
 
+            // Convert FormData to an object (excluding files)
+            const data = {};
+            formData.forEach((value, key) => {
+                if (value instanceof File && value.size > 0) {
+                    data[key] = value; // Keep file objects
+                } else {
+                    data[key] = value.toString(); // Convert other fields to string
+                }
+            });
 
-            const data = Object.fromEntries(formData.entries());
 
             try {
                 const response = await fetch("/api/v1/seller/create", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
                     credentials: "include",
-                    body: JSON.stringify(data)
+                    body: formData, // Send as FormData, not JSON
                 });
 
                 console.log(response);
-                if(response.ok){
-                    window.location.href="/api/v1/seller/"
-                }else{
-                    if(response.ok){
-                    window.location.href="/api/v1/seller/create"
-                }
+                if (response.ok) {
+                    window.location.href = "/api/v1/seller/"
+                } else {
+                    if (response.ok) {
+                        window.location.href = "/api/v1/seller/create"
+                    }
                 }
 
             } catch (error) {
                 console.error("Error submitting form:", error);
                 alert("Failed to submit form");
-                   window.location.href="/api/v1/seller/create"
+                window.location.href = "/api/v1/seller/create"
             }
         }
     </script>
