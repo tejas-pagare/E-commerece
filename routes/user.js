@@ -27,6 +27,10 @@ router.post("/account/update", isAuthenticated, async(req,res)=>{
     return res.redirect("/api/v1/user/account");
   }
 });
+router.get("/sell", isAuthenticated, async(req,res)=>{
+  res.render("User/sell/index.ejs",{title:"Sell Product",role:"user"});
+
+});
 router.get("/account/address", isAuthenticated,addressRenderController)
 router.get("/blog/:id", isAuthenticated, blogController);
 router.get("/shop",isAuthenticated,shopController)
