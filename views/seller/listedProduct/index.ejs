@@ -29,19 +29,21 @@
                                 <%= product.title %>
                             </td>
                             <td class="p-3 border">
-                                <%= 10%>
+                                <%= product.quantity%>
                             </td>
                             <td class="p-3 border">
                                 <%= product.category %>
                             </td>
-                            <td class="p-3 border"><span class="bg-green-200 text-green-700 px-2 py-1 rounded">
+                            <td class="p-3 border">
                                     <% if( product.stock){%>
-                                        Active
+                                        <span class="bg-green-200 text-green-700 px-2 py-1 rounded">   In Stock
+                                        </span>
                                         <% } else{%>
-                                            Not Active
+                                            <span class="bg-red-200 text-red-700 px-2 py-1 rounded">  Out Of Stock
+                                            </span>
                                             <% } %>
 
-                                </span></td>
+                                </td>
                             <td class="p-3 border">
                                 <%= product.price %>
                             </td>

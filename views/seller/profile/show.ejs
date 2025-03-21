@@ -1,0 +1,41 @@
+<body class="bg-gray-100 text-gray-800">
+  <main class="flex">
+      <aside class="w-64 min-h-screen bg-green-200 p-6 rounded-lg text-center shadow-md">
+          <div class="profile mb-4">
+              <img src=<%= seller.profileImage %>
+                  alt="Profile Picture" class="w-20 h-20 rounded-full object-cover mx-auto" />
+              <h2 class="text-lg font-semibold mt-2"><%= seller.name %></h2>
+          </div>
+          <nav class="space-y-2">
+              <a href="/api/v1/seller/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
+              <a href="/api/v1/seller/" class="block py-2 font-medium text-black hover:text-green-700">Listed Product</a>
+             
+              <a href="/api/v1/seller/logout" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
+          </nav>
+      </aside>
+
+      <section class="flex-1  p-6 bg-white rounded-lg shadow-md">
+          <h1 class="text-2xl font-bold mb-6">My Account</h1>
+          <hr class="mb-6">
+
+          <form  class="mb-6">
+              <h2 class="text-xl font-semibold mb-4">Account Details</h2>
+              <label class="block font-bold"> Name *</label>
+              <p><%= seller.name %></p>
+
+        
+              <label class="block font-bold mt-4">Email *</label>
+              <p><%= seller.email %></p>
+
+              <label class="block font-bold mt-4">Gstn *</label>
+              <p><%= seller.gstn %></p>
+
+  
+             
+                <a class="mt-12 block w-[180px] px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 " href="/api/v1/seller/account/update">Update Account </a> 
+          </form>
+
+      </section>
+  </main>
+</body>
+

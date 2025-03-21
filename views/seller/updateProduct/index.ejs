@@ -1,82 +1,83 @@
 <body>
-  <div class="bg-gray-100 p-6">
-      <form onsubmit="event.preventDefault(); update('<%= product._id %>');" class="product-form bg-white p-8 rounded-lg shadow-md space-y-8">
-          <!-- Product Information Section -->
-          <section>
-              <h2 class="text-xl font-semibold mb-4">Product Information</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <input value="<%= product.title %>" name="title" type="text" placeholder="Title (Product Name)"
-                      class="p-3 border rounded-lg w-full" required>
-              </div>
-              <input value="<%= product.image %>" name="image" type="text" placeholder="Photo Link"
-                  class="p-3 mt-4 border rounded-lg w-full" required>
-          </section>
+    <div class="bg-gray-100 p-6">
+        <form onsubmit="event.preventDefault(); update('<%= product._id %>');"
+            class="product-form bg-white p-8 rounded-lg shadow-md space-y-8">
+            <!-- Product Information Section -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Product Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <input value="<%= product.title %>" name="title" type="text" placeholder="Title (Product Name)"
+                        class="p-3 border rounded-lg w-full" required>
+                </div>
+                <input value="<%= product.image %>" name="image" type="text" placeholder="Photo Link"
+                    class="p-3 mt-4 border rounded-lg w-full" required>
+            </section>
 
-          <input value="<%= product.quantity %>" name="quantity" type="number" placeholder="Quantity"
-              class="p-3 border rounded-lg w-full" required>
+            <input value="<%= product.quantity %>" name="quantity" type="number" placeholder="Quantity"
+                class="p-3 border rounded-lg w-full" required>
 
-          <!-- Product Description Section -->
-          <section>
-              <h2 class="text-xl font-semibold mb-4">Product Description</h2>
-              <textarea name="description" placeholder="Enter product description"
-                  class="p-3 border rounded-lg w-full h-32" required><%= product.description %></textarea>
-          </section>
+            <!-- Product Description Section -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Product Description</h2>
+                <textarea name="description" placeholder="Enter product description"
+                    class="p-3 border rounded-lg w-full h-32" required><%= product.description %></textarea>
+            </section>
 
-          <!-- Pricing Section -->
-          <section>
-              <h2 class="text-xl font-semibold mb-4">Pricing</h2>
-              <div class="grid grid-cols-1">
-                  <input value="<%= product.price %>" name="price" type="number" placeholder="Sale Price"
-                      class="p-3 border rounded-lg w-full" required>
-              </div>
-          </section>
+            <!-- Pricing Section -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Pricing</h2>
+                <div class="grid grid-cols-1">
+                    <input value="<%= product.price %>" name="price" type="number" placeholder="Sale Price"
+                        class="p-3 border rounded-lg w-full" required>
+                </div>
+            </section>
 
-          <!-- Stock and Status Section -->
-          <section>
-              <h2 class="text-xl font-semibold mb-4">Stock and Status</h2>
-              <select name="stock" class="p-3 border rounded-lg w-full" required>
-                  <option value="true" <%= product.stock === true ? 'selected' : '' %>>In Stock</option>
-                  <option value="false" <%= product.stock === false ? 'selected' : '' %>>Not In Stock</option>
-              </select>
-          </section>
+            <!-- Stock and Status Section -->
+            <section>
+                <h2 class="text-xl font-semibold mb-4">Stock and Status</h2>
+                <select name="stock" class="p-3 border rounded-lg w-full" required>
+                    <option value="true" <%=product.stock===true ? 'selected' : '' %>>In Stock</option>
+                    <option value="false" <%=product.stock===false ? 'selected' : '' %>>Not In Stock</option>
+                </select>
+            </section>
 
-          <!-- Footer Section -->
-          <footer class="flex justify-between mt-8">
-              <button type="button" class="text-gray-600 hover:underline">Back to Product</button>
-              <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700">
-                  Update Details
-              </button>
-          </footer>
-      </form>
-  </div>
+            <!-- Footer Section -->
+            <footer class="flex justify-between mt-8">
+                <button type="button" class="text-gray-600 hover:underline">Back to Product</button>
+                <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700">
+                    Update Details
+                </button>
+            </footer>
+        </form>
+    </div>
 
-  <script>
-      async function update(id) {
-          console.log("Updating product:", id);
+    <script>
+        async function update(id) {
+            console.log("Updating product:", id);
 
-          const form = document.querySelector(".product-form");
-          const formData = new FormData(form);
-          const data = Object.fromEntries(formData.entries());
+            const form = document.querySelector(".product-form");
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
 
-          try {
-              const response = await fetch(`/api/v1/product/update/${id}`, {
-                  method: "POST",
-                  headers: {
-                      "Content-Type": "application/json"
-                  },
-                  credentials: "include",
-                  body: JSON.stringify(data)
-              });
+            try {
+                const response = await fetch(`/api/v1/seller/update/${id}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(data)
+                });
 
-              if (response.ok) {
-                  window.location.href = "/api/v1/seller/";
-              } else {
-                  alert("Failed to update product.");
-              }
-          } catch (error) {
-              console.error("Error submitting form:", error);
-              alert("Failed to submit form");
-          }
-      }
-  </script>
+                if (response.ok) {
+                    window.location.href = "/api/v1/seller/";
+                } else {
+                    alert("Failed to update product.");
+                }
+            } catch (error) {
+                console.error("Error submitting form:", error);
+                alert("Failed to submit form");
+            }
+        }
+    </script>
 </body>

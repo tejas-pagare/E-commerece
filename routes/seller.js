@@ -79,7 +79,7 @@ router.post("/signup", async (req, res) => {
 
 router.get("/logout", isAuthenticated, (req, res) => {
   res.clearCookie("token");
-  return res.redirect("/api/v1/seller/login");
+  return res.redirect("/");
 })
 
 
@@ -134,23 +134,12 @@ router.post("/create", isAuthenticated, async (req, res) => {
     })
   }
 });
-
-router.get("/update/:id",isAuthenticated,async(req,res)=>{
-  try {
-    const id = req.params.id;
-    const product = await Product.findById(id);
-    res.render("seller/updateProduct/index.ejs",{title:"Update Product",role:"seller",product});
-    return;
-  } catch (error) {
-    res.redirect("/api/v1/seller");
-    return;
-  }
-})
 router.post("/update/:id", isAuthenticated, async (req, res) => {
   try {
-    console.log("/update");
+    
     const id = req.params.id;
     const { title, price, description,image,quantity,stock } = req.body;
+    console.log(quantity);
     const product = await Product.findById(id);
     if(title)product.title=title;
     if(price)product.price=price;
@@ -173,6 +162,18 @@ router.post("/update/:id", isAuthenticated, async (req, res) => {
     })
   }
 });
+router.get("/update/:id",isAuthenticated,async(req,res)=>{
+  try {
+    const id = req.params.id;
+    const product = await Product.findById(id);
+    res.render("seller/updateProduct/index.ejs",{title:"Update Product",role:"seller",product});
+    return;
+  } catch (error) {
+    res.redirect("/api/v1/seller");
+    return;
+  }
+})
+
 
 router.delete("/product/:id", isAuthenticated, async (req, res) => {
   try {
@@ -200,7 +201,33 @@ router.delete("/product/:id", isAuthenticated, async (req, res) => {
       success:false
     })
   }
-})
+});
+
+router.get("/account", isAuthenticated, async(req, res) => {
+  const seller = await Seller.findById(req.userId);
+  res.render("Seller/profile/show.ejs", { title: 'Account', role: req.role,seller });
+});
+
+router.get("/account/update", isAuthenticated, async(req, res) => {
+  const seller = await Seller.findById(req.userId);
+  res.render("Seller/profile/index.ejs", { title: 'Account', role: req.role,seller });
+});
+router.post("/account/update", isAuthenticated, async(req,res)=>{
+  const {name,gstn, email} = req.body;
+  console.log(name,gstn, email)
+  try {
+    if(!email || !name || !gstn){
+      return res.redirect("/api/v1/seller/account");
+    }
+    await Seller.findByIdAndUpdate(req.userId, {name,gstn,email})
+    res.json({
+      message:"Account updated successfully"
+    });
+    return;
+  } catch (error) {
+    return res.redirect("/api/v1/seller/account");
+  }
+});
 
 router.get("/", isAuthenticated, async (req, res) => {
   try {

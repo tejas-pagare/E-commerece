@@ -76,7 +76,7 @@ const signupController =  async (req, res) => {
 
 const logoutController = (req, res) => {
   res.clearCookie("token");
-  return res.redirect("/api/v1/user/login");
+  return res.redirect("/");
 }
 
 const renderCartController = async (req, res) => {

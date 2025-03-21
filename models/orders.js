@@ -79,7 +79,7 @@ const orderSchema = new mongoose.Schema({
   },
 });
 
-// Middleware to update 'updatedAt' before saving
+
 orderSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();

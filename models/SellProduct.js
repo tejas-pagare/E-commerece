@@ -9,7 +9,11 @@ const SellProductSchema = new mongoose.Schema({
   images: [{ type: String }], // Array of image URLs
   status: { type: String, enum: ["Pending", "Verified", "Rejected", "Sold"], default: "Pending" },
   estimated_value: { type: Number }, // In virtual coins
-  created_at: { type: Date, default: Date.now }
+  created_at: { type: Date, default: Date.now },
+  category:{
+    type:String,
+    required:true
+  }
 });
 
 const SellProduct =  mongoose.model("SellProduct", SellProductSchema);

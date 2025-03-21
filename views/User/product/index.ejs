@@ -1,9 +1,9 @@
 <body class="bg-gray-100">
 
-    <div class=" mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+    <div class=" mx-auto p-6 bg-white shadow-lg rounded-lg ">
         <!-- Breadcrumb -->
         <nav class="text-sm text-gray-500 mb-4">
-            <a href="/" class="hover:underline">Home</a> / <a href="/" class="hover:underline">Shop</a> / <a class="cursor-pointer"
+            <a href="/api/v1/user" class="hover:underline">Home</a> / <a href="/" class="hover:underline">Shop</a> / <a class="cursor-pointer"
                 class="text-gray-700"><%=product.title%></a>
         </nav>
 
@@ -17,7 +17,7 @@
                 <div class="flex space-x-4 mt-4">
                     <img src=<%=product.image%> class="thumbnail w-20 h-20 cursor-pointer rounded-lg" onclick="changeImage(this.src)">
                     <img src=<%=product.image%> class="thumbnail w-20 h-20 cursor-pointer rounded-lg" onclick="changeImage(this.src)">
-                    <img src=<%=product.image%>class="thumbnail w-20 h-20 cursor-pointer rounded-lg" onclick="changeImage(this.src)">
+                    
                 </div>
             </div>
     
@@ -46,10 +46,10 @@
     
                 <!-- Additional Info -->
                 <div class="mt-8 text-gray-700">
-                    <p><strong>Product Code:</strong> CHO12345</p>
-                    <p><strong>Availability:</strong> In Stock</p>
-                    <p><strong>Type:</strong> Confectionery</p>
-                    <p><strong>Shipping:</strong> Free Shipping on orders over $50</p>
+                    <p><strong>Product Code:</strong><%= product._id.toString() %></p>
+                    <p><strong>Availability:</strong><%= product.stock ? "In Stock" : "Not In Stock" %></p>
+                    <p><strong>Type:</strong> <%=product.category%></p>
+                    <p><strong>Shipping:</strong> Free Shipping </p>
                 </div>
             </div>
         </div>
@@ -74,19 +74,19 @@
         <!-- Related Products -->
         <h3 class="text-2xl font-bold mt-10">Related Items</h3>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
-            <% for (let i=0; i < filteredProducts.length; i++) { %>
-            <div class="bg-white shadow-lg rounded-lg p-4">
+            <% for (let i=0; i < products.length; i++) { %>
+            <div class="bg-white shadow-lg rounded-lg p-4 flex flex-col justify-evenly    items-center">
                 <img  src=<%=
-                filteredProducts[i].image
+                products[i].image
                 %>
                     class="w-48 h-48 rounded-lg">
                 <h4 class="text-sm font-bold mt-2"><%=
-                    filteredProducts[i].title
+                    products[i].title
                     %></h4>
                 <p class="text-green-600 font-semibold"> Rs.<%=
-                    filteredProducts[i].price
+                    products[i].price
                     %></p>
-                <button class="mt-2 w-full py-2 bg-green-600 text-white rounded-lg text-sm">Add</button>
+                <a href=<%=`/api/v1/product/${products[i].id}`%>  class="mt-2 w-full cursor-pointer font-bold text-center py-2 bg-green-600 text-white rounded-lg text-sm">View</a>
             </div>
             <% } %>
         </div>

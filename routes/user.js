@@ -29,10 +29,10 @@ router.post("/account/update", isAuthenticated, async(req,res)=>{
 });
 router.get("/account/address", isAuthenticated,addressRenderController)
 router.get("/blog/:id", isAuthenticated, blogController);
-router.get("/shop",isAuthenticated,shopController)
+router.get("/shop",isAuthenticated,shopController);
 router.get("/vendors",isAuthenticated,vendorsController)
 router.get('/blog', isAuthenticated, blogRenderController);
-router.get('/contact', isAuthenticated, (req, res) => res.render('User/contact/index.ejs', { title: 'Contact Page', role: req.role }));
+router.get('/contact', isAuthenticated, (req, res) => res.render('User/contact/index.ejs', { title: 'Contact Page', role: "user" }));
 router.get("/cart",cartRenderController)
 router.post("/cart", isAuthenticated, renderCartController)
 router.post("/cart/add/:id", isAuthenticated, addToCartController)

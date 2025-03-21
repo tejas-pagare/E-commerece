@@ -17,7 +17,7 @@ const sellerHistorySchema = new mongoose.Schema({
     required: true,
   },
   details: {
-    type: String, // Optional: Store specific changes (e.g., "Price changed from 100 to 120")
+    type: String, 
   },
   timestamp: {
     type: Date,

@@ -1,0 +1,248 @@
+<body class="bg-gray-50">
+
+  <div class="flex">
+      <!-- Sidebar -->
+      <aside id="sidebar" class="w-64 bg-white p-4 hidden lg:block shadow-lg min-h-screen">
+          <h2 class="text-lg font-bold mb-4">Filters</h2>
+          <div>
+              <h3 class="font-semibold">Category</h3>
+              <div class="mt-2 space-y-2 text-gray-700">
+                  <label class="block"><input type="radio" name="category" value="all" checked class="mr-2">All</label>
+                  <label class="block"><input type="radio" name="category" value="home-gym" class="mr-2">Home Gym</label>
+                  <label class="block"><input type="radio" name="category" value="electronics" class="mr-2">Electronics</label>
+              </div>
+          </div>
+          <div class="mt-4">
+              <h3 class="font-semibold">Price Range</h3>
+              <div class="mt-2 space-y-2 text-gray-700">
+                  <label class="block"><input type="radio" name="price" value="all" checked class="mr-2">All</label>
+                  <label class="block"><input type="radio" name="price" value="0-500" class="mr-2">0 - 500</label>
+                  <label class="block"><input type="radio" name="price" value="100-500" class="mr-2">100 - 500</label>
+              </div>
+          </div>
+          <div class="mt-4">
+              <h3 class="font-semibold">Customer Rating</h3>
+              <div class="mt-2 space-y-2 text-gray-700">
+                  <label class="block"><input type="radio" name="rating" value="all" checked class="mr-2">All</label>
+                  <label class="block flex items-center"><input type="radio" name="rating" value="4" class="mr-2"> <span class="text-yellow-500">★★★★☆</span> & Up</label>
+                  <label class="block flex items-center"><input type="radio" name="rating" value="3" class="mr-2"> <span class="text-yellow-500">★★★☆☆</span> & Up</label>
+              </div>
+          </div>
+      </aside>
+      <main class="flex-1 p-4">
+          <button id="toggleSidebar" class="lg:hidden bg-green-600 text-white p-2 mb-4">Toggle Filters</button>
+          <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-6">
+              <!-- Products will be loaded here dynamically -->
+          </div>
+      </main>
+    
+  </div>
+
+  <script>
+      document.getElementById('toggleSidebar').addEventListener('click', () => {
+          document.getElementById('sidebar').classList.toggle('hidden');
+      });
+
+      const  products = [
+  {
+    id:1,
+    title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",
+    price: 109.95,
+    description:
+      "Your perfect pack for everyday use and walks in the forest. Stash your laptop (up to 15 inches) in the padded sleeve, your everyday",
+    category: "men's clothing",
+    image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
+    rating: {
+      rate: 3.9,
+      count: 120,
+    },
+  },
+   {
+    id:2,
+    title: "Mens Casual Premium Slim Fit T-Shirts",
+    price: 22.3,
+    description:
+      "Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight & soft fabric for breathable and comfortable wearing.",
+    category: "men's clothing",
+    image:
+      "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg",
+    rating: {
+      rate: 4.1,
+      count: 259,
+    },
+  },
+  {
+    id:3,
+    title: "Mens Cotton Jacket",
+    price: 55.99,
+    description:
+      "Great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions such as working, hiking, camping, and more.",
+    category: "men's clothing",
+    image: "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg",
+    rating: {
+      rate: 4.7,
+      count: 500,
+    },
+  },
+   {
+    id:4,
+    title: "Mens Casual Slim Fit",
+    price: 15.99,
+    description:
+      "The color could be slightly different between on the screen and in practice. Please check size details below.",
+    category: "men's clothing",
+    image: "https://fakestoreapi.com/img/71YXzeOuslL._AC_UY879_.jpg",
+    rating: {
+      rate: 2.1,
+      count: 430,
+    },
+  },
+   {
+    id:5,
+    title: "John Hardy Women's Legends Naga Gold & Silver Dragon Station Chain Bracelet",
+    price: 695,
+    description:
+      "From our Legends Collection, inspired by the mythical water dragon. Wear inward for love and abundance, outward for protection.",
+    category: "jewelery",
+    image:
+      "https://fakestoreapi.com/img/71pWzhdJNwL._AC_UL640_QL65_ML3_.jpg",
+    rating: {
+      rate: 4.6,
+      count: 400,
+    },
+  },
+   {
+    id:6,
+    title: "Solid Gold Petite Micropave",
+    price: 168,
+    description:
+      "Satisfaction Guaranteed. Return or exchange any order within 30 days. Designed and sold by Hafeez Center in the United States.",
+    category: "jewelery",
+    image:
+      "https://fakestoreapi.com/img/61sbMiUnoGL._AC_UL640_QL65_ML3_.jpg",
+    rating: {
+      rate: 3.9,
+      count: 70,
+    },
+  },
+  {
+    id:7,
+    title: "White Gold Plated Princess",
+    price: 9.99,
+    description:
+      "Classic Created Wedding Engagement Solitaire Diamond Promise Ring for Her. Ideal gift for special occasions.",
+    category: "jewelery",
+    image:
+      "https://fakestoreapi.com/img/71YAIFU48IL._AC_UL640_QL65_ML3_.jpg",
+    rating: {
+      rate: 3,
+      count: 400,
+    },
+  },
+   {
+    id:8,
+    title: "Pierced Owl Rose Gold Plated Stainless Steel Double",
+    price: 10.99,
+    description:
+      "Rose Gold Plated Double Flared Tunnel Plug Earrings. Made of 316L Stainless Steel.",
+    category: "jewelery",
+    image:
+      "https://fakestoreapi.com/img/51UDEzMJVpL._AC_UL640_QL65_ML3_.jpg",
+    rating: {
+      rate: 1.9,
+      count: 100,
+    },
+  },
+   {
+    id:9,
+    title: "WD 2TB Elements Portable External Hard Drive - USB 3.0",
+    price: 64,
+    description:
+      "USB 3.0 and USB 2.0 Compatibility. Fast data transfers and improved PC performance.",
+    category: "electronics",
+    image: "https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg",
+    rating: {
+      rate: 3.3,
+      count: 203,
+    },
+  },
+   {
+    id:10,
+    title: "SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s",
+    price: 109,
+    description:
+      "Easy upgrade for faster boot-up, shutdown, application load, and response. Ideal for typical PC workloads.",
+    category: "electronics",
+    image: "https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_.jpg",
+    rating: {
+      rate: 2.9,
+      count: 470,
+    },
+  },{
+    id:10,
+    title: "DANVOUY Womens T Shirt Casual Cotton Short",
+    price: 109,
+    description:
+      "95%Cotton,5%Spandex, Features: Casual, Short Sleeve, Letter Print,V-Neck,Fashion Tees, The fabric is soft and has some stretch., Occasion: Casual/Office/Beach/School/Home/Street. Season: Spring,Summer,Autumn,Winter.",
+    category: "women's clothing",
+    image: "https://fakestoreapi.com/img/61pHAEJ4NML._AC_UX679_.jpg",
+    rating: {
+      rate: 2.9,
+      count: 470,
+    }
+  }
+];
+
+
+
+      let cart = [];
+      function renderProducts(filter = {}) {
+          const grid = document.getElementById("productGrid");
+          grid.innerHTML = "";
+          products.filter(product => {
+              return (filter.category ? filter.category === "all" || product.category === filter.category : true) &&
+                     (filter.price ? (filter.price === "0-500" && product.price <= 500) || (filter.price === "100-500" && product.price >= 100 && product.price <= 500) : true) &&
+                     (filter.rating ? product.rating >= filter.rating : true);
+          }).forEach(product => {
+              grid.innerHTML += `
+                  <div class="bg-white p-4 rounded-lg shadow-lg  flex flex-col gap-3 justify-evenly">
+                      <img src="${product.image}" alt="${product.title}" class="w-56 h-56 object-cover rounded object-top">
+                      <h3 class="text-lg font-semibold mt-2">${product.title}</h3>
+                      <p class="text-green-600 font-bold">$${product.price}</p>
+                      <p class="text-yellow-500">${'★'.repeat(product.rating.rate)}${'☆'.repeat(5 - product.rating)}</p>
+                      <button onclick="addToCart(${product.id})" class="mt-2 bg-green-600 text-white px-4 py-2 rounded">Add to Cart</button>
+                  </div>`;
+          });
+      }
+
+      function addToCart(id) {
+          const product = products.find(p => p.id === id);
+          cart.push(product);
+          updateCart();
+      }
+
+      function updateCart() {
+          const cartItems = document.getElementById("cartItems");
+          const totalPrice = document.getElementById("totalPrice");
+          cartItems.innerHTML = "";
+          let total = 0;
+          cart.forEach(product => {
+              cartItems.innerHTML += `<li>${product.title} - $${product.price}</li>`;
+              total += product.price;
+          });
+          totalPrice.textContent = total;
+      }
+
+      document.querySelectorAll("input[name='category'], input[name='price'], input[name='rating']").forEach(radio => {
+          radio.addEventListener("change", () => {
+              renderProducts({
+                  category: document.querySelector("input[name='category']:checked").value,
+                  price: document.querySelector("input[name='price']:checked").value,
+                  rating: document.querySelector("input[name='rating']:checked").value
+              });
+          });
+      });
+
+      renderProducts();
+  </script>
+</body>
