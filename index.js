@@ -57,7 +57,7 @@ app.get("*", (req, res) => {
 
 
 
-const PORT = 8000;
+const PORT = 5501;
 app.listen(PORT, () => {
   dbConnection();
   console.log(`Server running on http://localhost:${PORT}`)

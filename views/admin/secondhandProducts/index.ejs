@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Second-Hand Products</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="w-full mx-auto bg-white shadow-md rounded-lg p-6">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-4">
+        <h1 class="text-xl font-bold">Second-Hand Products</h1>
+      </div>
+ 
+      <!-- Search Bar -->
+      <div class="relative mb-4">
+        <input type="text" id="search" placeholder="Search Products" class="w-full border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring focus:ring-green-300" onkeyup="filterProducts()">
+      </div>
+ 
+      <!-- Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse bg-white text-left text-sm text-gray-700">
+          <thead class="bg-gray-100">
+            <tr>
+                <th class="px-4 py-2">User ID</th>
+              <th class="px-4 py-2">Image</th>
+              <th class="px-4 py-2">Fabric</th>
+              <th class="px-4 py-2">Cloth Duration</th>
+              <th class="px-4 py-2">Size</th>
+              <th class="px-4 py-2">Estimated Points</th>
+              <th class="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="secproducts-table">
+            <!-- Rows will be injected dynamically -->
+          </tbody>
+        </table>
+      </div>
+ 
+      <!-- Pagination -->
+      <div class="flex justify-between items-center mt-4">
+        <span id="page-info" class="text-sm text-gray-600">Page 1 of 1</span>
+        <div class="flex space-x-2">
+          <button onclick="prevPage()" class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">&laquo; Prev</button>
+          <button onclick="nextPage()" class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Next &raquo;</button>
+        </div>
+      </div>
+    </div>
+ 
+    <script>
+     const secproducts = [
+       {
+         quantity: 3,
+         image: "/api/placeholder/80/80",
+         category: "Electronics",
+         purchaseDate: "2024-03-10",
+         name: "Wireless Headphones",
+         points: 100
+       },
+       {
+         quantity: 1,
+         image: "/api/placeholder/80/80",
+         category: "Furniture",
+         purchaseDate: "2024-03-11",
+         name: "Wooden Coffee Table",
+         points: 200
+       },
+       {
+         quantity: 2,
+         image: "/api/placeholder/80/80",
+         category: "Books",
+         purchaseDate: "2024-03-12",
+         name: "Fiction Novel Set",
+         points: 50
+       },
+       {
+         quantity: 5,
+         image: "/api/placeholder/80/80",
+         category: "Home Decor",
+         purchaseDate: "2024-03-13",
+         name: "Ceramic Flower Vase",
+         points: 100
+       },
+       {
+         quantity: 1,
+         image: "/api/placeholder/80/80",
+         category: "Clothing",
+         purchaseDate: "2024-03-14",
+         name: "Leather Jacket",
+         points: 200
+       },
+       {
+         quantity: 4,
+         image: "/api/placeholder/80/80",
+         category: "Kitchen",
+         purchaseDate: "2024-03-15",
+         name: "Stainless Steel Pots",
+         points: 150
+       },
+       {
+         quantity: 2,
+         image: "/api/placeholder/80/80",
+         category: "Sports",
+         purchaseDate: "2024-03-16",
+         name: "Yoga Mat",
+         points: 50
+       }
+     ];
+      
+      let currentPage = 1;
+      const rowsPerPage = 7;  
+ 
+      function displayProducts() {
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const table = document.getElementById("secproducts-table");
+        table.innerHTML = "";
+       
+        secproducts.slice(start, end).forEach((product, index) => {
+          const row = `<tr class='border-t hover:bg-gray-50'>
+            <td class='px-4 py-2'>${product.quantity}</td>
+            <td class='px-4 py-2'><img src="${product.image}" class="w-16 h-16 object-cover rounded" alt="Product Image"></td>
+            <td class='px-4 py-2'>${product.category}</td>
+            <td class='px-4 py-2'>${product.purchaseDate}</td>
+            <td class='px-4 py-2'>${product.name}</td>
+            <td class='px-4 py-2'>
+            </td>
+            <td class='px-4 py-2'>
+              <select class="border border-gray-300 rounded py-1 px-2 focus:outline-none focus:ring focus:ring-green-300">
+                <option value="">Select Action</option>
+                <option value="approve" class="text-green-600">Approve</option>
+                <option value="disapprove" class="text-red-600">Disapprove</option>
+              </select>
+            </td>
+          </tr>`;
+          table.innerHTML += row;
+        });
+        
+        const totalPages = Math.ceil(secproducts.length / rowsPerPage);
+        document.getElementById("page-info").innerText = `Page ${currentPage} of ${totalPages}`;
+      }
+ 
+      function updatePoints(index, value) {
+        secproducts[index].points = parseInt(value);
+      }
+      
+      function filterProducts() {
+        const searchTerm = document.getElementById("search").value.toLowerCase();
+        const filteredProducts = secproducts.filter(product => 
+          product.name.toLowerCase().includes(searchTerm) || 
+          product.category.toLowerCase().includes(searchTerm)
+        );
+        
+        // Here you would update the display with filtered products
+        // For simplicity, just redisplaying all products
+        displayProducts();
+      }
+      
+      function prevPage() {
+        if (currentPage > 1) {
+          currentPage--;
+          displayProducts();
+        }
+      }
+      
+      function nextPage() {
+        const totalPages = Math.ceil(secproducts.length / rowsPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          displayProducts();
+        }
+      }
+ 
+      // Initial display
+      displayProducts();
+    </script>
+  </body>
+</html>
