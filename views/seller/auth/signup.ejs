@@ -1,116 +1,135 @@
 <body>
   <div class="min-h-screen flex items-center justify-center bg-gray-50">
-    <div class="w-full mx-auto p-6 lg:flex lg:items-center lg:justify-between">
+    <div class="w-full mx-auto p-6 lg:flex lg:items-start lg:justify-between">
       
-      <div class="w-full md:w-1/2 lg:w-1/3 hidden md:flex items-center justify-center mx-auto">
-        <img src="https://freshcart-next-js.vercel.app/images/svg-graphics/signup-g.svg" alt="Sign Up Illustration" class="w-full h-[50%] md:h-auto mx-auto">
+      <!-- Illustration Section -->
+      <div class="w-full md:w-1/2 lg:w-1/3 mt-20 hidden md:flex items-start justify-start mx-auto">
+        <img src="https://freshcart-next-js.vercel.app/images/svg-graphics/signup-g.svg" 
+             alt="Sign Up Illustration" class="w-full h-[50%] md:h-auto mx-auto">
       </div>
 
+      <!-- Form Section -->
       <div class="w-full lg:w-1/2 max-w-3xl mx-auto">
         <h1 class="text-3xl font-bold mb-4">Become a Seller</h1>
         <p class="text-gray-600 mb-8">Join SwiftMart and start selling your products today!</p>
   
-        <form class="space-y-4" action="/api/v1/seller/signup" method="POST" id="sellerSignupForm">
+        <form class="space-y-4" action="/api/v1/seller/signup" method="POST" 
+              id="sellerSignupForm" enctype="multipart/form-data">
+          
+          <!-- Full Name -->
           <div>
             <label for="name" class="block text-sm font-medium">Full Name</label>
-            <input type="text" id="name" name="name" required class="mt-1 p-2 w-full border rounded-lg">
-            <p class="text-red-500 text-sm mt-1 hidden" id="nameError"></p>
+            <input type="text" id="name" name="name" required 
+                   class="mt-1 p-2 w-full border rounded-lg">
           </div>
-
+  
+          <!-- Store Name -->
+          <div>
+            <label for="storeName" class="block text-sm font-medium">Store Name</label>
+            <input type="text" id="storeName" name="storeName" required 
+                   class="mt-1 p-2 w-full border rounded-lg">
+          </div>
+  
+          <!-- Phone Number -->
+          <div>
+            <label for="phoneNumber" class="block text-sm font-medium">Phone Number</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" required 
+                   pattern="\d{10}" 
+                   class="mt-1 p-2 w-full border rounded-lg" 
+                   placeholder="Enter 10-digit phone number">
+          </div>
+  
+          <!-- Email -->
           <div>
             <label for="email" class="block text-sm font-medium">Email</label>
-            <input type="email" id="email" name="email" required class="mt-1 p-2 w-full border rounded-lg">
-            <p class="text-red-500 text-sm mt-1 hidden" id="emailError"></p>
+            <input type="email" id="email" name="email" required 
+                   class="mt-1 p-2 w-full border rounded-lg">
           </div>
-
+  
+          <!-- Password -->
           <div>
             <label for="password" class="block text-sm font-medium">Password</label>
             <div class="relative">
-              <input type="password" id="password" name="password" required class="mt-1 p-2 w-full border rounded-lg pr-10">
-              <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <input type="password" id="password" name="password" required 
+                     class="mt-1 p-2 w-full border rounded-lg pr-10">
+              <button type="button" id="togglePassword" 
+                      class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
                 👁️
               </button>
             </div>
-            <p class="text-red-500 text-sm mt-1 hidden" id="passwordError"></p>
           </div>
-
+  
+          <!-- GST Number -->
           <div>
             <label for="gstn" class="block text-sm font-medium">GST Number</label>
-            <input type="text" id="gstn" name="gstn" required class="mt-1 p-2 w-full border rounded-lg">
-            <p class="text-red-500 text-sm mt-1 hidden" id="gstnError"></p>
-          </div>
-
-          <div>
-            <label for="profileImage" class="block text-sm font-medium">Profile Image Url</label>
-            <input type="text" id="profileImage" name="profileImage" accept="image/*" class="mt-1 p-2 w-full border rounded-lg">
+            <input type="text" id="gstn" name="gstn" required 
+                   pattern="[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}" 
+                   class="mt-1 p-2 w-full border rounded-lg">
           </div>
   
-          <button type="submit" class="w-full bg-green-600 text-white p-2 rounded-lg hover:bg-green-700">Register</button>
+          <!-- Profile Image -->
+          <div>
+            <label for="profileImage" class="block text-sm font-medium">Profile Image</label>
+            <input type="file" id="profileImage" name="profileImage" accept="image/*" required 
+                   class="mt-1 p-2 w-full border rounded-lg">
+          </div>
+  
+          <!-- Aadhaar Image -->
+          <div>
+            <label for="aadhaarImage" class="block text-sm font-medium">Aadhaar Image</label>
+            <input type="file" id="aadhaarImage" name="aadhaarImage" accept="image/*" required 
+                   class="mt-1 p-2 w-full border rounded-lg">
+          </div>
+  
+          <!-- Bank Account Number -->
+          <div>
+            <label for="accountNumber" class="block text-sm font-medium">Bank Account Number</label>
+            <input type="text" id="accountNumber" name="accountNumber" required 
+                   pattern="\d{6,18}" 
+                   class="mt-1 p-2 w-full border rounded-lg">
+          </div>
+  
+          <!-- IFSC Code -->
+          <div>
+            <label for="ifscCode" class="block text-sm font-medium">IFSC Code</label>
+            <input type="text" id="ifscCode" name="ifscCode" required 
+                   pattern="^[A-Z]{4}0[A-Z0-9]{6}$" 
+                   class="mt-1 p-2 w-full border rounded-lg">
+          </div>
+  
+          <!-- Bank Name -->
+          <div>
+            <label for="bankName" class="block text-sm font-medium">Bank Name</label>
+            <input type="text" id="bankName" name="bankName" required 
+                   class="mt-1 p-2 w-full border rounded-lg">
+          </div>
+  
+          <!-- Submit Button -->
+          <button type="submit" 
+                  class="w-full bg-green-600 text-white p-2 rounded-lg hover:bg-green-700">
+            Register
+          </button>
         </form>
   
-        <p class="text-xs text-gray-500 mt-4">By continuing, you agree to our <a href="#" class="text-green-600 underline">Terms of Service</a> & <a href="#" class="text-green-600 underline">Privacy Policy</a>.</p>
-        <p class="mt-6 text-center text-gray-700">Already have an account? <a href="/api/v1/seller/login" class="text-green-600 hover:underline">Login</a></p>
+        <!-- Terms & Login Links -->
+        <p class="text-xs text-gray-500 mt-4">
+          By continuing, you agree to our 
+          <a href="#" class="text-green-600 underline">Terms of Service</a> & 
+          <a href="#" class="text-green-600 underline">Privacy Policy</a>.
+        </p>
+        <p class="mt-6 text-center text-gray-700">
+          Already have an account? 
+          <a href="/api/v1/seller/login" class="text-green-600 hover:underline">Login</a>
+        </p>
       </div>
     </div>
   </div>
 
+  <!-- Password Toggle Script -->
   <script>
-    const passwordInput = document.getElementById('password');
-    const togglePassword = document.getElementById('togglePassword');
-
-    togglePassword.addEventListener('click', () => {
-      passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-    });
-
-    document.getElementById('sellerSignupForm').addEventListener('submit', (event) => {
-      let isValid = true;
-
-      const name = document.getElementById('name');
-      const email = document.getElementById('email');
-      const password = document.getElementById('password');
-      const gstn = document.getElementById('gstn');
-
-      const nameError = document.getElementById('nameError');
-      const emailError = document.getElementById('emailError');
-      const passwordError = document.getElementById('passwordError');
-      const gstnError = document.getElementById('gstnError');
-
-      nameError.classList.add('hidden');
-      emailError.classList.add('hidden');
-      passwordError.classList.add('hidden');
-      gstnError.classList.add('hidden');
-
-      const namePattern = /^[a-zA-Z\s]+$/;
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      const gstnPattern = /^[0-9A-Z]{15}$/;
-
-      if (!namePattern.test(name.value.trim())) {
-        nameError.textContent = "Name should contain only letters.";
-        nameError.classList.remove('hidden');
-        isValid = false;
-      }
-
-      if (!emailPattern.test(email.value.trim())) {
-        emailError.textContent = "Invalid email address.";
-        emailError.classList.remove('hidden');
-        isValid = false;
-      }
-
-      if (password.value.length < 8) {
-        passwordError.textContent = "Password must be at least 8 characters long.";
-        passwordError.classList.remove('hidden');
-        isValid = false;
-      }
-
-      if (!gstnPattern.test(gstn.value.trim())) {
-        gstnError.textContent = "Invalid GST Number. It should be 15 characters long.";
-        gstnError.classList.remove('hidden');
-        isValid = false;
-      }
-
-      if (!isValid) {
-        event.preventDefault();
-      }
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordField = document.getElementById('password');
+      passwordField.type = passwordField.type === 'password' ? 'text' : 'password';
     });
   </script>
 </body>

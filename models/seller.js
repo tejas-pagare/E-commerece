@@ -5,6 +5,9 @@ const SellerSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  storeName:{
+    type:String
+  },
   email: {
     type: String,
     required: true,
@@ -32,7 +35,27 @@ const SellerSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  }
+  ,
+  address: {
+    street: { type: String },
+    city: { type: String },
+    state: { type: String },
+    pincode: { type: String },
+    country: { type: String, default: "India" },
   },
+  identityVerification: {
+    aadharCard: { type: String, required: true },
+    status: {
+      type: String,
+      enum: ["Pending", "Verified", "Rejected"],
+      default: "Pending",
+    },
+  }, bankDetails: {
+    accountNumber: { type: String, required: true, unique: true },
+    ifscCode: { type: String, required: true },
+    bankName: { type: String, required: true },
+  }
 });
 
 const Seller = mongoose.model("Seller", SellerSchema);

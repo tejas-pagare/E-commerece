@@ -120,10 +120,10 @@ router.post("/cart/remove/:id", isAuthenticated, removeFromCartController)
 router.delete("/cart/remove/:id", isAuthenticated, deleteFromCartController);
 router.get("/checkout",isAuthenticated,async(req,res)=>{
   const user = await User.findById(req.userId).populate("cart.productId");
-  console.log(user.cart[0]);
+  console.log(user);
   let total =0;
-  user.cart.forEach((e)=>{
-    total += Math.round(e.productId.price)*e.quantity
+  user.cart?.forEach((e)=>{
+    total += Math.round(e?.productId?.price)*e.quantity
   })
   return res.render("User/payment/index.ejs",{title:"Checkout Page",role:"user",user,total})
 });
