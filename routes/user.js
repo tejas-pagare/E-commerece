@@ -127,7 +127,9 @@ router.get("/checkout",isAuthenticated,async(req,res)=>{
   })
   return res.render("User/payment/index.ejs",{title:"Checkout Page",role:"user",user,total})
 });
-
+router.post("/payment",(req,res)=>{
+  console.log(req.body);
+})
 
 router.get('/', isAuthenticated, HomePageController);
 
