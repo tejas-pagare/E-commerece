@@ -1,43 +1,33 @@
 <body class="bg-gray-100 text-gray-800">
-  <main class="flex">
-      <aside class="w-64 min-h-screen bg-green-200 p-6 rounded-lg text-center shadow-md">
-          <div class="profile mb-4">
-              <img src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
-                  alt="Profile Picture" class="w-20 h-20 rounded-full object-cover mx-auto" />
-              <h2 class="text-lg font-semibold mt-2"><%= user.firstname %></h2>
-          </div>
-          <nav class="space-y-2">
-              <a href="/api/v1/user/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
-              <a href="/api/v1/user/account/address" class="block py-2 font-medium text-black hover:text-green-700">Address</a>
-              <% if ( role==="user" ) { %>
-                  <a href="#" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
-                  <a href="/api/v1/user/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
-                  
-                  <% }%>
-              <a href="/api/v1/user/logout" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
-          </nav>
-      </aside>
+    <main class="flex">
+        <%- include('../../partials/profileSidebar.ejs') %>
 
-      <section class="flex-1  p-6 bg-white rounded-lg shadow-md">
-          <h1 class="text-2xl font-bold mb-6">My Account</h1>
-          <hr class="mb-6">
+            <section class="flex-1  p-6 bg-white rounded-lg shadow-md">
+                <h1 class="text-2xl font-bold mb-6">My Account</h1>
+                <hr class="mb-6">
 
-          <form class="mb-6">
-              <h2 class="text-xl font-semibold mb-4">Account Details</h2>
-              <label class="block font-bold">First Name *</label>
-              <p><%= user.firstname %></p>
+                <form class="mb-6">
+                    <h2 class="text-xl font-semibold mb-4">Account Details</h2>
+                    <label class="block font-bold">First Name *</label>
+                    <p>
+                        <%= user.firstname %>
+                    </p>
 
-              <label class="block font-bold mt-4">Last Name *</label>
-              <p><%= user.lastname %></p>
-            
-              <label class="block font-bold mt-4">Email *</label>
-              <p><%= user.email %></p>
-  
-             
-                <a class="mt-12 block w-[180px] px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 " href="/api/v1/user/account/update">Update Account </a> 
-          </form>
+                    <label class="block font-bold mt-4">Last Name *</label>
+                    <p>
+                        <%= user.lastname %>
+                    </p>
 
-      </section>
-  </main>
+                    <label class="block font-bold mt-4">Email *</label>
+                    <p>
+                        <%= user.email %>
+                    </p>
+
+
+                    <a class="mt-12 block w-[180px] px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 "
+                        href="/api/v1/user/account/update">Update Account </a>
+                </form>
+
+            </section>
+    </main>
 </body>
-

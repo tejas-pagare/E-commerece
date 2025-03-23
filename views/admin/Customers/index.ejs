@@ -1,14 +1,11 @@
 <body class="bg-gray-100">
-  <div class="w-full min-h-screen mx-auto bg-white shadow-md rounded-lg p-6">
+  <div class="w-full min-h-screen mx-auto bg-white shadow-md rounded-lg p-6 relative">
     <!-- Header -->
     <div class="flex justify-between items-center mb-4">
       <h1 class="text-xl font-bold">Customers</h1>
     </div>
 
-    <!-- Search Bar -->
-    <div class="relative mb-4">
-      <input type="text" id="search" placeholder="Search Customers" class="w-full border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring focus:ring-green-300" onkeyup="filterCustomers()">
-    </div>
+   
 
     <!-- Table -->
     <div class="overflow-x-auto">
@@ -27,6 +24,19 @@
         
         </tbody>
       </table>
+    </div>
+
+    <div id="popover" class="hidden fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+      <div class="bg-white shadow-lg rounded-lg p-6 w-96 border relative">
+        <img id="popover-image" src="" class="w-full h-56 object-cover
+        object-top rounded-lg mb-4" alt="Product Image">
+        
+        <p><strong>Name:</strong> <span id="popover-name"></span></p>
+        <p><strong>Email:</strong> <span id="popover-email"></span></p>
+        <p><strong>Phone:</strong> <span id="popover-phone"></span></p>
+        
+        <button onclick="closePopover()" class="mt-4 px-4 py-2 bg-gray-500 text-white rounded-md text-sm">Close</button>
+      </div>
     </div>
   </div>
 
@@ -71,13 +81,13 @@
         row.className = "border-t hover:bg-gray-50";
 
         row.innerHTML = `
-          <td class='px-4 py-2'><img src="${customer.avatar||"data:image/jpeg;base64,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"}" class="rounded-full w-10 h-10" alt="Avatar"></td>
+          <td class='px-4 py-2'><img src="${customer.avatar||"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3xM2vjVkOGoeb34L7o1BU93Nmi0zAz6BvDw&sewNttFXNUW2qrIhNC6F8ZeHNc0+YzkdyvjY+AEfpcunyhbOi5bNGGy85R1179muWYXhp9f0e2m6XWa4XOerqJZXZLTIGtaBoAMDgpi07L2OzuDrdbaeJ4/aEb7/9TslTCLq5PML1EQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREH//2Q=="}" class="rounded-full w-10 h-10" alt="Avatar"></td>
           <td class='px-4 py-2'>${customer.firstname}</td>
           <td class='px-4 py-2'>${customer.email}</td>
           <td class='px-4 py-2'>${new Date(customer.createdAt).getFullYear()}</td>
           <td class='px-4 py-2'>${customer.Address?.phone || "8978987689"}</td>
           <td class='px-4 py-2 space-x-2'>
-            <button class="px-2 py-1 bg-blue-500 text-white rounded-md text-xs" onclick="viewCustomer('${customer._id}')">View</button>
+             <button class="px-2 py-1 bg-blue-500 text-white rounded-md text-xs" onclick="viewProduct('${customer.image||"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3xM2vjVkOGoeb34L7o1BU93Nmi0zAz6BvDw&s"}', '${customer.firstname}', '${customer.email}', '${customer.phone||"7558388619"}')">View</button>
             
             <button class="px-2 py-1 bg-red-500 text-white rounded-md text-xs" onclick="deleteCustomer('${customer._id}')">Delete</button>
           </td>
@@ -87,6 +97,21 @@
       });
     }
     getCustomer()
+
+
+
+    function viewProduct(image, firstname, email, phone) {
+      document.getElementById("popover-image").src = image;
+      document.getElementById("popover-name").innerText = firstname;
+      document.getElementById("popover-email").innerText = email;
+      document.getElementById("popover-phone").innerText = phone;
+      
+      document.getElementById("popover").classList.remove("hidden");
+    }
+
+    function closePopover() {
+      document.getElementById("popover").classList.add("hidden");
+    }
   </script>
 </body>
 </html>

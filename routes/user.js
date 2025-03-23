@@ -131,6 +131,9 @@ router.post("/payment",(req,res)=>{
   
 })
 
+router.get("/dashboard",isAuthenticated,(req,res)=>{
+  res.render("User/dashboard/index.ejs",{title:"Dashboard",role:"user"});
+})
 router.get('/', isAuthenticated, HomePageController);
 
 

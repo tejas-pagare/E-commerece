@@ -105,13 +105,15 @@ const addToCartController =  async (req, res) => {
     const userId = req.userId
     if (!id) {
       return res.json({
-        message: "No product id provided"
+        message: "No product id provided",
+        success:false
       })
     }
     const product = await Product.findOne({ _id: id });
     if (!product) {
       return res.json({
-        message: "No such product"
+        message: "No such product",
+        success:false
       })
     }
 
@@ -128,13 +130,15 @@ const addToCartController =  async (req, res) => {
     }
     (await user).save();
     res.json({
-      message: "updated cart"
+      message: "Product added",
+      success:true
     })
 
   } catch (error) {
     console.log(error)
     return res.json({
-      messag: "Server error"
+      messag: "Server error",
+      success:false
     })
   }
 }
@@ -145,13 +149,15 @@ const removeFromCartController = async (req, res) => {
     const userId = req.userId
     if (!id) {
       return res.json({
-        message: "No product id provided"
+        message: "No product id provided",
+        success:false
       })
     }
     const product = await Product.findOne({ _id: id });
     if (!product) {
       return res.json({
-        message: "No such product"
+        message: "No such product",
+        success:false
       })
     }
 
@@ -165,13 +171,15 @@ const removeFromCartController = async (req, res) => {
     }
     (await user).save();
     res.json({
-      message: "updated cart"
+      message: "Product removed from cart",
+      success:true
     })
 
   } catch (error) {
     console.log(error)
     return res.json({
-      messag: "Server error"
+      messag: "Server error",
+      success:false
     })
   }
 }
@@ -183,13 +191,15 @@ const deleteFromCartController = async (req, res) => {
     const userId = req.userId
     if (!id) {
       return res.json({
-        message: "No product id provided"
+        message: "No product id provided",
+        success:false
       })
     }
     const product = await Product.findOne({ _id: id });
     if (!product) {
       return res.json({
-        message: "No such product"
+        message: "No such product",
+        success:false
       })
     }
 
@@ -201,11 +211,13 @@ const deleteFromCartController = async (req, res) => {
     }
     (await user).save();
     res.json({
-      message: "updated cart"
+      message: "Product reomved from cart",
+      success:true
     })
   } catch (error) {
     return res.json({
-      messag: "Server error"
+      messag: "Server error",
+      success:false
     })
   }
 }

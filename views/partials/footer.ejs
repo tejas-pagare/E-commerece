@@ -1,29 +1,53 @@
-<footer class="footer">
-    <div class="container">
-        <div class="footer-top">
-            <div class="footer-logo">
-                <a href="/">3legant</a>
-                <p>Gift & Decoration Store</p>
+<% if(title!=="Home") {%>
+
+    <footer class="bg-green-500 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- About Section -->
+                <div>
+                    <h2 class="text-xl font-bold mb-3">SwiftMart</h2>
+                    <p class="text-sm">Your one-stop shop for quality products at the best prices. Shop with confidence and convenience.</p>
+                </div>
+    
+                <!-- Quick Links -->
+                <div>
+                    <h2 class="text-xl font-bold mb-3">Quick Links</h2>
+                    <ul class="space-y-2">
+                        <li><a href="/api/v1/user/" class="hover:text-gray-200">Home</a></li>
+                        <li><a href="/api/v1/user/shop" class="hover:text-gray-200">Shop</a></li>
+                        <li><a href="/api/v1/user/blog" class="hover:text-gray-200">Blog</a></li>
+                        <li><a href="/api/v1/user/contact" class="hover:text-gray-200">Contact</a></li>
+                    </ul>
+                </div>
+    
+                <!-- Customer Service -->
+                <div>
+                    <h2 class="text-xl font-bold mb-3">Customer Service</h2>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-gray-200">FAQ</a></li>
+                        <li><a href="#" class="hover:text-gray-200">Shipping & Returns</a></li>
+                        <li><a href="#" class="hover:text-gray-200">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-gray-200">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+    
+                <!-- Social Media -->
+                <div>
+                    <h2 class="text-xl font-bold mb-3">Follow Us</h2>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-white hover:text-gray-200"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-white hover:text-gray-200"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-white hover:text-gray-200"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-white hover:text-gray-200"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                </div>
             </div>
-            <div class="footer-links">
-                <a href="/">Home</a>
-                <a href="/shop">Shop</a>
-                <a href="/product">Product</a>
-                <a href="/blog">Blog</a>
-                <a href="/contact">Contact Us</a>
+    
+            <!-- Copyright -->
+            <div class="border-t border-white mt-6 pt-4 text-center text-sm">
+                &copy; 2025 SwiftMart. All Rights Reserved.
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>Copyright © 2023 3legant. All rights reserved</p>
-            <div class="footer-legal">
-                <a href="/privacy">Privacy Policy</a>
-                <a href="/terms">Terms of Use</a>
-            </div>
-            <div class="social-links">
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-facebook"></i></a>
-                <a href="#"><i class="fab fa-youtube"></i></a>
-            </div>
-        </div>
-    </div>
-</footer>
+    </footer>
+
+<%}%>

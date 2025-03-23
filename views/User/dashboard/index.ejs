@@ -1,0 +1,232 @@
+<body class="bg-green-50 font-sans">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-green-700 text-white shadow-lg p-6">
+      <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+      <nav>
+        <ul>
+          <li class="mb-4"><a href="#" class="block p-3 bg-green-600 hover:bg-green-500 rounded transition"
+              onclick="showSection('orders')">Orders</a></li>
+          <li class="mb-4"><a href="#" class="block p-3 hover:bg-green-600 rounded transition"
+              onclick="showSection('profile')">Profile</a></li>
+          <li class="mb-4"><a href="#" class="block p-3 hover:bg-green-600 rounded transition"
+              onclick="showSection('wishlist')">Wishlist</a></li>
+          <li class="mb-4"><a href="#" class="block p-3 hover:bg-green-600 rounded transition"
+              onclick="showSection('settings')">Settings</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
+      <h1 class="text-3xl font-bold mb-6 text-green-800">Welcome, User!</h1>
+
+      <div id="orders" class="content-section bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4 text-green-700">Recent Orders</h2>
+        <table class="w-full border-collapse border border-green-300 rounded-lg overflow-hidden">
+          <thead>
+            <tr class="bg-green-300 text-green-900">
+              <th class="border p-3">Order ID</th>
+              <th class="border p-3">Date</th>
+              <th class="border p-3">Total</th>
+              <th class="border p-3">Status</th>
+              <th class="border p-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable"></tbody>
+        </table>
+      </div>
+
+      <div id="profile" class="content-section hidden bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4 text-green-700">Profile</h2>
+        <p>Name: John Doe</p>
+        <p>Email: john.doe@example.com</p>
+      </div>
+
+      <div id="wishlist" class="content-section hidden bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4 text-green-700">Wishlist</h2>
+        <p>Your wishlist items will appear here.</p>
+      </div>
+
+      <div id="settings" class="content-section hidden bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4 text-green-700">Settings</h2>
+        <p>Account settings and preferences.</p>
+      </div>
+    </main>
+  </div>
+
+<!-- Order Details Popup -->
+<div id="orderPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="relative top-[10%] bg-white p-6 rounded-lg shadow-xl w-[500px] max-h-[80vh] overflow-y-auto text-center">
+    <!-- Close Button -->
+    <button class="absolute top-2 right-2 text-green-700 hover:text-green-500 text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full bg-green-200 hover:bg-green-300"
+      onclick="closePopup()">✖</button>
+
+    <h2 class="text-2xl font-semibold text-green-700 mb-4">Order Details</h2>
+    <p id="popupContent">Order details will appear here.</p>
+    <button class="mt-4 px-5 py-2 bg-green-600 hover:bg-green-500 text-white rounded transition"
+      onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const orders = [
+        {
+          id: "#1234",
+          date: "2025-03-20",
+          total: "$150",
+          status: "Shipped",
+          details: [
+            {
+              title: "Casual Cotton T-Shirt",
+              price: 15.99,
+              description: "A comfortable and breathable cotton t-shirt for everyday wear.",
+              category: "Clothing",
+              image: "https://example.com/images/cotton-tshirt.jpg"
+            },
+            {
+              title: "Aviator Sunglasses",
+              price: 25.99,
+              description: "Classic aviator sunglasses with UV protection.",
+              category: "Accessories",
+              image: "https://example.com/images/aviator-sunglasses.jpg"
+            },
+            {
+              title: "Running Shoes",
+              price: 59.99,
+              description: "Lightweight running shoes with a cushioned sole for comfort.",
+              category: "Clothing",
+              image: "https://example.com/images/running-shoes.jpg"
+            },
+            {
+              title: "Leather Wallet",
+              price: 30.00,
+              description: "A premium leather wallet with multiple compartments.",
+              category: "Accessories",
+              image: "https://example.com/images/leather-wallet.jpg"
+            }
+          ]
+        },
+        {
+          id: "#5678",
+          date: "2025-03-18",
+          total: "$80",
+          status: "Processing",
+          details: [
+            {
+              title: "Bluetooth Headphones",
+              price: 49.99,
+              description: "Over-ear wireless headphones with deep bass and noise cancellation.",
+              category: "Electronics",
+              image: "https://example.com/images/bluetooth-headphones.jpg"
+            },
+            {
+              title: "Smartphone Tripod",
+              price: 19.99,
+              description: "Portable and adjustable tripod for capturing stable photos and videos.",
+              category: "Electronics",
+              image: "https://example.com/images/smartphone-tripod.jpg"
+            },
+            {
+              title: "Gaming Mouse",
+              price: 39.99,
+              description: "High-precision gaming mouse with customizable RGB lighting.",
+              category: "Electronics",
+              image: "https://example.com/images/gaming-mouse.jpg"
+            },
+            {
+              title: "Portable Power Bank",
+              price: 29.99,
+              description: "10,000mAh power bank for charging devices on the go.",
+              category: "Electronics",
+              image: "https://example.com/images/power-bank.jpg"
+            }
+          ]
+        },
+        {
+          id: "#9101",
+          date: "2025-03-15",
+          total: "$220",
+          status: "Delivered",
+          details: [
+            {
+              title: "Wooden Bookshelf",
+              price: 89.99,
+              description: "A spacious wooden bookshelf with a modern design.",
+              category: "Furniture",
+              image: "https://example.com/images/bookshelf.jpg"
+            },
+            {
+              title: "Ceramic Dinner Set",
+              price: 49.99,
+              description: "A 16-piece ceramic dinner set for elegant dining.",
+              category: "Home",
+              image: "https://example.com/images/dinner-set.jpg"
+            },
+            {
+              title: "LED Desk Lamp",
+              price: 22.99,
+              description: "A sleek and energy-efficient LED desk lamp with adjustable brightness.",
+              category: "Home",
+              image: "https://example.com/images/led-desk-lamp.jpg"
+            },
+            {
+              title: "Memory Foam Pillow",
+              price: 34.99,
+              description: "Ergonomic memory foam pillow for a comfortable sleep.",
+              category: "Home",
+              image: "https://example.com/images/memory-foam-pillow.jpg"
+            }
+          ]
+        }
+      ];
+
+      console.log(orders);
+
+
+      const ordersTable = document.getElementById("ordersTable");
+      orders.forEach(order => {
+        const row = `<tr class="hover:bg-green-100 transition">
+                  <td class="border p-3 text-center">${order.id}</td>
+                  <td class="border p-3 text-center">${order.date}</td>
+                  <td class="border p-3 text-center">${order.total}</td>
+                  <td class="border p-3 text-center">${order.status}</td>
+                  <td class="border p-3 text-center">
+                     <button class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded transition" 
+  onclick='viewDetails(${JSON.stringify(order.details)})'>Details</button>
+
+                  </td>
+              </tr>`;
+        ordersTable.innerHTML += row;
+      });
+    });
+
+    function showSection(sectionId) {
+      document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.add('hidden');
+      });
+      document.getElementById(sectionId).classList.remove('hidden');
+    }
+    function viewDetails(details) {
+      const popupContent = document.getElementById("popupContent");
+      popupContent.innerHTML = details.map(item => `
+    <div class="p-3 border-b">
+      <p class="font-semibold">${item.title}</p>
+      <p>${item.description}</p>
+      <p><strong>Price:</strong> $${item.price}</p>
+      <p><strong>Category:</strong> ${item.category}</p>
+      <img src="${item.image}" alt="${item.title}" class="w-20 h-20 mt-2">
+    </div>
+  `).join("");
+
+      document.getElementById("orderPopup").classList.remove("hidden");
+    }
+
+
+    function closePopup() {
+      document.getElementById("orderPopup").classList.add("hidden");
+    }
+  </script>
+</body>

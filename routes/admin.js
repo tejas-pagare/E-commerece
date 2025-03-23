@@ -8,6 +8,10 @@ router.get("/login", (req, res) => {
   return res.render('admin/login/index.ejs', { title: 'login', role: "admin" })
 })
 
+router.get("/secondHand",(req,res)=>{
+  return res.render("admin/secondhandProducts/index.ejs",{title:"secondHandProduct",role:"admin"});
+})
+
 router.get("/dashboard", async (req, res) => {
 
   const users = await User.find({}).populate(["cart.productId", "products"]);

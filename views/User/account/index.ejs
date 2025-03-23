@@ -1,49 +1,37 @@
 <body class="bg-gray-100 text-gray-800">
     <main class="flex">
         <!-- Sidebar -->
-        <aside class="w-64 min-h-screen bg-green-200 p-6 rounded-lg text-center shadow-md">
-            <div class="profile mb-4">
-                <img src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
-                    alt="Profile Picture" class="w-20 h-20 rounded-full object-cover mx-auto" />
-                <h2 class="text-lg font-semibold mt-2"><%= user.firstname %></h2>
-            </div>
-            <nav class="space-y-2">
-                <a href="/api/v1/user/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
-                <a href="/api/v1/user/account/address" class="block py-2 font-medium text-black hover:text-green-700">Address</a>
-                <% if (role === "user") { %>
-                    <a href="#" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
-                    <a href="/api/v1/user/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
-                <% } %>
-                <a href="/api/v1/user/logout" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
-            </nav>
-        </aside>
-  
-        <!-- Main Section -->
-        <section class="flex-1 p-6 bg-white rounded-lg shadow-md">
-            <h1 class="text-2xl font-bold mb-6">My Account</h1>
-            <hr class="mb-6">
-  
-            <!-- Update Account Form -->
-            <form action="/api/v1/user/account/update" method="post">
-                <h2 class="text-xl font-semibold mb-4">Account Details</h2>
-                
-                <label class="block font-bold">First Name *</label>
-                <input id="firstname" name="firstname" value="<%= user.firstname %>" type="text" placeholder="First name" class="w-full p-2 mt-1 border border-gray-300 rounded">
-  
-                <label class="block font-bold mt-4">Last Name *</label>
-                <input id="lastname" name="lastname" value="<%= user.lastname %>" type="text" placeholder="Last name" class="w-full p-2 mt-1 border border-gray-300 rounded">
-  
-                <label class="block font-bold mt-4">Email *</label>
-                <input id="email" name="email" value="<%= user.email %>" type="email" placeholder="Email" class="w-full p-2 mt-1 border border-gray-300 rounded">
-                
+        <%- include('../../partials/profileSidebar.ejs') %>
+            <!-- Main Section -->
+            <section class="flex-1 p-6 bg-white rounded-lg shadow-md">
+                <h1 class="text-2xl font-bold mb-6">My Account</h1>
                 <hr class="mb-6">
-    
-                <button type="submit" class="mt-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Save Changes</button>
-            </form>
-  
-        </section>
+
+                <!-- Update Account Form -->
+                <form action="/api/v1/user/account/update" method="post">
+                    <h2 class="text-xl font-semibold mb-4">Account Details</h2>
+
+                    <label class="block font-bold">First Name *</label>
+                    <input id="firstname" name="firstname" value="<%= user.firstname %>" type="text"
+                        placeholder="First name" class="w-full p-2 mt-1 border border-gray-300 rounded">
+
+                    <label class="block font-bold mt-4">Last Name *</label>
+                    <input id="lastname" name="lastname" value="<%= user.lastname %>" type="text"
+                        placeholder="Last name" class="w-full p-2 mt-1 border border-gray-300 rounded">
+
+                    <label class="block font-bold mt-4">Email *</label>
+                    <input id="email" name="email" value="<%= user.email %>" type="email" placeholder="Email"
+                        class="w-full p-2 mt-1 border border-gray-300 rounded">
+
+                    <hr class="mb-6">
+
+                    <button type="submit" class="mt-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Save
+                        Changes</button>
+                </form>
+
+            </section>
     </main>
 
     <!-- JavaScript to Handle Form Submission -->
-    
+
 </body>
