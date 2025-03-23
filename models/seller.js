@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Product from "./product.js";
 
 const SellerSchema = new mongoose.Schema({
   name: {
@@ -58,6 +59,15 @@ const SellerSchema = new mongoose.Schema({
   }
 });
 
+SellerSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
+  try {
+    console.log(`Deleting all products for seller ${this._id}`);
+    await Product.deleteMany({ sellerId: this._id }); // Delete related products
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 const Seller = mongoose.model("Seller", SellerSchema);
 
 export default Seller;

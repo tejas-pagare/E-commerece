@@ -1,10 +1,8 @@
-
 <body class="bg-gray-100">
-  <div class="w-full mx-auto bg-white shadow-md rounded-lg p-6">
+  <div class="w-full min-h-screen mx-auto bg-white shadow-md rounded-lg p-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-4">
       <h1 class="text-xl font-bold">Customers</h1>
-    
     </div>
 
     <!-- Search Bar -->
@@ -20,88 +18,75 @@
             <th class="px-4 py-2">Avatar</th>
             <th class="px-4 py-2">Name</th>
             <th class="px-4 py-2">Email</th>
-            <th class="px-4 py-2">Purchase Date</th>
+            <th class="px-4 py-2">Joined Date</th>
             <th class="px-4 py-2">Phone</th>
-            <th class="px-4 py-2">Spent</th>
             <th class="px-4 py-2">Actions</th>
           </tr>
         </thead>
         <tbody id="customer-table">
-          <!-- Rows will be injected dynamically -->
+        
         </tbody>
       </table>
     </div>
-
-    <!-- Pagination -->
-  
   </div>
 
   <script>
-   const customers = [
-  { name: "Aarav Sharma", email: "aarav@example.com", date: "2024-03-10", phone: "987-654-3210", spent: "$500", avatar: "https://i.pravatar.cc/40?img=10" },
-  { name: "Ishita Patel", email: "ishita@example.com", date: "2024-03-11", phone: "876-543-2109", spent: "$750", avatar: "https://i.pravatar.cc/40?img=11" },
-  { name: "Rajesh Verma", email: "rajesh@example.com", date: "2024-03-12", phone: "765-432-1098", spent: "$1200", avatar: "https://i.pravatar.cc/40?img=12" },
-  { name: "Neha Gupta", email: "neha@example.com", date: "2024-03-13", phone: "654-321-0987", spent: "$300", avatar: "https://i.pravatar.cc/40?img=13" },
-  { name: "Vikram Reddy", email: "vikram@example.com", date: "2024-03-14", phone: "543-210-9876", spent: "$900", avatar: "https://i.pravatar.cc/40?img=14" },
-  { name: "Pooja Singh", email: "pooja@example.com", date: "2024-03-15", phone: "432-109-8765", spent: "$650", avatar: "https://i.pravatar.cc/40?img=15" },
-  { name: "Arjun Mehta", email: "arjun@example.com", date: "2024-03-16", phone: "321-098-7654", spent: "$1100", avatar: "https://i.pravatar.cc/40?img=16" },
-  { name: "Sneha Nair", email: "sneha@example.com", date: "2024-03-17", phone: "210-987-6543", spent: "$400", avatar: "https://i.pravatar.cc/40?img=17" },
-  { name: "Rohan Das", email: "rohan@example.com", date: "2024-03-18", phone: "109-876-5432", spent: "$550", avatar: "https://i.pravatar.cc/40?img=18" },
-  { name: "Kavya Iyer", email: "kavya@example.com", date: "2024-03-19", phone: "987-654-3211", spent: "$720", avatar: "https://i.pravatar.cc/40?img=19" },
-  { name: "Manish Kumar", email: "manish@example.com", date: "2024-03-20", phone: "876-543-2101", spent: "$1300", avatar: "https://i.pravatar.cc/40?img=20" },
-  { name: "Ananya Saxena", email: "ananya@example.com", date: "2024-03-21", phone: "765-432-1091", spent: "$350", avatar: "https://i.pravatar.cc/40?img=21" },
-  { name: "Amit Joshi", email: "amit@example.com", date: "2024-03-22", phone: "654-321-0981", spent: "$890", avatar: "https://i.pravatar.cc/40?img=22" },
-  { name: "Sanya Kapoor", email: "sanya@example.com", date: "2024-03-23", phone: "543-210-9871", spent: "$270", avatar: "https://i.pravatar.cc/40?img=23" },
-  { name: "Rahul Malhotra", email: "rahul@example.com", date: "2024-03-24", phone: "432-109-8761", spent: "$960", avatar: "https://i.pravatar.cc/40?img=24" },
-  { name: "Priya Choudhary", email: "priya@example.com", date: "2024-03-25", phone: "321-098-7651", spent: "$680", avatar: "https://i.pravatar.cc/40?img=25" },
-  { name: "Siddharth Rao", email: "siddharth@example.com", date: "2024-03-26", phone: "210-987-6541", spent: "$1050", avatar: "https://i.pravatar.cc/40?img=26" },
-  { name: "Meera Pillai", email: "meera@example.com", date: "2024-03-27", phone: "109-876-5431", spent: "$410", avatar: "https://i.pravatar.cc/40?img=27" },
-  { name: "Tarun Bhatia", email: "tarun@example.com", date: "2024-03-28", phone: "987-654-3212", spent: "$730", avatar: "https://i.pravatar.cc/40?img=28" },
-  { name: "Divya Sen", email: "divya@example.com", date: "2024-03-29", phone: "876-543-2102", spent: "$920", avatar: "https://i.pravatar.cc/40?img=29" }
-];
-
-    let currentPage = 1;
-    const rowsPerPage = 7;  
-
-    function displayCustomers() {
-      const start = (currentPage - 1) * rowsPerPage;
-      const end = start + rowsPerPage;
-      const table = document.getElementById("customer-table");
-      table.innerHTML = "";
-      
-      customers.slice(start, end).forEach((customer, index) => {
-        const row = `<tr class='border-t hover:bg-gray-50'>
-          <td class='px-4 py-2'><img src="${customer.avatar}" class="rounded-full w-10 h-10" alt="Avatar"></td>
-          <td class='px-4 py-2'>${customer.name}</td>
-          <td class='px-4 py-2'>${customer.email}</td>
-          <td class='px-4 py-2'>${customer.date}</td>
-          <td class='px-4 py-2'>${customer.phone}</td>
-          <td class='px-4 py-2'>${customer.spent}</td>
-          <td class='px-4 py-2'>
-            <div class='relative inline-block text-left'>
-              <button onclick='toggleDropdown(this)' class='inline-flex justify-center rounded-md border bg-white px-3 py-1 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring focus:ring-green-300'>Actions</button>
-              <div class='hidden absolute right-0 mt-2 w-max origin-top-right rounded-md bg-white shadow-lg ring ring-black ring-opacity-5 focus:outline-none z-[100]'>
-                <div class='py-1'>
-                  <button onclick='' class='block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100'>Edit</button>
-                  <button onclick='deleteCustomer(${start + index})' class='block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-100'>Delete</button>
-                </div>
-              </div>
-            </div>
-          </td>
-        </tr>`;
-        table.innerHTML += row;
-      });
-      document.getElementById("page-info").innerText = `Page ${currentPage} of ${Math.ceil(customers.length / rowsPerPage)}`;
+    function viewCustomer(id) {
+      alert("Viewing customer: " + id);
+      // Add your logic here to view customer details
     }
 
-    function deleteCustomer(index) {
+    function editCustomer(id) {
+      alert("Editing customer: " + id);
+      // Add your logic here to edit customer details
+    }
+
+   async function deleteCustomer (id) {
       if (confirm("Are you sure you want to delete this customer?")) {
-        customers.splice(index, 1);
-        displayCustomers();
+       
+      const response =   await fetch(`http://localhost:8000/api/v1/admin/customer/${id}`,{
+          method:"Delete",
+          
+        });
+       getCustomer()
       }
     }
 
-    displayCustomers();
+    async function getCustomer(){
+      const response = await fetch("http://localhost:8000/api/v1/admin/customer/details",{
+        method:"GET"
+      });
+      const data = await response.json();
+      
+      renderCustomers(data.customers);
+    }
+
+
+    function renderCustomers(customers) {
+      const tableBody = document.getElementById("customer-table");
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      customers.forEach(customer => {
+        const row = document.createElement("tr");
+        row.className = "border-t hover:bg-gray-50";
+
+        row.innerHTML = `
+          <td class='px-4 py-2'><img src="${customer.avatar||"data:image/jpeg;base64,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"}" class="rounded-full w-10 h-10" alt="Avatar"></td>
+          <td class='px-4 py-2'>${customer.firstname}</td>
+          <td class='px-4 py-2'>${customer.email}</td>
+          <td class='px-4 py-2'>${new Date(customer.createdAt).getFullYear()}</td>
+          <td class='px-4 py-2'>${customer.Address?.phone || "8978987689"}</td>
+          <td class='px-4 py-2 space-x-2'>
+            <button class="px-2 py-1 bg-blue-500 text-white rounded-md text-xs" onclick="viewCustomer('${customer._id}')">View</button>
+            
+            <button class="px-2 py-1 bg-red-500 text-white rounded-md text-xs" onclick="deleteCustomer('${customer._id}')">Delete</button>
+          </td>
+        `;
+
+        tableBody.appendChild(row);
+      });
+    }
+    getCustomer()
   </script>
 </body>
 </html>

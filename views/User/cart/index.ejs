@@ -57,24 +57,24 @@
             <div class="grid grid-cols-4 items-center gap-4 border-b pb-4">
               <!-- Product Image -->
               <div class="w-[100px] h-[100px] overflow-hidden">
-                <img class="h-full w-full object-cover object-top rounded" src="${item.productId.image}" alt="">
+                <img class="h-full w-full object-cover object-top rounded" src="${item?.productId?.image}" alt="">
               </div>
   
               <!-- Product Info -->
               <div>
-                <p class="font-semibold tracking-tighter text-sm">${item.productId.title}</p>
-                <button class="text-red-600 text-sm" onclick="removeFromCartPermanent('${item.productId._id}')">🗑 Remove</button>
+                <p class="font-semibold tracking-tighter text-sm">${item?.productId?.title}</p>
+                <button class="text-red-600 text-sm" onclick="removeFromCartPermanent('${item?.productId?._id}')">🗑 Remove</button>
               </div>
   
               <!-- Quantity Control -->
               <div class="flex items-center space-x-2">
                 <button class="px-2 py-1 bg-gray-200 rounded" onclick="removeFromCart('${item.productId._id}')">-</button>
-                <span id="qty-${item.productId._id}" class="px-4">${item.quantity}</span>
-                <button class="px-2 py-1 bg-gray-200 rounded" onclick="AddToCart('${item.productId._id}')">+</button>
+                <span id="qty-${item?.productId?._id}" class="px-4">${item?.quantity}</span>
+                <button class="px-2 py-1 bg-gray-200 rounded" onclick="AddToCart('${item?.productId?._id}')">+</button>
               </div>
   
               <!-- Product Price -->
-              <p class="font-semibold text-lg">Rs. ${item.productId.price*item.quantity}</p>
+              <p class="font-semibold text-lg">Rs. ${item?.productId?.price*item?.quantity}</p>
             </div>
           `;
         });

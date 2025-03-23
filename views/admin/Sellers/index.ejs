@@ -1,0 +1,54 @@
+
+<body class="bg-gray-100">
+  <div class="w-full mx-auto bg-white shadow-md rounded-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-xl font-bold">Customers</h1>
+    
+    </div>
+
+    <!-- Search Bar -->
+    <div class="relative mb-4">
+      <input type="text" id="search" placeholder="Search Customers" class="w-full border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring focus:ring-green-300" onkeyup="filterCustomers()">
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse bg-white text-left text-sm text-gray-700">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2">Avatar</th>
+            <th class="px-4 py-2">Name</th>
+            <th class="px-4 py-2">Email</th>
+            <th class="px-4 py-2">Purchase Date</th>
+            <th class="px-4 py-2">Phone</th>
+            <th class="px-4 py-2">Spent</th>
+            <th class="px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="customer-table">
+          <!-- Rows will be injected dynamically -->
+           <%customers&&customers.map((customer)=>{%>
+            <tr class='border-t hover:bg-gray-50'>
+              <td class='px-4 py-2'><img src="${customer.avatar}" class="rounded-full w-10 h-10" alt="Avatar"></td>
+              <td class='px-4 py-2'><%=customer.name%></td>
+              <td class='px-4 py-2'><%=customer.email%></td>
+              <td class='px-4 py-2'><%=customer.createdAt.split("T")[0]%></td>
+              <td class='px-4 py-2'><%=customer?.Address?.name%></td>
+              <td class='px-4 py-2'>${customer.spent}</td>
+              <td class='px-4 py-2'>
+                Edit
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+  
+  </div>
+
+
+</body>
+</html>
