@@ -4,7 +4,9 @@
     <div class="flex justify-between items-center mb-4">
       <h1 class="text-xl font-bold">Products</h1>
     </div>
-    
+    <div id="flash-message" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow-md transition-opacity duration-500 opacity-0">
+      Success!
+    </div>
     <!-- Table -->
     <div class="overflow-x-auto">
       <table class="w-full border-collapse bg-white text-left text-sm text-gray-700">
@@ -16,6 +18,7 @@
             <th class="px-4 py-2">Quantity</th>
             <th class="px-4 py-2">Price</th>
             <th class="px-4 py-2">Stock</th>
+            <th class="px-4 py-2">Verfied</th>
             <th class="px-4 py-2">Actions</th>
           </tr>
         </thead>
@@ -41,6 +44,40 @@
   </div>
 
   <script>
+    function showNotification(message, type) {
+  // Check if notification container exists, if not create it
+  let notificationContainer = document.querySelector(".notification-container")
+
+  if (!notificationContainer) {
+    notificationContainer = document.createElement("div")
+    notificationContainer.className = "fixed top-5 right-5 z-50 space-y-2"
+    document.body.appendChild(notificationContainer)
+  }
+
+  // Create notification element
+  const notification = document.createElement("div")
+  notification.className = `px-4 py-2 rounded-md shadow-md text-white transition-transform transform translate-x-full opacity-0 ${
+    type === "success" ? "bg-green-500" : "bg-red-500"
+  }`
+  notification.textContent = message
+
+  // Append notification and trigger animation
+  notificationContainer.appendChild(notification)
+  setTimeout(() => {
+    notification.classList.remove("translate-x-full", "opacity-0")
+    notification.classList.add("translate-x-0", "opacity-100")
+  }, 10)
+
+  // Remove notification after 3 seconds
+  setTimeout(() => {
+    notification.classList.add("opacity-0", "translate-x-full")
+    setTimeout(() => {
+      notification.remove()
+    }, 200)
+  }, 2000)
+}
+
+
     async function getProducts() {
       const response = await fetch("http://localhost:8000/api/v1/admin/products/details", { method: "GET" });
       const data = await response.json();
@@ -60,6 +97,13 @@
           <td class='px-4 py-2'>${product.quantity}</td>
           <td class='px-4 py-2'>${product.price}</td>
           <td class='px-4 py-2'>${product.stock.toString()}</td>
+          <td class='px-4 py-2'>
+      ${product.verified
+        ? `<span class="badge bg-success disabled">Verified</span>`
+        : `<button  class="badge bg-danger" onclick="approveProduct('${product._id}')">Approve</button>`
+      }
+    </td>
+    
           <td class='px-4 py-2'>
             <button class="px-2 py-1 bg-blue-500 text-white rounded-md text-xs" onclick="viewProduct('${product.image}', '${product.title}', '${product.category}', '${product.quantity}', '${product.price}', '${product.stock}')">View</button>
             <button class="px-2 py-1 bg-red-500 text-white rounded-md text-xs" onclick="deleteCustomer('${product._id}')">Delete</button>
@@ -93,7 +137,16 @@
         }
       }
     }
-
-    getProducts();
+    async function approveProduct(id){
+      const response = await fetch(`/api/v1/admin/product/approve/${id}`,{method:"GET"});
+      const data = await response.json();
+      if(data.success){
+        showNotification(data.message,"success");
+        getProducts()
+      }else{
+        showNotification(data.message,"error");
+      }
+    }
+   document.addEventListener("DOMContentLoaded",()=>getProducts()) 
   </script>
 </body>
