@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Get Started with SwiftMart - Seller Portal</title>
+    <title>Get Started with SwiftMart - Industry Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
@@ -23,10 +23,10 @@
                         Get Started with SwiftMart
                     </h2>
                     <p class="mt-2 text-sm text-gray-600">
-                        Create your seller account and start selling on SwiftMart!
+                        Create your industry account and start selling on SwiftMart!
                     </p>
 
-                    <form class="mt-8 space-y-6" action="/seller/auth/signup" method="POST">
+                    <form class="mt-8 space-y-6" action="/industry/auth/signup" method="POST">
                         <% if (typeof error !== 'undefined') { %>
                             <div class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
                                 <span class="block sm:inline"><%= error %></span>
@@ -34,27 +34,14 @@
                         <% } %>
 
                         <div class="space-y-4">
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label for="firstName" class="block text-sm font-medium text-gray-700">
-                                        First Name
-                                    </label>
-                                    <div class="mt-1">
-                                        <input id="firstName" name="firstName" type="text" required
-                                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                            placeholder="Enter first name">
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label for="lastName" class="block text-sm font-medium text-gray-700">
-                                        Last Name
-                                    </label>
-                                    <div class="mt-1">
-                                        <input id="lastName" name="lastName" type="text" required
-                                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                            placeholder="Enter last name">
-                                    </div>
+                            <div>
+                                <label for="industryName" class="block text-sm font-medium text-gray-700">
+                                    Industry Name
+                                </label>
+                                <div class="mt-1">
+                                    <input id="industryName" name="industryName" type="text" required
+                                        class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                                        placeholder="Enter industry name">
                                 </div>
                             </div>
 
@@ -79,17 +66,6 @@
                                         placeholder="Create a password">
                                 </div>
                             </div>
-
-                            <div>
-                                <label for="shopName" class="block text-sm font-medium text-gray-700">
-                                    Shop Name
-                                </label>
-                                <div class="mt-1">
-                                    <input id="shopName" name="shopName" type="text" required
-                                        class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                                        placeholder="Enter your shop name">
-                                </div>
-                            </div>
                         </div>
 
                         <div>
@@ -110,7 +86,7 @@
                     <div class="mt-6 text-center text-sm">
                         <p class="text-gray-600">
                             Already have an account? 
-                            <a href="/seller/login" class="font-medium text-green-600 hover:text-green-500">
+                            <a href="/industry/login" class="font-medium text-green-600 hover:text-green-500">
                                 Sign in
                             </a>
                         </p>
@@ -120,4 +96,4 @@
         </div>
     </div>
 </body>
-</html>
+</html> 
