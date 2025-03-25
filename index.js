@@ -7,6 +7,7 @@ import userController from "./routes/user.js"
 import productRouter from "./routes/product.js"
 import sellerRouter from "./routes/seller.js"
 import adminRouter from "./routes/admin.js"
+import industryRouter from "./routes/industry.js"
 import dbConnection from "./config/db.js"
 import { fileURLToPath } from 'url';
 import dotenv from "dotenv";
@@ -43,6 +44,7 @@ app.use("/api/v1/user", userController);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/seller",sellerRouter);
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/industry", industryRouter);
 
 
 app.get("/", (req, res) => {

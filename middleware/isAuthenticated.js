@@ -39,3 +39,24 @@ const isAuthenticated = async (req, res, next) => {
 }
 
 export default isAuthenticated;
+
+module.exports.industryAuth= async (req,res,next)=>{
+  try{
+    const token= req.cookies.token || req.headers.authorization?.split(' ')[1];
+    if(!token){
+      return res.redirect("/indusrtyLogin");
+    }
+    const decode= jwt.verify(token,"JWT_SECRET");
+    if(!decode){
+      return res.redirect("/indusrtyLogin");
+    }
+    req.industry= decode.industry_id;
+    next();
+
+  }
+  catch(error){
+    console.log(error)
+    return res.redirect("/indusrtyLogin");
+  }
+}
+   
