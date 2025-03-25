@@ -20,6 +20,11 @@ const loginController = async (req, res) => {
     if (!userCheck) {
       return res.redirect("/api/v1/user/login");
     }
+    
+    const isMatch = await bcrypt.compare(password, userCheck.password);
+    if (!isMatch) {
+      return res.redirect("/api/v1/user/login");
+    }
 
     const token = jwt.sign({ userId: userCheck._id, role: "user" }, "JWT_SECRET", { expiresIn: "5h" });
 

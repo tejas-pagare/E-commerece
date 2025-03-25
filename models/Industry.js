@@ -1,11 +1,7 @@
 import mongoose from "mongoose";
-
+import SellProduct from "./SellProduct";
 const industrySchema = new mongoose.Schema({
-  firstname: {
-    type: String,
-    required: true,
-  },
-  lastname: {
+  companyName: {
     type: String,
     required: true,
   },
@@ -19,24 +15,62 @@ const industrySchema = new mongoose.Schema({
     required: true,
   },
   
-  products: [
+  cart:[
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-    },
-  ],
-  cart: [
-    {
+
+      fabric:{
+        type: String,
+        required: true,
+        // enum: ["Cotton", "Silk", "Linen", "Wool", "Leather", "Cashmere", "Synthetic", "Denim", "Polyster"]
+      },
+      size:{
+         type: String,
+         required: true,
+      },
+      usageDuration:{
+        type:Number,
+        required: true,
+        enum: [1, 2]
+
       productId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'SellProduct',
+
       },
       quantity: {
         type: Number,
         default: 0
+      },
+      amount:{
+        type: Number,
+        required: true,
+        default: 0
+      },
+      combination_id:{
+        type:String,
+        required: true,
+      },
+      id:{
+        type:String,
+        required:true,
       }
+      
+      // productIds:[
+      //   {
+      //   type: mongoose.Schema.Types.ObjectId,
+      //   ref: 'SellProduct',
+      //   required: true,}
+      // ]
+    }],
+    Address: {
+      plotno: { type: String },
+      street: { type: String },
+      city: { type: String },
+      state: { type: String },
+      pincode: { type: Number },
+      phone: { type: String },
     }
-  ],
+  ,
   createdAt: {
     type: Date,
     default: Date.now,
@@ -46,10 +80,6 @@ const industrySchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  sellProduct:[{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"SellProduct"
-  }]
 });
 
 // Hash password before saving
