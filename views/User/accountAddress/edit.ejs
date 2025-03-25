@@ -1,66 +1,51 @@
 <body>
     <div class="flex min-h-screen ">
         <!-- Sidebar -->
-        <aside class="w-64 h-screen bg-green-200 p-6 rounded-lg text-center shadow-md">
-            <div class="profile mb-4">
-                <img src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
-                    alt="Profile Picture" class="w-20 h-20 rounded-full object-cover mx-auto" />
-                <h3 class="text-lg font-semibold mt-2">
-                    <%= user.name %>
-                </h3>
-            </div>
-            <nav class="space-y-2">
-                <a href="/api/v1/user/account"
-                    class="block py-2 font-medium text-black hover:text-green-700">Account</a>
-                <a href="/api/v1/user/account/address" class="block py-2 font-medium text-black hover:text-green-700">Address</a>
-                <% if (role==="user" ) { %>
-                    <a href="#" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
-                    <a href="/api/v1/user/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
-                    <% } %>
-                        <a href="/api/v1/user/logout" class="block py-2 font-medium text-black hover:text-green-700">Log
-                            Out</a>
-            </nav>
-        </aside>
+        <%- include('../../partials/profileSidebar.ejs') %>
 
-        <!-- Address Update Form -->
-        <div class="flex justify-center items-center w-full">
-            <form id="addressForm" class="bg-white p-6  w-full border-green-600">
-                <h2 class="text-2xl font-bold text-green-700 text-center mb-4">Update Address</h2>
+            <!-- Address Update Form -->
+            <div class="flex justify-center items-center w-full">
+                <form id="addressForm" class="bg-white p-6  w-full border-green-600">
+                    <h2 class="text-2xl font-bold text-green-700 text-center mb-4">Update Address</h2>
 
-                <label class="block text-green-700 font-medium">Plot No:</label>
-                <input value=<%=user.Address.plotno%>   type="text" name="plotno" id="plotno" required
-                    class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3"  >
+                    <label class="block text-green-700 font-medium">Plot No:</label>
+                    <input value=<%=user.Address.plotno%> type="text" name="plotno" id="plotno" required
+                    class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3" >
 
-                <label class="block text-green-700 font-medium">Street:</label>
-                <input  value=<%= user.Address.street %>  type="text" name="street" id="street" required
+                    <label class="block text-green-700 font-medium">Street:</label>
+                    <input value=<%=user.Address.street %> type="text" name="street" id="street" required
                     class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
 
-                <label class="block text-green-700 font-medium">City:</label>
-                <input value=<%= user.Address.city %> type="text" name="city" id="city" required pattern="^[A-Za-z\s]+$"
+                    <label class="block text-green-700 font-medium">City:</label>
+                    <input value=<%=user.Address.city %> type="text" name="city" id="city" required
+                    pattern="^[A-Za-z\s]+$"
                     title="City should contain only letters"
                     class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
 
-                <label class="block text-green-700 font-medium">State:</label>
-                <input value=<%= user.Address.state %> type="text" name="state" id="state" required pattern="^[A-Za-z\s]+$"
+                    <label class="block text-green-700 font-medium">State:</label>
+                    <input value=<%=user.Address.state %> type="text" name="state" id="state" required
+                    pattern="^[A-Za-z\s]+$"
                     title="State should contain only letters"
                     class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
 
-                <label class="block text-green-700 font-medium">Pincode:</label>
-                <input value=<%= user.Address.pincode %> type="number" name="pincode" id="pincode" required pattern="^[0-9]{6}$"
+                    <label class="block text-green-700 font-medium">Pincode:</label>
+                    <input value=<%=user.Address.pincode %> type="number" name="pincode" id="pincode" required
+                    pattern="^[0-9]{6}$"
                     title="Pincode must be a 6-digit number"
                     class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
 
-                <label class="block text-green-700 font-medium">Phone:</label>
-                <input value=<%= user.Address.phone %> type="tel" name="phone" id="phone" required pattern="^[6-9]\d{9}$"
+                    <label class="block text-green-700 font-medium">Phone:</label>
+                    <input value=<%=user.Address.phone %> type="tel" name="phone" id="phone" required
+                    pattern="^[6-9]\d{9}$"
                     title="Phone number must start with 6-9 and be 10 digits long"
                     class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
 
-                <button type="submit"
-                    class="w-full bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700 transition">
-                    Update Address
-                </button>
-            </form>
-        </div>
+                    <button type="submit"
+                        class="w-full bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700 transition">
+                        Update Address
+                    </button>
+                </form>
+            </div>
     </div>
 
     <script>

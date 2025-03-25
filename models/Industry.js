@@ -17,6 +17,7 @@ const industrySchema = new mongoose.Schema({
   
   cart:[
     {
+
       fabric:{
         type: String,
         required: true,
@@ -30,6 +31,11 @@ const industrySchema = new mongoose.Schema({
         type:Number,
         required: true,
         enum: [1, 2]
+
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'SellProduct',
+
       },
       quantity: {
         type: Number,
