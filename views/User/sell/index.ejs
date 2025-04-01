@@ -121,12 +121,13 @@
                     <!-- Size Information -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Adult Sizes</label>
-                            <input type="text" name="adultSizes" placeholder="e.g., XS, S, M, L, XL, XXL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Children's Sizes</label>
-                            <input type="text" name="childrenSizes" placeholder="e.g., 2T, 3T, 4T, or age ranges" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <label class="block text-sm font-medium text-gray-700"> Sizes</label>
+                            <select name="adultSizes" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                <option value="">Select Size</option>
+                                <option value="silk">S</option>
+                                <option value="cotton">M</option>
+                                <option value="linen">L</option>
+                            </select>
                         </div>
                     </div>
     
@@ -145,29 +146,6 @@
                             <label class="flex items-center space-x-2">
                                 <input type="radio" name="gender" value="unisex" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
                                 <span>Unisex</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="gender" value="childrens" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Children's</span>
-                            </label>
-                        </div>
-                    </div>
-    
-                    <!-- Condition of Items -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Condition of Items</label>
-                        <div class="space-y-2">
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="condition" value="good" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Good Condition (No holes, in excellent shape)</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="condition" value="less-damaged" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Less Damaged (Minor wear but still usable)</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="condition" value="heavily-damaged" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Heavily Damaged (Significant wear and tear)</span>
                             </label>
                         </div>
                     </div>
@@ -207,9 +185,9 @@
                         </div>
                     </div>
     
-                    <!-- Photo Upload -->
+                    <!-- reciept Upload -->
                     <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700">Photo Upload (for item verification)</label>
+                        <label class="block text-sm font-medium text-gray-700">reciept Upload (for item verification)</label>
                         <input type="file" name="photos" accept="image/*" multiple class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     </div>
     
@@ -218,29 +196,6 @@
                         <h3 class="text-lg font-semibold mb-4">Terms and Conditions</h3>
                         <div class="space-y-4 text-sm text-gray-600">
                             <p>1. <strong>Eligibility:</strong> Clothes must be clean and in acceptable condition. We reserve the right to refuse items that do not meet our standards.</p>
-                            <p>2. <strong>Condition Guidelines:</strong></p>
-                            <div class="space-y-6">
-                                <div class="border rounded-lg p-4">
-                                    <h4 class="font-semibold mb-2">Good Condition</h4>
-                                    <p class="mb-2">Items that do not have any holes and are in excellent shape.</p>
-                                    <img src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=500&h=300&fit=crop" alt="Good Condition Example" class="w-full h-48 object-contain rounded-lg mb-2">
-                                    <p class="text-xs text-gray-500">Example: Clean, no holes, no stains, ready to wear</p>
-                                </div>
-                                
-                                <div class="border rounded-lg p-4">
-                                    <h4 class="font-semibold mb-2">Less Damaged</h4>
-                                    <p class="mb-2">Items that show minor wear but are still usable.</p>
-                                    <img src="https://imgs.search.brave.com/1oZ1xB_JYlcGSEwOGWLhksTHi2Edx_9LSUBWeVL3sxw/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzY2LzBm/LzI4LzY2MGYyOGQ5/ZmE2MmE5NTA1MWZk/YjYxNmNlMDBhMDc0/LmpwZw" alt="Less Damaged Example" class="w-full h-48 object-contain rounded-lg mb-2">
-                                    <p class="text-xs text-gray-500">Example: Minor fading, slight wear, still functional</p>
-                                </div>
-                                
-                                <div class="border rounded-lg p-4">
-                                    <h4 class="font-semibold mb-2">Heavily Damaged</h4>
-                                    <p class="mb-2">Items that show significant wear and tear and may not be suitable for clothes.</p>
-                                    <img src="https://imgs.search.brave.com/BDckuqU7HJzGdex2P80whe6jHw5SJwBROk9eVwE4Pm4/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzNiLzJm/LzgwLzNiMmY4MDBi/YmY0ZWE3Mjg5MDVk/YmZiYzQyMjZlNzg3/LmpwZw" alt="Heavily Damaged Example" class="w-full h-48 object-contain rounded-lg mb-2">
-                                    <p class="text-xs text-gray-500">Example: Holes, stains, or significant wear</p>
-                                </div>
-                            </div>
                             <p>3. <strong>Item Limitations:</strong> We do not accept items that are heavily soiled or damaged beyond repair.</p>
                             <p>4. <strong>Privacy Policy:</strong> All personal information collected will be kept confidential and used solely for the purpose of processing clothes.</p>
                             <p>5. <strong>clothes Acknowledgment:</strong> By submitting this form, you acknowledge that you are donating items without expectation of compensation or reimbursement.</p>
@@ -351,10 +306,9 @@
                 }
     
                 // Size Validation
-                const adultSizes = document.querySelector('input[name="adultSizes"]').value.trim();
-                const childrenSizes = document.querySelector('input[name="childrenSizes"]').value.trim();
-                if (!adultSizes && !childrenSizes) {
-                    errorMessages.push('Please enter either adult or children\'s sizes');
+                const adultSizes = document.querySelector('input[name="adultSizes"]').value;
+                if (!adultSizes) {
+                    errorMessages.push('Please enter the size');
                     isValid = false;
                 }
     
