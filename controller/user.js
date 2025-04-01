@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import blogPosts from "../data/blogId.json" with {type:"json"}
 const HomePageController = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const products = await Product.find({verified:true});
     res.render('User/homepage/index.ejs', { title: 'HomePage', products, role: "user" });
 
   } catch (error) {

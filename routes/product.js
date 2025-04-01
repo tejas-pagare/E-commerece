@@ -11,7 +11,7 @@ router.get("/", isAuthenticated, async (req, res) => {
 
     const userId = req.userId;
     const productListed = await User.findById(userId).populate("products").select("products");
-    console.log(productListed)
+    
     return res.render("seller/listedProduct/index.ejs", { title: "Listed Product", role: req?.role, productListed: productListed?.products })
   } catch (error) {
     res.json({

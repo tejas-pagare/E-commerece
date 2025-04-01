@@ -164,6 +164,30 @@ router.get("/product/approve/:id", async (req, res) => {
   }
 });
 
+router.get("/product/disapprove/:id",async(req,res)=>{
+  try {
+    const id = req.params.id;
+    const product = await Product.findById(id);
+    if(!product){
+      return res.json({
+        message:"No such Product exits",
+        success:false
+      })
+    }
+    product.verified=false;
+    await product.save();
+    return res.json({
+      message:"Product disapproved successfully",
+      success:true
+    })
+  } catch (error) {
+    res.json({
+      message:"Server Error",
+      success:false
+    })
+  }
+})
+
 router.get("/seller", (req, res) => {
   res.render("admin/Sellers/index.ejs", { title: "Sellers", role: "admin" });
 });
@@ -206,6 +230,8 @@ router.get("/seller/details", async (req, res) => {
       success: false
     })
   }
-})
+});
+
+
 
 export default router

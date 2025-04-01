@@ -27,18 +27,10 @@ const productSchema = new mongoose.Schema({
     required: true,
   },
 
-  reviewers: [
-    {
-      user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-      },
-      rating: {
-        type: Number,
-        default: 0
-      }
-    }
-  ],
+  reviews:[{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Review"
+    }],
   createdAt: {
     type: Date,
     default: Date.now,
@@ -62,11 +54,15 @@ const productSchema = new mongoose.Schema({
   }
 });
 
-// Middleware to update 'updatedAt' before saving
+
 productSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
+
+productSchema.pre([""],(req,res)=>{
+  
+})
 
 const Product = mongoose.model('Product', productSchema);
 

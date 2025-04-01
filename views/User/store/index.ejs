@@ -1,9 +1,9 @@
 <body class="font-sans">
 
-  <!-- Main Container -->
+ 
   <div class="flex min-h-screen">
 
-    <!-- Sidebar -->
+   
     <aside id="sidebar" class="w-64 bg-white p-6 shadow-lg hidden md:block">
       <h2 class="text-xl font-bold text-gray-800">Filters</h2>
 
@@ -47,7 +47,7 @@
 
     let cart = [];
 
-    // Function to fetch and render products
+    
     async function fetchAndRenderProducts(filter = {}) {
       try {
         let url = new URL("http://localhost:8000/api/v1/user/sell"); // Update with your backend URL
@@ -86,7 +86,7 @@
 
 
 
-    // Listen for filter changes and fetch data from the backend
+   
     document.querySelectorAll("input[name='category'], input[name='price']").forEach(radio => {
       radio.addEventListener("change", () => {
         fetchAndRenderProducts({
