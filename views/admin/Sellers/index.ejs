@@ -1,0 +1,130 @@
+<body class="bg-gray-100">
+  <div class="w-full mx-auto bg-white shadow-md rounded-lg p-6 min-h-screen">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-xl font-bold">Seller</h1>
+    </div>
+
+    <div id="flash-message" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow-md transition-opacity duration-500 opacity-0">
+      Success!
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse bg-white text-left text-sm text-gray-700">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2">Avatar</th>
+            <th class="px-4 py-2">Name</th>
+            <th class="px-4 py-2">StoreName</th>
+            <th class="px-4 py-2">Email</th>
+            <th class="px-4 py-2">Gstn</th>
+            <th class="px-4 py-2">AadharCard</th>
+            <th class="px-4 py-2">BankName</th>
+            <th class="px-4 py-2">Verified</th>
+            <th class="px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="customer-table">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Popover Modal -->
+  <div id="popover" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-1/3">
+      <h2 class="text-xl font-bold mb-4">Seller Details</h2>
+      <div id="popover-content"></div>
+      <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded" onclick="closePopover()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    function showNotification(message, type) {
+      let notificationContainer = document.querySelector(".notification-container");
+      if (!notificationContainer) {
+        notificationContainer = document.createElement("div");
+        notificationContainer.className = "fixed top-5 right-5 z-50 space-y-2";
+        document.body.appendChild(notificationContainer);
+      }
+      const notification = document.createElement("div");
+      notification.className = `px-4 py-2 rounded-md shadow-md text-white transition-transform transform translate-x-full opacity-0 ${type === "success" ? "bg-green-500" : "bg-red-500"}`;
+      notification.textContent = message;
+      notificationContainer.appendChild(notification);
+      setTimeout(() => {
+        notification.classList.remove("translate-x-full", "opacity-0");
+        notification.classList.add("translate-x-0", "opacity-100");
+      }, 10);
+      setTimeout(() => {
+        notification.classList.add("opacity-0", "translate-x-full");
+        setTimeout(() => {
+          notification.remove();
+        }, 200);
+      }, 2000);
+    }
+
+    async function RenderSellers() {
+      try {
+        const response = await fetch("http://localhost:8000/api/v1/admin/seller/details", { method: "GET" });
+        const data = await response.json();
+        let table = document.getElementById("customer-table");
+        table.innerHTML = "";
+        let row = "";
+        data.sellers.map((e) => {
+          row += `
+            <tr>
+              <td class="px-4 py-2"><img src=${e.profileImage} alt="logo" class="h-16 w-16"></td>
+              <td class="px-4 py-2">${e.name}</td>
+              <td class="px-4 py-2">${e.storeName}</td>
+              <td class="px-4 py-2">${e.email}</td>
+              <td class="px-4 py-2">${e.gstn}</td>
+              <td class="px-4 py-2">
+                <a title="Aadhar proof" href=${e.identityVerification.aadharCard} target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700">Aadhar Proof</a>
+              </td>
+              <td class="px-4 py-2">${e.bankDetails.bankName}</td>
+              <td class="px-4 py-2">${e.identityVerification.status === "Verified" ? `<span class="badge bg-success disabled">Verified</span>` : `<button class="badge bg-danger" onclick="approveSeller('${e._id}')">Approve</button>`}</td>
+              <td class="px-4 py-2">
+                <button class="px-2 py-1 bg-blue-500 text-white rounded-md text-xs" onclick="viewProduct('${e._id}', '${e.name}', '${e.storeName}', '${e.email}', '${e.gstn}', '${e.bankDetails.bankName}','${e.profileImage}')">View</button>
+                <button class="px-2 py-1 bg-red-500 text-white rounded-md text-xs" onclick="deleteCustomer('${e._id}')">Delete</button>
+              </td>
+            </tr>`;
+        });
+        table.innerHTML = row;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    async function approveSeller(id) {
+      const response = await fetch(`/api/v1/admin/seller/approve/${id}`, { method: "GET" });
+      const data = await response.json();
+      if (data.success) {
+        showNotification(data.message, "success");
+        RenderSellers();
+      } else {
+        showNotification(data.message, "error");
+      }
+    }
+
+    function viewProduct(id, name, storeName, email, gstn, bankName,profileImage) {
+      const popover = document.getElementById("popover");
+      const content = document.getElementById("popover-content");
+      content.innerHTML = `
+      <p class="px-4 py-2"><img src=${profileImage} alt="logo" class="h-24 w-24"></p>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Store Name:</strong> ${storeName}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>GSTN:</strong> ${gstn}</p>
+        <p><strong>Bank Name:</strong> ${bankName}</p>
+      `;
+      popover.classList.remove("hidden");
+    }
+
+    function closePopover() {
+      document.getElementById("popover").classList.add("hidden");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => RenderSellers());
+  </script>
+</body>

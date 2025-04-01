@@ -3,95 +3,122 @@
         <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
             <h2 class="text-3xl font-bold text-green-700 mb-4">Checkout</h2>
             <div class="grid md:grid-cols-2 gap-6">
-                
+
                 <!-- Order Summary -->
                 <div class="bg-green-50 p-4 rounded-lg shadow">
                     <h3 class="text-lg font-semibold text-green-700 mb-2">Order Summary</h3>
-                    <% user.cart.map((e) => { %>
+                    <% user.cart.map((e)=> { %>
                         <div class="border-b pb-2 mb-2">
                             <div class="flex justify-between items-center">
                                 <img src="<%= e.productId.image %>" alt="Product" class="w-12 h-12 rounded">
                                 <div class="flex-1 ml-3 text-xs">
-                                    <p class="font-medium"><%= e.productId.title %></p>
-                                    <p class="text-sm text-gray-500">Rs <%= e.productId.price %> x <%= e.quantity %></p>
+                                    <p class="font-medium">
+                                        <%= e.productId.title %>
+                                    </p>
+                                    <p class="text-sm text-gray-500">Rs <%= e.productId.price %> x <%= e.quantity %>
+                                    </p>
                                 </div>
-                                <p class="font-medium">Rs <%= e.productId.price * e.quantity %></p>
+                                <p class="font-medium">Rs <%= e.productId.price * e.quantity %>
+                                </p>
                             </div>
                         </div>
-                    <% }) %>
-                    <div class="flex justify-between font-bold text-lg text-green-700">
-                        <p>Total:</p>
-                        <p>Rs <%= total %></p>
-                    </div>
+                        <% }) %>
+                            <div class="flex justify-between font-bold text-lg text-green-700">
+                                <p>Total:</p>
+                                <p>Rs <%= total %>
+                                </p>
+                            </div>
                 </div>
-                
+
                 <!-- User Details -->
                 <div>
                     <h3 class="text-lg font-semibold text-green-700 mb-2">User Details</h3>
-                    <div class="w-full p-2 mb-2 border rounded"><%= user.firstname %> <%= user.lastname %></div>
-                    <div class="w-full p-2 mb-2 border rounded"><%= user.email %></div>
-                    <div class="w-full p-2 mb-2 border rounded"><%= user.Address.phone %></div>
+                    <div class="w-full p-2 mb-2 border rounded">
+                        <%= user.firstname %>
+                            <%= user.lastname %>
+                    </div>
+                    <div class="w-full p-2 mb-2 border rounded">
+                        <%= user.email %>
+                    </div>
+                    <div class="w-full p-2 mb-2 border rounded">
+                        <%= user.Address.phone %>
+                    </div>
                 </div>
             </div>
-            
+
             <!-- Billing Address with Edit Button -->
             <div class="mt-6">
                 <h3 class="text-lg font-semibold text-green-700 mb-2">Billing Address</h3>
                 <div id="address-view">
-                    <p class="p-2 border rounded mb-2"><%= user.Address.plotno %>, <%= user.Address.street %>, <%= user.Address.city %>, <%= user.Address.state %> - <%= user.Address.pincode %></p>
+                    <p class="p-2 border rounded mb-2" id="address">
+                        <%= user.Address.plotno %>, <%= user.Address.street %>, <%= user.Address.city %>, <%=
+                                        user.Address.state %> - <%= user.Address.pincode %>
+                    </p>
                     <button id="edit-address" class="bg-blue-500 text-white py-1 px-3 rounded">Edit</button>
                 </div>
                 <div id="address-edit" class="hidden">
-                    <input id="plotno" name="plotno" value="<%= user.Address.plotno %>" type="text" class="w-full p-2 mb-2 border rounded" required>
-                    <input id="street" name="street" value="<%= user.Address.street %>" type="text" class="w-full p-2 mb-2 border rounded" required>
-                    <input id="city" name="city" value="<%= user.Address.city %>" type="text" class="w-full p-2 mb-2 border rounded" required>
-                    <input id="state" name="state" value="<%= user.Address.state %>" type="text" class="w-full p-2 mb-2 border rounded" required>
-                    <input id="pincode" name="pincode" value="<%= user.Address.pincode %>" type="text" class="w-full p-2 mb-2 border rounded" required pattern="\d{6}">
+                    <input id="plotno" name="plotno" value="<%= user.Address.plotno %>" type="text"
+                        class="w-full p-2 mb-2 border rounded" required>
+                    <input id="street" name="street" value="<%= user.Address.street %>" type="text"
+                        class="w-full p-2 mb-2 border rounded" required>
+                    <input id="city" name="city" value="<%= user.Address.city %>" type="text"
+                        class="w-full p-2 mb-2 border rounded" required>
+                    <input id="state" name="state" value="<%= user.Address.state %>" type="text"
+                        class="w-full p-2 mb-2 border rounded" required>
+                    <input id="pincode" name="pincode" value="<%= user.Address.pincode %>" type="text"
+                        class="w-full p-2 mb-2 border rounded" required pattern="\d{6}">
                     <button id="save-address" class="bg-green-500 text-white py-1 px-3 rounded">Save</button>
                 </div>
             </div>
 
-            <!-- Payment Options -->
-            <!-- Payment Options -->
-<div class="mt-6">
-    <h3 class="text-lg font-semibold text-green-700 mb-4">Payment Options</h3>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        
-        <!-- COD -->
-        <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
-            <input type="radio" name="payment" value="COD" class="hidden peer">
-            <img src="https://media.istockphoto.com/id/537487845/vector/payment-by-cash.jpg?s=612x612&w=0&k=20&c=ikEp0CWBCwizA4xdzFGUw1QO0FBGfjE1_iq-aOco8Dg=" alt="COD" class="w-14 h-14">
-            <span class="text-sm font-medium mt-2">Cash on Delivery</span>
-        </label>
+            <div class="mt-6">
+                <h3 class="text-lg font-semibold text-green-700 mb-4">Payment Options</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-        <!-- Credit Card -->
-        <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
-            <input type="radio" name="payment" value="Credit Card" class="hidden peer">
-            <img src="https://cdn1.vectorstock.com/i/1000x1000/76/35/hand-with-credit-card-for-payment-mobile-vector-19987635.jpg" alt="Credit Card" class="w-14 h-14">
-            <span class="text-sm font-medium mt-2">Credit Card</span>
-        </label>
+                    <!-- COD -->
+                    <label
+                        class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
+                        <input type="radio" name="payment" value="COD" class="hidden peer">
+                        <img src="https://media.istockphoto.com/id/537487845/vector/payment-by-cash.jpg?s=612x612&w=0&k=20&c=ikEp0CWBCwizA4xdzFGUw1QO0FBGfjE1_iq-aOco8Dg="
+                            alt="COD" class="w-14 h-14">
+                        <span class="text-sm font-medium mt-2">Cash on Delivery</span>
+                    </label>
 
-        <!-- UPI -->
-        <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
-            <input type="radio" name="payment" value="UPI" class="hidden peer">
-            <img src="https://m.economictimes.com/thumb/msid-74960608,width-1200,height-900,resizemode-4,imgsize-49172/upi-twitter.jpg" alt="UPI" class="w-14 h-14">
-            <span class="text-sm font-medium mt-2">UPI</span>
-        </label>
+                    <!-- Credit Card -->
+                    <label
+                        class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
+                        <input type="radio" name="payment" value="Credit Card" class="hidden peer">
+                        <img src="https://cdn1.vectorstock.com/i/1000x1000/76/35/hand-with-credit-card-for-payment-mobile-vector-19987635.jpg"
+                            alt="Credit Card" class="w-14 h-14">
+                        <span class="text-sm font-medium mt-2">Credit Card</span>
+                    </label>
 
-        <!-- Net Banking -->
-        <label class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
-            <input type="radio" name="payment" value="Net Banking" class="hidden peer">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwvjrjoZnord6W3t9JtI44aUE2-LLtXruvbw&s" alt="Net Banking" class="w-14 h-14">
-            <span class="text-sm font-medium mt-2">Net Banking</span>
-        </label>
-        
-    </div>
-</div>
+                    <!-- UPI -->
+                    <label
+                        class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
+                        <input type="radio" name="payment" value="UPI" class="hidden peer">
+                        <img src="https://m.economictimes.com/thumb/msid-74960608,width-1200,height-900,resizemode-4,imgsize-49172/upi-twitter.jpg"
+                            alt="UPI" class="w-14 h-14">
+                        <span class="text-sm font-medium mt-2">UPI</span>
+                    </label>
+
+                    <!-- Net Banking -->
+                    <label
+                        class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
+                        <input type="radio" name="payment" value="Net Banking" class="hidden peer">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwvjrjoZnord6W3t9JtI44aUE2-LLtXruvbw&s"
+                            alt="Net Banking" class="w-14 h-14">
+                        <span class="text-sm font-medium mt-2">Net Banking</span>
+                    </label>
+
+                </div>
+            </div>
 
 
             <!-- Place Order Button -->
             <div class="mt-6 text-center">
-                <button id="place-order" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">
+                <button id="place-order"
+                    class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">
                     Place Order
                 </button>
             </div>
@@ -99,30 +126,6 @@
     </div>
 
     <script>
-        document.getElementById("edit-address").addEventListener("click", function () {
-            document.getElementById("address-view").classList.add("hidden");
-            document.getElementById("address-edit").classList.remove("hidden");
-        });
-
-        document.getElementById("save-address").addEventListener("click", function () {
-            let plotno = document.getElementById("plotno").value.trim();
-            let street = document.getElementById("street").value.trim();
-            let city = document.getElementById("city").value.trim();
-            let state = document.getElementById("state").value.trim();
-            let pincode = document.getElementById("pincode").value.trim();
-
-            if (!plotno || !street || !city || !state || !pincode) {
-                alert("All address fields are required!");
-                return;
-            }
-
-            document.getElementById("address-view").innerHTML = `
-                <p class="p-2 border rounded mb-2">${plotno}, ${street}, ${city}, ${state} - ${pincode}</p>
-                <button id="edit-address" class="bg-blue-500 text-white py-1 px-3 rounded">Edit</button>
-            `;
-            document.getElementById("address-view").classList.remove("hidden");
-            document.getElementById("address-edit").classList.add("hidden");
-        });
 
         document.getElementById("place-order").addEventListener("click", function () {
             let selectedPayment = document.querySelector('input[name="payment"]:checked');
@@ -130,7 +133,30 @@
                 alert("Please select a payment option before placing the order.");
                 return;
             }
-            alert(`Order placed successfully with ${selectedPayment.value}!`);
+
+            // Check if the edit section is visible, meaning the user is editing the address
+            let address;
+            if (!document.getElementById("address-edit").classList.contains("hidden")) {
+                // Get values from input fields
+                let plotno = document.getElementById("plotno").value.trim();
+                let street = document.getElementById("street").value.trim();
+                let city = document.getElementById("city").value.trim();
+                let state = document.getElementById("state").value.trim();
+                let pincode = document.getElementById("pincode").value.trim();
+
+                if (!plotno || !street || !city || !state || !pincode) {
+                    alert("All address fields are required!");
+                    return;
+                }
+
+                address = `${plotno}, ${street}, ${city}, ${state} - ${pincode}`;
+            } else {
+                // Get address from displayed view
+                address = document.getElementById("address").innerText;
+            }
+
+            alert(`Order placed successfully with ${selectedPayment.value}. Shipping to: ${address}`);
         });
+
     </script>
 </body>

@@ -46,7 +46,7 @@ router.post("/sell", async (req, res) => {
 
     // Add category filter if present
     if (filter?.category) {
-      query.category = filter.category;
+      query.category = filter.category.toLowerCase();
     }
 
     
@@ -128,9 +128,12 @@ router.get("/checkout",isAuthenticated,async(req,res)=>{
   return res.render("User/payment/index.ejs",{title:"Checkout Page",role:"user",user,total})
 });
 router.post("/payment",(req,res)=>{
-  console.log(req.body);
+  
 })
 
+router.get("/dashboard",isAuthenticated,(req,res)=>{
+  res.render("User/dashboard/index.ejs",{title:"Dashboard",role:"user"});
+})
 router.get('/', isAuthenticated, HomePageController);
 
 

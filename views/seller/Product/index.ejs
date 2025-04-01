@@ -61,7 +61,7 @@
             <!-- Footer Section -->
             <footer class="flex justify-between mt-8">
                 <button type="button" class="text-gray-600 hover:underline">Back to Product</button>
-                <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700">Create
+                <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 create-btn">Create
                     Product</button>
             </footer>
         </form>
@@ -86,6 +86,7 @@
 
 
             try {
+                document.querySelector(".create-btn").diabled=true;
                 const response = await fetch("/api/v1/seller/create", {
                     method: "POST",
                     credentials: "include",
@@ -94,14 +95,17 @@
 
                 console.log(response);
                 if (response.ok) {
+                    document.querySelector(".create-btn").diabled=false;
                     window.location.href = "/api/v1/seller/"
                 } else {
                     if (response.ok) {
+                        document.querySelector(".create-btn").diabled=false;
                         window.location.href = "/api/v1/seller/create"
                     }
                 }
 
             } catch (error) {
+                document.querySelector(".create-btn").diabled=false;
                 console.error("Error submitting form:", error);
                 alert("Failed to submit form");
                 window.location.href = "/api/v1/seller/create"

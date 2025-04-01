@@ -17,19 +17,15 @@ const industrySchema = new mongoose.Schema({
   
   cart:[
     {
-      fabric:{
-        type: String,
-        required: true,
-        // enum: ["Cotton", "Silk", "Linen", "Wool", "Leather", "Cashmere", "Synthetic", "Denim", "Polyster"]
-      },
-      size:{
-         type: String,
-         required: true,
-      },
-      usageDuration:{
-        type:Number,
-        required: true,
-        enum: [1, 2]
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+    },
+  ],
+  cart: [
+    {
+      productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
       },
       quantity: {
         type: Number,
