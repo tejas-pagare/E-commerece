@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import SellProduct from "./SellProduct";
+// import SellProduct from "./SellProduct.js";
 const industrySchema = new mongoose.Schema({
   companyName: {
     type: String,
@@ -17,16 +17,26 @@ const industrySchema = new mongoose.Schema({
   
   cart:[
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-    },
-  ],
-  cart: [
-    {
-      productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
+
+      fabric:{
+        type: String,
+        required: true,
+        // enum: ["Cotton", "Silk", "Linen", "Wool", "Leather", "Cashmere", "Synthetic", "Denim", "Polyster"]
       },
+      size:{
+         type: String,
+         required: true,
+      },
+      usageDuration:{
+        type:Number,
+        required: true,
+        enum: [1, 2]
+      },
+      // productId: {
+      //   type: mongoose.Schema.Types.ObjectId,
+      //   ref: 'SellProduct',
+
+      // },
       quantity: {
         type: Number,
         default: 0

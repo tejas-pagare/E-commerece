@@ -1,8 +1,8 @@
 import express from 'express';
-import SellProduct from '../models/SellProduct';
-import Industry from '../models/Industry';
-import{industryAuth} from '../middleware/isAuthenticated';
-import { loginController, registerController } from ('../controllers/industry');
+import SellProduct from '../models/SellProduct.js';
+import Industry from '../models/Industry.js';
+import industryAuth from '../middleware/isAuthenticated.js';
+import { loginController, registerController } from '../controller/industry.js';
 import {v4 as uuidv4} from 'uuid';
 const router = express.Router();
 
@@ -156,4 +156,4 @@ router.get('/checkout', industryAuth, async (req,res)=>{
     }
 })
 
-module.exports = router;
+export default router;

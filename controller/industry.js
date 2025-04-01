@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import Industry from '../models/Industry';
+import Industry from '../models/Industry.js';
 
 
 
-module.exports.loginController = async (req, res) => {
+const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
     const industryCheck = await Industry.findOne({ email });
@@ -35,7 +35,7 @@ module.exports.loginController = async (req, res) => {
 
 
 
-module.exports.signupController =  async (req, res) => {
+const registerController =  async (req, res) => {
   try {
     const { companyName, password, email } = req.body;
     const industryCheck = await Industry.findOne({ email });
@@ -57,3 +57,5 @@ module.exports.signupController =  async (req, res) => {
     return res.redirect("/api/v1/industry/signup")
   }
 }
+
+export { loginController, registerController };
