@@ -57,7 +57,11 @@ const userSchema = new mongoose.Schema({
     state: { type: String },
     pincode: { type: Number },
     phone: { type: String },
-  }
+  },
+  reviews:[{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Review"
+  }]
 });
 
 // Hash password before saving

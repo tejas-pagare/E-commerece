@@ -99,7 +99,7 @@
           <td class='px-4 py-2'>${product.stock.toString()}</td>
           <td class='px-4 py-2'>
       ${product.verified
-        ? `<span class="badge bg-success disabled">Verified</span>`
+        ? `<span class="badge bg-success disabled cursor-pointer" onclick="disApproveProduct('${product._id}')" >Verified</span>`
         : `<button  class="badge bg-danger" onclick="approveProduct('${product._id}')">Approve</button>`
       }
     </td>
@@ -139,6 +139,18 @@
     }
     async function approveProduct(id){
       const response = await fetch(`/api/v1/admin/product/approve/${id}`,{method:"GET"});
+      const data = await response.json();
+      if(data.success){
+        showNotification(data.message,"success");
+        getProducts()
+      }else{
+        showNotification(data.message,"error");
+      }
+    }
+
+
+    async function disApproveProduct(id){
+      const response = await fetch(`/api/v1/admin/product/disapprove/${id}`,{method:"GET"});
       const data = await response.json();
       if(data.success){
         showNotification(data.message,"success");

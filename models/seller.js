@@ -59,11 +59,12 @@ const SellerSchema = new mongoose.Schema({
   }
 });
 
-SellerSchema.pre("deleteOne", { document: true, query: false }, async function (next) {
+SellerSchema.pre(["deleteOne","deleteMany"], { document: true, query: false }, async function (next) {
   try {
     console.log(`Deleting all products for seller ${this._id}`);
-    await Product.deleteMany({ sellerId: this._id }); // Delete related products
+    await Product.deleteMany({ sellerId: this._id }); 
     next();
+    
   } catch (err) {
     next(err);
   }

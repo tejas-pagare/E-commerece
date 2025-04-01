@@ -4,6 +4,7 @@ import User from '../models/user.js';
 import isAuthenticated from '../middleware/isAuthenticated.js';
 import { title } from 'process';
 import Product from '../models/product.js';
+import Review from '../models/Reviews.js';
 
 
 const router = express.Router();
@@ -43,6 +44,7 @@ router.post("/sell", async (req, res) => {
    
 
     const query = {};
+    query.verified = true;
 
     // Add category filter if present
     if (filter?.category) {
@@ -133,6 +135,43 @@ router.post("/payment",(req,res)=>{
 
 router.get("/dashboard",isAuthenticated,(req,res)=>{
   res.render("User/dashboard/index.ejs",{title:"Dashboard",role:"user"});
+});
+
+router.post("/review/create/:id",isAuthenticated,async(req,res)=>{
+  try {
+    const id = req.params.id;
+    
+    const {description,rating} = req.body;
+   
+    if(!description||!id||!rating){
+      return res.json({
+        message:"Please Enter all fields",
+        success:false
+      })
+    }
+
+    const review = await Review.create({
+      user:req.userId,
+      product:id,
+      rating:Number(rating),
+      description
+    });
+
+    await Promise.all([
+      review.save(),
+      User.findByIdAndUpdate(req.userId,{$push:{reviews:review._id}}),
+      Product.findByIdAndUpdate(id,{$push:{reviews:review._id}})
+    ]);
+    res.json({
+      message:"Review Created Sucessfully",
+      success:true
+    })
+  } catch (error) {
+    res.json({
+      message:"Server Error",
+      success:false
+    })
+  }
 })
 router.get('/', isAuthenticated, HomePageController);
 
