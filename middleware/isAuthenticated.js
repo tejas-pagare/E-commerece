@@ -40,7 +40,7 @@ const isAuthenticated = async (req, res, next) => {
 
 export default isAuthenticated;
 
-module.exports.industryAuth= async (req,res,next)=>{
+const industryAuth= async (req,res,next)=>{
   try{
     const token= req.cookies.token || req.headers.authorization?.split(' ')[1];
     if(!token){
@@ -60,3 +60,5 @@ module.exports.industryAuth= async (req,res,next)=>{
   }
 }
    
+
+export{industryAuth};
