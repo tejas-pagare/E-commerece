@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import SellProduct from "./SellProduct";
+// import SellProduct from "./SellProduct.js";
 const industrySchema = new mongoose.Schema({
   companyName: {
     type: String,
@@ -31,12 +31,12 @@ const industrySchema = new mongoose.Schema({
         type:Number,
         required: true,
         enum: [1, 2]
-
-      productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'SellProduct',
-
       },
+      // productId: {
+      //   type: mongoose.Schema.Types.ObjectId,
+      //   ref: 'SellProduct',
+
+      // },
       quantity: {
         type: Number,
         default: 0
