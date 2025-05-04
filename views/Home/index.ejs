@@ -1,29 +1,43 @@
-<body >
-  <div class="flex items-center justify-center min-h-screen bg-green-100">
-    <div class="text-center bg-white p-10 rounded-lg shadow-lg">
-      <h1 class="text-4xl font-bold text-green-600 mb-6">Welcome to SwiftMart</h1>
-      <div class="space-y-4">
-        <button onclick="redirect('/api/v1/admin/login')"
-          class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">
-          Admin Login
-        </button>
-        <button onclick="redirect('/api/v1/user/login')"
-          class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">
-          User Login
-        </button>
-        <button onclick="redirect('/api/v1/seller/login')"
-          class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">
-          Seller Login
-        </button>
-        <button onclick="redirect('/api/v1/industry/login')"
-        class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md">
-        Industry Login
-        </button>
-      </div>
+<body class="min-h-screen bg-gradient-to-br from-green-100 via-green-50 to-green-200 flex items-center justify-center font-sans">
+  <div class="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-md mx-auto border border-green-100 relative overflow-hidden">
+    <!-- Decorative Element -->
+    <div class="absolute -top-10 -right-10 w-32 h-32 bg-green-100 rounded-full opacity-40 animate-pulse"></div>
+    <div class="absolute -bottom-10 -left-10 w-24 h-24 bg-green-200 rounded-full opacity-30 animate-pulse"></div>
+    <!-- Logo or Icon -->
+    <div class="flex justify-center mb-6">
+      <span class="inline-flex items-center justify-center w-16 h-16 bg-green-500 rounded-full shadow-lg">
+        <i class="fas fa-bolt text-white text-3xl"></i>
+      </span>
     </div>
-
+    <!-- Heading -->
+    <h1 class="text-4xl font-extrabold text-green-700 mb-2 text-center">Welcome to <span class="text-green-500">SwiftMart</span></h1>
+    <p class="text-gray-500 mb-8 text-center">Choose your portal to get started</p>
+    <!-- Login Buttons -->
+    <div class="space-y-4">
+      <button onclick="redirect('/api/v1/admin/login')"
+        class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-600 hover:to-green-500 active:from-green-700 active:to-green-600 transition-all duration-200 text-white font-semibold py-3 px-4 rounded-xl shadow-md text-lg group">
+        <i class="fas fa-user-shield group-hover:scale-110 transition-transform"></i> Admin Login
+      </button>
+      <button onclick="redirect('/api/v1/user/login')"
+        class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-600 hover:to-green-500 active:from-green-700 active:to-green-600 transition-all duration-200 text-white font-semibold py-3 px-4 rounded-xl shadow-md text-lg group">
+        <i class="fas fa-user group-hover:scale-110 transition-transform"></i> User Login
+      </button>
+      <button onclick="redirect('/api/v1/seller/login')"
+        class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-600 hover:to-green-500 active:from-green-700 active:to-green-600 transition-all duration-200 text-white font-semibold py-3 px-4 rounded-xl shadow-md text-lg group">
+        <i class="fas fa-store group-hover:scale-110 transition-transform"></i> Seller Login
+      </button>
+      <button onclick="redirect('/api/v1/industry/login')"
+        class="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-green-400 hover:from-green-600 hover:to-green-500 active:from-green-700 active:to-green-600 transition-all duration-200 text-white font-semibold py-3 px-4 rounded-xl shadow-md text-lg group">
+        <i class="fas fa-industry group-hover:scale-110 transition-transform"></i> Industry Login
+      </button>
+    </div>
+    <!-- Footer -->
+    <div class="mt-10 text-center text-xs text-gray-400">
+      &copy; 2025 <span class="font-semibold text-green-500">SwiftMart</span>. All rights reserved.
+    </div>
   </div>
-
+  <!-- Font Awesome CDN for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
     function redirect(url) {
       window.location.href = url;
