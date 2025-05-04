@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sustainable Style Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 font-sans min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <h1 class="text-3xl font-extrabold text-emerald-700 tracking-tight">Swift Mart</h1>
+      <button class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 font-semibold">Shop Now</button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-r from-green-100 via-emerald-50 to-green-200 py-12 mb-10">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center px-6">
+      <div class="md:w-2/3 mb-8 md:mb-0">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Wear the Change</h2>
+        <p class="text-lg text-gray-600 mb-6">Discover our curated selection of eco-friendly fabrics and responsibly crafted fashion. Shop consciously, look fabulous.</p>
+        <a href="#order" class="inline-block bg-emerald-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-emerald-700 transition">Explore Collection</a>
+      </div>
+      <div class="md:w-1/3 flex justify-center">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Eco Fashion" class="rounded-xl shadow-lg w-72 h-72 object-cover border-4 border-emerald-200">
+      </div>
+    </div>
+  </section>
+
+  <!-- Fabric Selector -->
+  <section class="max-w-7xl mx-auto px-6 mb-12">
+    <h3 class="text-2xl font-bold text-center mb-8 text-emerald-800">Choose Your Fabric</h3>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+      <!-- Card for each fabric -->
+      <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center hover:shadow-lg transition group cursor-pointer">
+        <img src="https://img.freepik.com/free-photo/top-view-cloths-made-with-different-natural-pigments-composition_23-2148734249.jpg" alt="Cotton" class="w-24 h-24 object-cover rounded-full mb-3 border-2 border-emerald-100 group-hover:border-emerald-400">
+        <span class="font-semibold text-gray-700">Cotton</span>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center hover:shadow-lg transition group cursor-pointer">
+        <img src="https://plus.unsplash.com/premium_photo-1672681446484-827767f95dab?q=80&w=686&auto=format&fit=crop" alt="Silk" class="w-24 h-24 object-cover rounded-full mb-3 border-2 border-emerald-100 group-hover:border-emerald-400">
+        <span class="font-semibold text-gray-700">Silk</span>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center hover:shadow-lg transition group cursor-pointer">
+        <img src="https://media.istockphoto.com/id/453550893/photo/sample-a-good-quality-leather-in-various-colors.jpg?s=612x612&w=is&k=20&c=gQUo-0fsKkEScdIMfPq48qFJT5dzih6XrttNGYP0SkE=" alt="Leather" class="w-24 h-24 object-cover rounded-full mb-3 border-2 border-emerald-100 group-hover:border-emerald-400">
+        <span class="font-semibold text-gray-700">Leather</span>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center hover:shadow-lg transition group cursor-pointer">
+        <img src="https://images.unsplash.com/photo-1636716018019-569382b46111?q=80&w=1170&auto=format&fit=crop" alt="Wool" class="w-24 h-24 object-cover rounded-full mb-3 border-2 border-emerald-100 group-hover:border-emerald-400">
+        <span class="font-semibold text-gray-700">Wool</span>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center hover:shadow-lg transition group cursor-pointer">
+        <img src="https://plus.unsplash.com/premium_photo-1674575954775-b5ef5af6fd17?w=1000&auto=format&fit=crop&q=60" alt="Linen" class="w-24 h-24 object-cover rounded-full mb-3 border-2 border-emerald-100 group-hover:border-emerald-400">
+        <span class="font-semibold text-gray-700">Linen</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Order Table Section -->
+  <section id="order" class="max-w-5xl mx-auto px-4 py-10 bg-white rounded-2xl shadow-lg mb-16">
+    <h3 class="text-2xl font-bold text-center text-emerald-800 mb-8">Order Your Sustainable Wear</h3>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm text-gray-700">
+        <thead>
+          <tr class="bg-emerald-100 text-emerald-800 text-center">
+            <th class="py-3 px-4">Material</th>
+            <th class="py-3 px-4">Cloth Duration</th>
+            <th class="py-3 px-4">Size</th>
+            <th class="py-3 px-4">Available Stock</th>
+            <th class="py-3 px-4">Quantity</th>
+            <th class="py-3 px-4">Add to Cart</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Example Row -->
+          <tr class="border-b hover:bg-green-50 text-center">
+            <td class="py-3 px-4 flex items-center justify-center gap-2">
+              <img src="https://media.istockphoto.com/id/453550893/photo/sample-a-good-quality-leather-in-various-colors.jpg?s=612x612&w=is&k=20&c=gQUo-0fsKkEScdIMfPq48qFJT5dzih6XrttNGYP0SkE=" alt="Leather" class="w-10 h-10 rounded-full object-cover border-2 border-emerald-200">
+              <span class="ml-2 font-medium">Leather</span>
+            </td>
+            <td class="py-3 px-4">Less than 1 year</td>
+            <td class="py-3 px-4">S</td>
+            <td class="py-3 px-4">1000</td>
+            <td class="py-3 px-4">
+              <div class="flex items-center justify-center gap-2">
+                <button class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold hover:bg-emerald-200">-</button>
+                <span>1</span>
+                <button class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold hover:bg-emerald-200">+</button>
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              <button class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">Add to Cart</button>
+            </td>
+          </tr>
+          <!-- Add more rows as needed, changing size/duration/stock -->
+          <tr class="border-b hover:bg-green-50 text-center">
+            <td class="py-3 px-4 flex items-center justify-center gap-2">
+              <img src="https://media.istockphoto.com/id/453550893/photo/sample-a-good-quality-leather-in-various-colors.jpg?s=612x612&w=is&k=20&c=gQUo-0fsKkEScdIMfPq48qFJT5dzih6XrttNGYP0SkE=" alt="Leather" class="w-10 h-10 rounded-full object-cover border-2 border-emerald-200">
+              <span class="ml-2 font-medium">Leather</span>
+            </td>
+            <td class="py-3 px-4">Less than 1 year</td>
+            <td class="py-3 px-4">M</td>
+            <td class="py-3 px-4">1000</td>
+            <td class="py-3 px-4">
+              <div class="flex items-center justify-center gap-2">
+                <button class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold hover:bg-emerald-200">-</button>
+                <span>1</span>
+                <button class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold hover:bg-emerald-200">+</button>
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              <button class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">Add to Cart</button>
+            </td>
+          </tr>
+          <!-- More rows for L, More than 1 year, etc. -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t py-6">
+    <div class="max-w-7xl mx-auto text-center text-gray-500 text-sm">
+      &copy; 2025 Sustainable Style Hub. Crafted for a greener tomorrow.
+    </div>
+  </footer>
+</body>
+</html>
