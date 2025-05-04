@@ -1,162 +1,201 @@
 <body>
     <div class="bg-green-100 p-4">
         <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-            <h2 class="text-3xl font-bold text-green-700 mb-4">Checkout</h2>
-            <div class="grid md:grid-cols-2 gap-6">
-
-                <!-- Order Summary -->
+            <h2 class="text-3xl font-bold text-green-700 mb-6">Checkout</h2>
+    
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-green-200 mb-6">
+                <button id="cart-tab" class="tab-button px-4 py-2 text-green-700 font-semibold border-b-2 border-green-500">Cart</button>
+                <button id="address-tab" class="tab-button px-4 py-2 text-green-500 font-semibold">Address</button>
+                <button id="summary-tab" class="tab-button px-4 py-2 text-green-500 font-semibold">Summary</button>
+            </div>
+    
+            <!-- Tab Content -->
+            <div id="cart-content" class="tab-content">
+                <h3 class="text-lg font-semibold text-green-700 mb-4">Your Cart</h3>
                 <div class="bg-green-50 p-4 rounded-lg shadow">
-                    <h3 class="text-lg font-semibold text-green-700 mb-2">Order Summary</h3>
-                    <% user.cart.map((e)=> { %>
+                    <% user.cart.map((e) => { %>
                         <div class="border-b pb-2 mb-2">
                             <div class="flex justify-between items-center">
                                 <img src="<%= e.productId.image %>" alt="Product" class="w-12 h-12 rounded">
                                 <div class="flex-1 ml-3 text-xs">
-                                    <p class="font-medium">
-                                        <%= e.productId.title %>
-                                    </p>
-                                    <p class="text-sm text-gray-500">Rs <%= e.productId.price %> x <%= e.quantity %>
-                                    </p>
+                                    <p class="font-medium"><%= e.productId.title %></p>
+                                    <p class="text-sm text-gray-500">Rs <%= e.productId.price %> x <%= e.quantity %></p>
                                 </div>
-                                <p class="font-medium">Rs <%= e.productId.price * e.quantity %>
-                                </p>
+                                <p class="font-medium">Rs <%= e.productId.price * e.quantity %></p>
                             </div>
                         </div>
-                        <% }) %>
-                            <div class="flex justify-between font-bold text-lg text-green-700">
-                                <p>Total:</p>
-                                <p>Rs <%= total %>
-                                </p>
-                            </div>
+                    <% }) %>
+                    <div class="flex justify-between font-bold text-lg text-green-700">
+                        <p>Total:</p>
+                        <p>Rs <%= total %></p>
+                    </div>
                 </div>
-
-                <!-- User Details -->
-                <div>
-                    <h3 class="text-lg font-semibold text-green-700 mb-2">User Details</h3>
-                    <div class="w-full p-2 mb-2 border rounded">
-                        <%= user.firstname %>
-                            <%= user.lastname %>
-                    </div>
-                    <div class="w-full p-2 mb-2 border rounded">
-                        <%= user.email %>
-                    </div>
-                    <div class="w-full p-2 mb-2 border rounded">
-                        <%= user.Address.phone %>
-                    </div>
+                <div class="mt-4 text-right">
+                    <button id="to-address" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Proceed to Address</button>
                 </div>
             </div>
-
-            <!-- Billing Address with Edit Button -->
-            <div class="mt-6">
-                <h3 class="text-lg font-semibold text-green-700 mb-2">Billing Address</h3>
+    
+            <div id="address-content" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-green-700 mb-4">Billing Address</h3>
                 <div id="address-view">
                     <p class="p-2 border rounded mb-2" id="address">
-                        <%= user.Address.plotno %>, <%= user.Address.street %>, <%= user.Address.city %>, <%=
-                                        user.Address.state %> - <%= user.Address.pincode %>
+                        <%= user.Address.plotno %>, <%= user.Address.street %>, <%= user.Address.city %>, <%= user.Address.state %> - <%= user.Address.pincode %>
                     </p>
-                    <button id="edit-address" class="bg-blue-500 text-white py-1 px-3 rounded">Edit</button>
+                    <button id="edit-address" class="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">Edit</button>
                 </div>
                 <div id="address-edit" class="hidden">
-                    <input id="plotno" name="plotno" value="<%= user.Address.plotno %>" type="text"
-                        class="w-full p-2 mb-2 border rounded" required>
-                    <input id="street" name="street" value="<%= user.Address.street %>" type="text"
-                        class="w-full p-2 mb-2 border rounded" required>
-                    <input id="city" name="city" value="<%= user.Address.city %>" type="text"
-                        class="w-full p-2 mb-2 border rounded" required>
-                    <input id="state" name="state" value="<%= user.Address.state %>" type="text"
-                        class="w-full p-2 mb-2 border rounded" required>
-                    <input id="pincode" name="pincode" value="<%= user.Address.pincode %>" type="text"
-                        class="w-full p-2 mb-2 border rounded" required pattern="\d{6}">
-                    <button id="save-address" class="bg-green-500 text-white py-1 px-3 rounded">Save</button>
+                    <input id="plotno" name="plotno" value="<%= user.Address.plotno %>" type="text" class="w-full p-2 mb-2 border rounded" required>
+                    <input id="street" name="street" value="<%= user.Address.street %>" type="text" class="w-full p-2 mb-2 border rounded" required>
+                    <input id="city" name="city" value="<%= user.Address.city %>" type="text" class="w-full p-2 mb-2 border rounded" required>
+                    <input id="state" name="state" value="<%= user.Address.state %>" type="text" class="w-full p-2 mb-2 border rounded" required>
+                    <input id="pincode" name="pincode" value="<%= user.Address.pincode %>" type="text" class="w-full p-2 mb-2 border rounded" required pattern="\d{6}">
+                    <button id="save-address" class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">Save</button>
+                </div>
+                <div class="mt-4 flex justify-between">
+                    <button id="back-to-cart" class="bg-gray-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-gray-600 transition">Back to Cart</button>
+                    <button id="to-summary" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Proceed to Summary</button>
                 </div>
             </div>
-
-            <div class="mt-6">
-                <h3 class="text-lg font-semibold text-green-700 mb-4">Payment Options</h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-                    <!-- COD -->
-                    <label
-                        class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
-                        <input type="radio" name="payment" value="COD" class="hidden peer">
-                        <img src="https://media.istockphoto.com/id/537487845/vector/payment-by-cash.jpg?s=612x612&w=0&k=20&c=ikEp0CWBCwizA4xdzFGUw1QO0FBGfjE1_iq-aOco8Dg="
-                            alt="COD" class="w-14 h-14">
-                        <span class="text-sm font-medium mt-2">Cash on Delivery</span>
-                    </label>
-
-                    <!-- Credit Card -->
-                    <label
-                        class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
-                        <input type="radio" name="payment" value="Credit Card" class="hidden peer">
-                        <img src="https://cdn1.vectorstock.com/i/1000x1000/76/35/hand-with-credit-card-for-payment-mobile-vector-19987635.jpg"
-                            alt="Credit Card" class="w-14 h-14">
-                        <span class="text-sm font-medium mt-2">Credit Card</span>
-                    </label>
-
-                    <!-- UPI -->
-                    <label
-                        class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
-                        <input type="radio" name="payment" value="UPI" class="hidden peer">
-                        <img src="https://m.economictimes.com/thumb/msid-74960608,width-1200,height-900,resizemode-4,imgsize-49172/upi-twitter.jpg"
-                            alt="UPI" class="w-14 h-14">
-                        <span class="text-sm font-medium mt-2">UPI</span>
-                    </label>
-
-                    <!-- Net Banking -->
-                    <label
-                        class="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-green-50 transition peer-checked:bg-green-100 peer-checked:border-green-600 peer-checked:text-green-700">
-                        <input type="radio" name="payment" value="Net Banking" class="hidden peer">
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwvjrjoZnord6W3t9JtI44aUE2-LLtXruvbw&s"
-                            alt="Net Banking" class="w-14 h-14">
-                        <span class="text-sm font-medium mt-2">Net Banking</span>
-                    </label>
-
+    
+            <div id="summary-content" class="tab-content hidden">
+                <h3 class="text-lg font-semibold text-green-700 mb-4">Order Summary</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Cart Summary -->
+                    <div class="bg-green-50 p-4 rounded-lg shadow">
+                        <% user.cart.map((e) => { %>
+                            <div class="border-b pb-2 mb-2">
+                                <div class="flex justify-between items-center">
+                                    <img src="<%= e.productId.image %>" alt="Product" class="w-12 h-12 rounded">
+                                    <div class="flex-1 ml-3 text-xs">
+                                        <p class="font-medium"><%= e.productId.title %></p>
+                                        <p class="text-sm text-gray-500">Rs <%= e.productId.price %> x <%= e.quantity %></p>
+                                    </div>
+                                    <p class="font-medium">Rs <%= e.productId.price * e.quantity %></p>
+                                </div>
+                            </div>
+                        <% }) %>
+                        <div class="flex justify-between font-bold text-lg text-green-700">
+                            <p>Total:</p>
+                            <p>Rs <%= total %></p>
+                        </div>
+                    </div>
+                    <!-- User Details -->
+                    <div>
+                        <h4 class="text-md font-semibold text-green-700 mb-2">User Details</h4>
+                        <div class="w-full p-2 mb-2 border rounded"><%= user.firstname %> <%= user.lastname %></div>
+                        <div class="w-full p-2 mb-2 border rounded"><%= user.email %></div>
+                        <div class="w-full p-2 mb-2 border rounded"><%= user.Address.phone %></div>
+                    </div>
                 </div>
-            </div>
-
-
-            <!-- Place Order Button -->
-            <div class="mt-6 text-center">
-                <button id="place-order"
-                    class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">
-                    Place Order
-                </button>
+                <!-- Shipping Address -->
+                <div class="mt-6">
+                    <h4 class="text-md font-semibold text-green-700 mb-2">Shipping Address</h4>
+                    <p class="p-2 border rounded mb-2" id="summary-address">
+                        <%= user.Address.plotno %>, <%= user.Address.street %>, <%= user.Address.city %>, <%= user.Address.state %> - <%= user.Address.pincode %>
+                    </p>
+                </div>
+                <!-- Navigation Buttons -->
+                <div class="mt-6 flex justify-between">
+                    <button id="back-to-address" class="bg-gray-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-gray-600 transition">Back to Address</button>
+                    <button id="place-order" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Pay</button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <script>
-
-        document.getElementById("place-order").addEventListener("click", function () {
-            let selectedPayment = document.querySelector('input[name="payment"]:checked');
-            if (!selectedPayment) {
-                alert("Please select a payment option before placing the order.");
-                return;
+    
+        <script>
+            // Tab switching logic
+            const tabs = ['cart', 'address', 'summary'];
+            function showTab(tabId) {
+                tabs.forEach(id => {
+                    const content = document.getElementById(`${id}-content`);
+                    const button = document.getElementById(`${id}-tab`);
+                    if (id === tabId) {
+                        content.classList.remove('hidden');
+                        button.classList.add('border-green-500', 'text-green-700');
+                        button.classList.remove('text-green-500');
+                    } else {
+                        content.classList.add('hidden');
+                        button.classList.remove('border-green-500', 'text-green-700');
+                        button.classList.add('text-green-500');
+                    }
+                });
             }
-
-            // Check if the edit section is visible, meaning the user is editing the address
-            let address;
-            if (!document.getElementById("address-edit").classList.contains("hidden")) {
-                // Get values from input fields
-                let plotno = document.getElementById("plotno").value.trim();
-                let street = document.getElementById("street").value.trim();
-                let city = document.getElementById("city").value.trim();
-                let state = document.getElementById("state").value.trim();
-                let pincode = document.getElementById("pincode").value.trim();
-
-                if (!plotno || !street || !city || !state || !pincode) {
-                    alert("All address fields are required!");
+    
+            // Tab button event listeners
+            document.getElementById('cart-tab').addEventListener('click', () => showTab('cart'));
+            document.getElementById('address-tab').addEventListener('click', () => showTab('address'));
+            document.getElementById('summary-tab').addEventListener('click', () => {
+                if (validateAddress()) {
+                    showTab('summary');
+                } else {
+                    alert('Please ensure all address fields are filled before proceeding to summary.');
+                }
+            });
+    
+            // Navigation button event listeners
+            document.getElementById('to-address').addEventListener('click', () => showTab('address'));
+            document.getElementById('to-summary').addEventListener('click', () => {
+                if (validateAddress()) {
+                    showTab('summary');
+                } else {
+                    alert('Please ensure all address fields are filled before proceeding to summary.');
+                }
+            });
+            document.getElementById('back-to-cart').addEventListener('click', () => showTab('cart'));
+            document.getElementById('back-to-address').addEventListener('click', () => showTab('address'));
+    
+            // Address validation function
+            function validateAddress() {
+                const isEditing = !document.getElementById('address-edit').classList.contains('hidden');
+                if (isEditing) {
+                    const plotno = document.getElementById('plotno').value.trim();
+                    const street = document.getElementById('street').value.trim();
+                    const city = document.getElementById('city').value.trim();
+                    const state = document.getElementById('state').value.trim();
+                    const pincode = document.getElementById('pincode').value.trim();
+                    return plotno && street && city && state && pincode && /^\d{6}$/.test(pincode);
+                } else {
+                    const address = document.getElementById('address').innerText.trim();
+                    return address !== '' && address !== ', , ,  - ';
+                }
+            }
+    
+            // Address edit/save logic
+            document.getElementById('edit-address').addEventListener('click', () => {
+                document.getElementById('address-view').classList.add('hidden');
+                document.getElementById('address-edit').classList.remove('hidden');
+            });
+    
+            document.getElementById('save-address').addEventListener('click', () => {
+                const plotno = document.getElementById('plotno').value.trim();
+                const street = document.getElementById('street').value.trim();
+                const city = document.getElementById('city').value.trim();
+                const state = document.getElementById('state').value.trim();
+                const pincode = document.getElementById('pincode').value.trim();
+    
+                if (!plotno || !street || !city || !state || !pincode || !/^\d{6}$/.test(pincode)) {
+                    alert('All address fields are required and pincode must be a 6-digit number!');
                     return;
                 }
-
-                address = `${plotno}, ${street}, ${city}, ${state} - ${pincode}`;
-            } else {
-                // Get address from displayed view
-                address = document.getElementById("address").innerText;
-            }
-
-            alert(`Order placed successfully with ${selectedPayment.value}. Shipping to: ${address}`);
-        });
-
-    </script>
+    
+                const address = `${plotno}, ${street}, ${city}, ${state} - ${pincode}`;
+                document.getElementById('address').innerText = address;
+                document.getElementById('summary-address').innerText = address;
+                document.getElementById('address-view').classList.remove('hidden');
+                document.getElementById('address-edit').classList.add('hidden');
+            });
+    
+            // Place order logic
+            document.getElementById('place-order').addEventListener('click', () => {
+                if (!validateAddress()) {
+                    alert('Please ensure all address fields are filled before placing the order.');
+                    return;
+                }
+                const address = document.getElementById('summary-address').innerText;
+                alert(`Order placed successfully. Shipping to: ${address}`);
+            });
+        </script>
+    </div>
+    
 </body>
