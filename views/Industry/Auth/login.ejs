@@ -19,7 +19,7 @@
                 <h1>Sign in to SwiftMart</h1>
                 <p class="auth-subtitle">Welcome back to SwiftMart! Enter your email to get started.</p>
 
-                <form action="/industry/auth/login" method="POST" class="auth-form">
+                <form action="/api/v1/industry/login" method="POST" class="auth-form">
                     <% if (typeof error !== 'undefined') { %>
                         <div class="error-message">
                             <%= error %>
