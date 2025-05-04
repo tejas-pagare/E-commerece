@@ -20,6 +20,7 @@ router.get('/about',industryAuth ,(req, res) => {
 })
 router.get('/home', industryAuth, async (req, res) => {
     try {
+        console.log(req.industry);
         const combinations = await SellProduct.aggregate([
           {
             $match: {
@@ -114,9 +115,10 @@ router.post('/cartDelete', industryAuth ,async(req,res)=>{
 
 router.get("/profile", industryAuth, async (req, res) => {
     try {
-      const id = req.industry
+        const id = req.industry;
+        console.log(id);
       const industry = await Industry.findById(id)
-  
+     console.log(industry);
       if (!industry) {
         return res.status(404).render("error", {
           message: "Industry profile not found",
@@ -124,9 +126,9 @@ router.get("/profile", industryAuth, async (req, res) => {
         })
       }
   
-      res.render("Industry/profile/profile", {
+      res.render("Industry/Profile/profile", {
         title: "Profile",
-        role: "User",
+        role: "Industry",
         industryName: industry.companyName,
         email: industry.email,
         address: industry.Address || industry.address || "No address provided",
