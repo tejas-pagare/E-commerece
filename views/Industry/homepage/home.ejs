@@ -9,12 +9,74 @@
 </head>
 <body class="bg-green-50 font-sans min-h-screen">
   <!-- Header -->
-  <header class="bg-white shadow-md">
+  <!-- <header class="bg-white shadow-md">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
       <h1 class="text-3xl font-extrabold text-emerald-700 tracking-tight">Swift Mart</h1>
       <button class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 font-semibold">Shop Now</button>
     </div>
-  </header>
+  </header> -->
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-4">
+        <!-- Top Bar -->
+        <div class="flex items-center justify-between mb-4">
+            <!-- Logo -->
+            <div class="flex items-center">
+
+                <span class="ml-2 text-2xl font-bold text-green-600">SwiftMart</span>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="hidden sm:block flex-1 max-w-2xl mx-8">
+                <div class="relative">
+                    <input type="text" placeholder="Search for products"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <button class="absolute right-3 top-2">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Icons -->
+            <div class="flex items-center space-x-6">
+
+                <div class="flex items-center space-x-4">
+
+                    <a href="/api/v1/user/account"><button class="relative">
+                            <i class="far fa-user text-xl"></i>
+                        </button></a>
+                    <a href="/api/v1/user/cart">
+                        <button class="relative">
+                            <i class="fas fa-shopping-cart text-xl"></i>
+                            <span
+                                class="absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                        </button>
+                    </a>
+                    <form action="/api/v1/user/logout" method="get">
+                        <button type="submit"
+                            class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex items-center space-x-6">
+            <button class="hidden md:block bg-green-500 text-white px-4 py-2 rounded-lg flex items-center">
+                <i class="fas fa-bars mr-2"></i>
+                All Departments
+            </button>
+            <a href="/api/v1/user/" class="text-gray-700 hover:text-green-500">Home</a>
+            <a href="/api/v1/user/store" class="text-gray-700 hover:text-green-500">Store</a>
+            <a href="/api/v1/user/vendors" class="text-gray-700 hover:text-green-500">Vendors</a>
+            <a href="/api/v1/user/blog" class="text-gray-700 hover:text-green-500">Blog</a>
+            <a href="/api/v1/user/sell" class="text-gray-700 hover:text-green-500">Sell Product</a>
+            <a href="/api/v1/user/contact" class="text-gray-700 hover:text-green-500">About us</a>
+            <a href="/api/v1/user/dashboard" class="text-gray-700 hover:text-green-500">Dashboard</a>
+            
+
+        </nav>
+    </div>
+</header>
 
   <!-- Hero Section -->
   <section class="bg-gradient-to-r from-green-100 via-emerald-50 to-green-200 py-12 mb-10">
