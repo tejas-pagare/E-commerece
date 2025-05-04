@@ -159,7 +159,7 @@ router.get("/profile", industryAuth, async (req, res) => {
         role: "User",
         companyName: industry.companyName,
         email: industry.email,
-        address: industry.Address || industry.address || "",
+        address: industry.Address || "",
       })
     } catch (error) {
       console.error("Error fetching industry:", error)
@@ -173,16 +173,18 @@ router.get("/profile", industryAuth, async (req, res) => {
 
   router.post("/profile/edit", industryAuth, async (req, res) => {
     try {
-      const { companyName, email, address } = req.body
+      const { companyName, email, address, password } = req.body
+       hashpassword = await bcrypt.hash(password, 10);
   
       // Validate input
-      if (!companyName || !email || !address) {
+      if (!companyName || !email || !address || !password) {
         return res.status(400).render("Industry/profile/editProfile", {
           title: "Profile Update",
           role: "User",
           companyName: companyName || "",
           email: email || "",
           address: address || "",
+          password: hashpassword || "", 
           error: "All fields are required",
         })
       }
@@ -196,8 +198,8 @@ router.get("/profile", industryAuth, async (req, res) => {
         {
           companyName,
           email,
-          Address: address, // For backward compatibility
-           // In case the schema uses lowercase
+          Address: address, 
+          password,
         },
         { new: true },
       )
@@ -218,6 +220,7 @@ router.get("/profile", industryAuth, async (req, res) => {
         companyName: req.body.companyName || "",
         email: req.body.email || "",
         address: req.body.address || "",
+        password: req.body.password || "",
         error: "An error occurred while updating your profile",
       })
     }

@@ -69,6 +69,18 @@
                         required
                     ><%= address %></textarea>
                 </div>
+
+                <div class="space-y-2">
+                    <label for="password" class="text-gray-700 font-medium">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        value="Enter new password" 
+                        class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
+                        required
+                    >
+                </div>
                 
                 <!-- Buttons -->
                 <div class="flex justify-end gap-4 pt-4">
@@ -92,8 +104,9 @@
             const companyName = document.getElementById('companyName').value.trim();
             const email = document.getElementById('email').value.trim();
             const address = document.getElementById('address').value.trim();
+            const password = document.getElementById('password').value.trim();
             
-            if (!companyName || !email || !address) {
+            if (!companyName || !email || !address || !password) {
                 event.preventDefault();
                 alert('Please fill in all required fields');
                 return false;
