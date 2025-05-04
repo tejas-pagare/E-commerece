@@ -46,8 +46,8 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ["COD", "Credit Card", "Debit Card", "UPI", "Net Banking"],
-    required: true,
+    default:"Online",
+    
   },
   shippingAddress: {
     fullname: { type: String, required: true },
