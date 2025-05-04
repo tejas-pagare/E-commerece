@@ -112,38 +112,114 @@ router.post('/cartDelete', industryAuth ,async(req,res)=>{
 
 });
 
-router.get('profile', industryAuth ,async (req,res)=>{
+router.get("/profile", industryAuth, async (req, res) => {
     try {
-        const id= req.industry;
-        const industry = await Industry.findById(id);
-        res.render('Industry/profile', {title:'Profile', role:'User', industryName: industry.companyName, email: industry.email, address: industry.Address});
-    }
-        catch (error) {
-        console.error("Error fetching industry:", error);}
-        
-})
-
-router.get('profile/edit',industryAuth ,async (req,res)=>{
-    try {
-        const id= req.industry;
-        const industry = await Industry.findById(id);
-        res.render('Industry/editProfile', {title:'Profile update', role:'User',companyName: industry.companyName, email: industry.email, address: industry.Address});
-    }catch (error) {
-        console.error("Error fetching industry:", error);}
-    
-})
-
-router.post('profile/edit', industryAuth, async (req,res)=>{
-    try {
-        const { companyName, email, address } = req.body;
-        const id= req.industry;
-        const industry = await Industry.findByIdAndUpdate(id, { companyName, email, address }, { new: true });
-        res.redirect('/industry/profile');
+      const id = req.industry
+      const industry = await Industry.findById(id)
+  
+      if (!industry) {
+        return res.status(404).render("error", {
+          message: "Industry profile not found",
+          error: { status: 404 },
+        })
+      }
+  
+      res.render("Industry/profile/profile", {
+        title: "Profile",
+        role: "User",
+        industryName: industry.companyName,
+        email: industry.email,
+        address: industry.Address || industry.address || "No address provided",
+      })
     } catch (error) {
-        console.error("Error updating industry profile:", error);
-        res.status(500).json({ message: "Internal Server Error" });
+      console.error("Error fetching industry:", error)
+      res.status(500).render("error", {
+        message: "Error fetching profile",
+        error: { status: 500 },
+      })
     }
-})
+  })
+
+  router.get("/profile/edit", industryAuth, async (req, res) => {
+    try {
+      const id = req.industry
+      const industry = await Industry.findById(id)
+  
+      if (!industry) {
+        return res.status(404).render("error", {
+          message: "Industry profile not found",
+          error: { status: 404 },
+        })
+      }
+  
+      res.render("Industry/profile/editProfile", {
+        title: "Profile Update",
+        role: "User",
+        companyName: industry.companyName,
+        email: industry.email,
+        address: industry.Address || industry.address || "",
+      })
+    } catch (error) {
+      console.error("Error fetching industry:", error)
+      res.status(500).render("error", {
+        message: "Error fetching profile for editing",
+        error: { status: 500 },
+      })
+    }
+  })
+  
+
+  router.post("/profile/edit", industryAuth, async (req, res) => {
+    try {
+      const { companyName, email, address } = req.body
+  
+      // Validate input
+      if (!companyName || !email || !address) {
+        return res.status(400).render("Industry/profile/editProfile", {
+          title: "Profile Update",
+          role: "User",
+          companyName: companyName || "",
+          email: email || "",
+          address: address || "",
+          error: "All fields are required",
+        })
+      }
+  
+      const id = req.industry
+  
+      // Update the industry profile
+      // Note: Using both Address and address to ensure compatibility
+      const industry = await Industry.findByIdAndUpdate(
+        id,
+        {
+          companyName,
+          email,
+          Address: address, // For backward compatibility
+           // In case the schema uses lowercase
+        },
+        { new: true },
+      )
+  
+      if (!industry) {
+        return res.status(404).render("error", {
+          message: "Industry profile not found",
+          error: { status: 404 },
+        })
+      }
+  
+      res.redirect("/industry/profile")
+    } catch (error) {
+      console.error("Error updating industry profile:", error)
+      res.status(500).render("Industry/profile/editProfile", {
+        title: "Profile Update",
+        role: "User",
+        companyName: req.body.companyName || "",
+        email: req.body.email || "",
+        address: req.body.address || "",
+        error: "An error occurred while updating your profile",
+      })
+    }
+  })
 
 router.get('/checkout', industryAuth, async (req,res)=>{
     try {
