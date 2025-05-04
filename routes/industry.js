@@ -7,13 +7,13 @@ import {v4 as uuidv4} from 'uuid';
 const router = express.Router();
 
 router.get('/login', (req,res)=>{
-    res.render('Industry/login', {title:'Login', role:'User'})
+    res.render('Industry/Auth/login', {title:'Login', role:'User'})
 } );
-router.get('/register', (req, res) => {
-    res.render('Industry/register', {title:'Register',role:'User'})
+router.get('/signup', (req, res) => {
+    res.render('Industry/Auth/signup', {title:'Signup',role:'User'})
 })
 router.post('/login', loginController );
-router.post('/register', registerController);
+router.post('/signup', registerController);
 
 router.get('/about',industryAuth ,(req, res) => {
     res.render('Industry/about', {title:'About',role:'User'})

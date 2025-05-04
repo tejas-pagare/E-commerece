@@ -9,8 +9,11 @@
 <body>
     <div class="auth-container">
         <div class="auth-content">
-            <div class="auth-illustration">
+            <div class="auth-illustration hidden lg:flex lg:w-1/2 bg-[#22c55e] bg-opacity-10 items-center justify-center p-12   ">
                 <!-- Illustration will be added via CSS background or img tag -->
+                <div class="relative w-full max-w-lg">
+                    <img src="https://freshcart-next-js.vercel.app/images/svg-graphics/signin-g.svg" alt="Authentication illustration" class="w-full">
+                </div>
             </div>
             <div class="auth-form-container">
                 <h1>Sign in to SwiftMart</h1>
@@ -51,8 +54,7 @@
                 </form>
 
                 <div class="auth-links">
-                    <p>Don't have an account? <a href="/industry/signup">Sign Up</a></p>
-                    <p>Are you admin? <a href="/admin/signup">Admin Sign Up</a></p>
+                    <p>Don't have an account? <a href="/api/v1/industry/signup">Sign Up</a></p>
                 </div>
             </div>
         </div>
