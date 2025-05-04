@@ -1,7 +1,7 @@
 import express from 'express';
 import SellProduct from '../models/SellProduct.js';
 import Industry from '../models/Industry.js';
-import industryAuth from '../middleware/isAuthenticated.js';
+import {industryAuth} from '../middleware/isAuthenticated.js';
 import { loginController, registerController } from '../controller/industry.js';
 import {v4 as uuidv4} from 'uuid';
 const router = express.Router();
@@ -30,7 +30,8 @@ router.get('/home', industryAuth, async (req, res) => {
           {
             $group: {
               _id: "$combination_id", // Group by combination_id
-              quantity: { $sum: 1 },  // Count the number of products in each combination
+              quantity: { $sum: 1 },
+              estimated_value:{$first: "$estimated_value"},  // Count the number of products in each combination
               fabric: { $first: "$fabric" },  // Get first fabric value
               size: { $first: "$size" },  // Get first size value
               usageDuration: { $first: "$usageDuration" } // Get first usage duration
@@ -40,7 +41,7 @@ router.get('/home', industryAuth, async (req, res) => {
             $limit: 54 // Limit to 54 unique combination_id groups
           }
         ]);
-
+         console.log(req.industry);
         res.render('Industry/homepage/home', { title: 'Home', role:'User' ,combinations });
     } catch (error) {
         console.error("Error fetching combinations with details:", error);
@@ -61,14 +62,14 @@ router.get('/cart', industryAuth, async( req,res)=>{
 
 router.post('/cart',industryAuth ,async(req,res)=>{
     try {
-        const { _id, quantity, fabric, size, usageDuration, new_quantity, amount } = req.body;
+        const { _id, quantity, fabric, size, usageDuration, new_quantity, estimated_value } = req.body;
         
         const cartItem= {
             fabric:fabric,
             size: size,
             usageDuration: usageDuration,
             quantity: new_quantity,
-            amount: amount,
+            amount: estimated_value*new_quantity,
             combination_id: _id,
             id:uuidv4(),
         }
