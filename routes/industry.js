@@ -16,7 +16,7 @@ router.post('/login', loginController );
 router.post('/signup', registerController);
 
 router.get('/about',industryAuth ,(req, res) => {
-    res.render('Industry/about', {title:'About',role:'User'})
+    res.render('Industry/aboutus/aboutus', {title:'About',role:'Industry'})
 })
 router.get('/home', industryAuth, async (req, res) => {
     try {
@@ -55,7 +55,7 @@ router.get('/cart', industryAuth, async( req,res)=>{
     try {
         const id= req.industry;
         const industry = await Industry.findById(id);
-        res.render('Industry/cart', {title:'Cart', role:'User', industryName: industry.companyName, email: industry.email, address: industry.address, cart: industry.cart});
+        res.render('Industry/newCart/cart', {title:'Cart', role:'User', industryName: industry.companyName, email: industry.email, address: industry.address, cart: industry.cart});
     }
         catch (error) {
         console.error("Error fetching industry:", error);}
@@ -91,7 +91,7 @@ router.post('/cart',industryAuth ,async(req,res)=>{
             { new: true } // Returns the updated document
           );
 
-          res.render('Industry/cart', {title:'Cart', role:'User',updatedIndustry: updatedIndustry})
+          res.render('Industry/newCart/cart', {title:'Cart', role:'User',updatedIndustry: updatedIndustry})
         
     } catch (error) {
         console.error("Error fetching product:", error);
@@ -108,7 +108,7 @@ router.post('/cartDelete', industryAuth ,async(req,res)=>{
             { $pull: { cart: { id:id } } },
             { new: true } // Returns the updated document
              )
-        res.render('Industry/cart', {title:'Cart', role:'User', updatedIndustry: updatedIndustry})}
+        res.render('Industry/cart', {title:'Cart', role:'Industry', updatedIndustry: updatedIndustry})}
           catch (error) {
         console.error("Error deleting product from cart:", error);}
 
@@ -132,7 +132,7 @@ router.get("/profile", industryAuth, async (req, res) => {
         role: "Industry",
         industryName: industry.companyName,
         email: industry.email,
-        address: industry.Address || industry.address || "No address provided",
+        address: industry.Address || "No address provided",
       })
     } catch (error) {
       console.error("Error fetching industry:", error)
@@ -157,7 +157,7 @@ router.get("/profile", industryAuth, async (req, res) => {
   
       res.render("Industry/profile/editProfile", {
         title: "Profile Update",
-        role: "User",
+        role: "Industry",
         companyName: industry.companyName,
         email: industry.email,
         address: industry.Address || "",
@@ -231,11 +231,29 @@ router.get('/checkout', industryAuth, async (req,res)=>{
     try {
         const id= req.industry;
         const industry = await Industry.findById(id);
-        res.render('Industry/checkout', {title:'Checkout', role:'User', industryName: industry.companyName, email: industry.email, address: industry.address, cart: industry.cart});
+        res.render('Industry/checkout/checkout', {title:'Checkout', role:'User', industryName: industry.companyName, email: industry.email, address: industry.address, cart: industry.cart});
     } catch (error) {
         console.error("Error fetching industry:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 })
+
+// Assuming you have an Order model and industryAuth middleware
+
+router.get('/dashboard', industryAuth, async (req, res) => {
+    try {
+      const industryId = req.industry;
+      // Fetch orders for this industry
+      const orders = await Order.find({ industry: industryId }).sort({ createdAt: -1 });
+      // Calculate total amount
+      const totalAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
+      res.render('Industry/dashboard', { orders, totalAmount });
+    } catch (error) {
+      console.error(error);
+      res.status(500).render('error', { message: 'Could not load dashboard' });
+    }
+  });
+  
+
 
 export default router;

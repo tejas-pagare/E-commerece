@@ -5,6 +5,7 @@ import isAuthenticated from '../middleware/isAuthenticated.js';
 import { title } from 'process';
 import Product from '../models/product.js';
 import Review from '../models/Reviews.js';
+import SellProduct from '../models/SellProduct.js';
 
 import Order from "../models/orders.js";
 import UserHistory from "../models/userHistory.js";
