@@ -2,20 +2,20 @@
 const relatedArticles = [
     {
         id: 1,
-        title: 'Modern Minimalist Living Room Design Ideas',
-        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7',
+        title: 'Modern Minimalist',
+        image: 'https://imgs.search.brave.com/UG_TQUhU7FtVqoJVMUl2pxXqjQCMaYRduB3JMvjh_L4/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pMC53/cC5jb20vYnJvb2tl/YW5kYmFiaWVzLmNv/bS93cC1jb250ZW50/L3VwbG9hZHMvMjAy/My8wMS9TY3JlZW4t/U2hvdC0yMDIzLTEw/LTE4LWF0LTEyLjA3/LjQzLVBNLTEtNjI1/eDEwMjQucG5nP3Jl/c2l6ZT02MjUsMTAy/NCZzc2w9MQ',
         date: 'October 16, 2023'
     },
     {
         id: 2,
-        title: 'Small Space Solutions: Making the Most of Your Home',
-        image: 'https://images.unsplash.com/photo-1583847268964-b28dc8f51f92',
+        title: ' Making the Most of Your Clothes',
+        image: 'https://imgs.search.brave.com/qa--kRdB7Y9KM2JQs3jdJwDdFZBKG76DlD-0Sh9znf0/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pMC53/cC5jb20vd3d3LnRo/ZXBhcmlzcGhvdG9n/cmFwaGVyLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvMjAxOC8x/MS9QaG90b3Nob290/LW91dGZpdHMtZm9y/LUFsZXhhbmRlci0z/LWJyaWRnZS1ieS1u/aWdodC5qcGc_cmVz/aXplPTY2OCwxMDAw/JnF1YWxpdHk9MTAw/JnNzbD0x',
         date: 'October 15, 2023'
     },
     {
         id: 3,
-        title: 'Creating a Perfect Home Office Setup',
-        image: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0',
+        title: ' Perfect Outfit',
+        image: 'https://imgs.search.brave.com/hvZvhMzIx1fn-Qv5mfCpHweikyTJ_ZXlcWCw8WMov3c/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9oYWxp/ZWNoaWxkLmNvbS93/cC1jb250ZW50L3Vw/bG9hZHMvc2l0ZXMv/ODY1Ni8yMDE5LzA0/L0Rlc2lnbmVyLUVu/Z2FnZW1lbnQtUGhv/dG8tT3V0Zml0cy1h/dC1Cb3N0b24tUHVi/bGljLUdhcmRlbi0x/OS02ODN4MTAyNC5q/cGc',
         date: 'October 14, 2023'
     }
 ];
