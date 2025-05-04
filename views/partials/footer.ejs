@@ -1,53 +1,54 @@
-<% if(!(title==="login" ||title==="signup" ||title==="Home" )) {%>
-
-    <footer class="bg-green-500 text-white py-8">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <!-- About Section -->
-                <div>
-                    <h2 class="text-xl font-bold mb-3">SwiftMart</h2>
-                    <p class="text-sm">Your one-stop shop for quality products at the best prices. Shop with confidence and convenience.</p>
-                </div>
-    
-                <!-- Quick Links -->
-                <div>
-                    <h2 class="text-xl font-bold mb-3">Quick Links</h2>
-                    <ul class="space-y-2">
-                        <li><a href="/api/v1/user/" class="hover:text-gray-200">Home</a></li>
-                        <li><a href="/api/v1/user/shop" class="hover:text-gray-200">Shop</a></li>
-                        <li><a href="/api/v1/user/blog" class="hover:text-gray-200">Blog</a></li>
-                        <li><a href="/api/v1/user/contact" class="hover:text-gray-200">Contact</a></li>
-                    </ul>
-                </div>
-    
-                <!-- Customer Service -->
-                <div>
-                    <h2 class="text-xl font-bold mb-3">Customer Service</h2>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="hover:text-gray-200">FAQ</a></li>
-                        <li><a href="#" class="hover:text-gray-200">Shipping & Returns</a></li>
-                        <li><a href="#" class="hover:text-gray-200">Privacy Policy</a></li>
-                        <li><a href="#" class="hover:text-gray-200">Terms & Conditions</a></li>
-                    </ul>
-                </div>
-    
-                <!-- Social Media -->
-                <div>
-                    <h2 class="text-xl font-bold mb-3">Follow Us</h2>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-white hover:text-gray-200"><i class="fab fa-facebook text-xl"></i></a>
-                        <a href="#" class="text-white hover:text-gray-200"><i class="fab fa-twitter text-xl"></i></a>
-                        <a href="#" class="text-white hover:text-gray-200"><i class="fab fa-instagram text-xl"></i></a>
-                        <a href="#" class="text-white hover:text-gray-200"><i class="fab fa-linkedin text-xl"></i></a>
-                    </div>
-                </div>
-            </div>
-    
-            <!-- Copyright -->
-            <div class="border-t border-white mt-6 pt-4 text-center text-sm">
-                &copy; 2025 SwiftMart. All Rights Reserved.
-            </div>
+<% if(!(title==="login" || title==="signup" || title==="Home")) { %>
+    <footer class="bg-green-50 border-t border-green-100 mt-12">
+      <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+        <!-- Brand & Mission -->
+        <div>
+          <div class="flex items-center space-x-2 mb-3">
+            <span class="text-2xl font-bold text-green-700">SwiftMart</span>
+          </div>
+          <p class="text-sm text-green-700 leading-relaxed">
+            Your one-stop shop for quality products at the best prices.<br>
+            Shop with confidence and convenience.
+          </p>
         </div>
+        <!-- Quick Links -->
+        <div>
+          <h3 class="text-base font-semibold text-green-800 mb-3">Quick Links</h3>
+          <ul class="space-y-2 text-green-700 text-sm">
+            <li><a href="/api/v1/user/" class="hover:text-green-900 transition">Home</a></li>
+            <li><a href="/api/v1/user/shop" class="hover:text-green-900 transition">Shop</a></li>
+            <li><a href="/api/v1/user/blog" class="hover:text-green-900 transition">Blog</a></li>
+            <li><a href="/api/v1/user/contact" class="hover:text-green-900 transition">Contact</a></li>
+          </ul>
+        </div>
+        <!-- Customer Service -->
+        <div>
+          <h3 class="text-base font-semibold text-green-800 mb-3">Customer Service</h3>
+          <ul class="space-y-2 text-green-700 text-sm">
+            <li><a href="#" class="hover:text-green-900 transition">FAQ</a></li>
+            <li><a href="#" class="hover:text-green-900 transition">Shipping & Returns</a></li>
+            <li><a href="#" class="hover:text-green-900 transition">Privacy Policy</a></li>
+            <li><a href="#" class="hover:text-green-900 transition">Terms & Conditions</a></li>
+          </ul>
+        </div>
+        <!-- Newsletter & Social -->
+        <div>
+          <h3 class="text-base font-semibold text-green-800 mb-3">Stay Connected</h3>
+          <form class="flex mb-4">
+            <input type="email" placeholder="Your email" class="rounded-l px-3 py-2 w-full text-green-900 border border-green-200 focus:outline-none focus:ring-2 focus:ring-green-300" />
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-r font-semibold hover:bg-green-700 transition">Subscribe</button>
+          </form>
+          <div class="flex space-x-4">
+            <a href="#" aria-label="Facebook" class="hover:text-green-700 transition"><i class="fab fa-facebook-f text-xl"></i></a>
+            <a href="#" aria-label="Twitter" class="hover:text-green-700 transition"><i class="fab fa-twitter text-xl"></i></a>
+            <a href="#" aria-label="Instagram" class="hover:text-green-700 transition"><i class="fab fa-instagram text-xl"></i></a>
+            <a href="#" aria-label="LinkedIn" class="hover:text-green-700 transition"><i class="fab fa-linkedin-in text-xl"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="border-t border-green-100 py-4 text-center text-green-600 text-xs">
+        &copy; 2025 SwiftMart. All Rights Reserved.
+      </div>
     </footer>
-
-<%}%>
+    <% } %>
+    

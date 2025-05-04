@@ -6,7 +6,8 @@ import { title } from 'process';
 import Product from '../models/product.js';
 import Review from '../models/Reviews.js';
 
-
+import Order from "../models/orders.js";
+import UserHistory from "../models/userHistory.js";
 const router = express.Router();
 
 router.get("/login", loginPageRenderController)
@@ -129,9 +130,84 @@ router.get("/checkout",isAuthenticated,async(req,res)=>{
   })
   return res.render("User/payment/index.ejs",{title:"Checkout Page",role:"user",user,total})
 });
-router.post("/payment",(req,res)=>{
-  
-})
+router.post("/payment", isAuthenticated, async (req, res) => {
+  try {
+    const { paymentMethod, address } = req.body;
+    const { userId } = req;
+console.log(address);
+    if (
+      !address ||
+      !address.plotno ||
+      !address.street ||
+      !address.city ||
+      !address.state ||
+      !address.pincode
+    ) {
+      return res.status(400).json({ error: "Shipping address is incomplete" });
+    }
+
+    const user = await User.findById(userId).populate("cart.productId");
+    if (!user) return res.status(404).json({ error: "User not found" });
+    if (user.cart.length === 0) return res.status(400).json({ error: "Cart is empty" });
+
+    const products = user.cart.map((item) => ({
+      productId: item.productId._id,
+      quantity: item.quantity,
+      price: item.productId.price,
+    }));
+
+    const totalAmount = products.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+
+    const newOrder = new Order({
+      userId: user._id,
+      products,
+      totalAmount,
+      paymentStatus,
+      paymentMethod,
+      shippingAddress: {
+        fullname: `${user.firstname} ${user.lastname}`,
+        plotno: address.plotno,
+        street: address.street,
+        city: address.city,
+        state: address.state,
+        pincode: address.pincode,
+        phone: address.phone,
+      },
+    });
+
+    await newOrder.save();
+
+    let userHistory = await UserHistory.findOne({ userId: user._id });
+    if (!userHistory) {
+      userHistory = new UserHistory({
+        userId: user._id,
+        orders: [],
+      });
+    }
+
+    userHistory.orders.push({
+      orderId: newOrder._id,
+      products,
+      totalAmount,
+      status: "Completed",
+    });
+
+    await userHistory.save();
+
+    user.cart = [];
+    await user.save();
+
+    res.status(200).json({ message: "Payment processed and order placed successfully" });
+  } catch (err) {
+    console.error("Payment error:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
+});
+
+
 
 router.get("/dashboard",isAuthenticated,(req,res)=>{
   res.render("User/dashboard/index.ejs",{title:"Dashboard",role:"user"});
