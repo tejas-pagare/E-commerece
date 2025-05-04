@@ -50,6 +50,8 @@ const industryAuth= async (req,res,next)=>{
     if(!decode){
       return res.redirect("/api/v1/indusrty/login");
     }
+    console.log(decode);
+
     req.industry= decode.industry_id;
     next();
 
