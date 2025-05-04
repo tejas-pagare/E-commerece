@@ -39,7 +39,7 @@ const registerController =  async (req, res) => {
   try {
     const { companyName, password, email } = req.body;
     const industryCheck = await Industry.findOne({ email });
-    if (!indusrtyCheck) {
+    if (industryCheck) {
         alert('Industry exists')
       return res.redirect("/api/v1/industry/signup")
     }
@@ -49,7 +49,6 @@ const registerController =  async (req, res) => {
     const industry = await Industry.create({
       companyName, password: hashPassword, email
     });
-    (await industry).save()
 
     return res.redirect("/api/v1/industry/login");
   } catch (error) {
