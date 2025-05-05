@@ -9,6 +9,7 @@ import SellProduct from '../models/SellProduct.js';
 
 import Order from "../models/orders.js";
 import UserHistory from "../models/userHistory.js";
+import path from 'path';
 const router = express.Router();
 
 router.get("/login", loginPageRenderController)
@@ -131,7 +132,7 @@ console.log(address);
       userId: user._id,
       products,
       totalAmount,
-      paymentStatus,
+      paymentStatus:"Pending",
       paymentMethod,
       shippingAddress: {
         fullname: `${user.firstname} ${user.lastname}`,
@@ -175,9 +176,30 @@ console.log(address);
 
 
 
-router.get("/dashboard",isAuthenticated,(req,res)=>{
-  res.render("User/dashboard/index.ejs",{title:"Dashboard",role:"user"});
+router.get("/dashboard", isAuthenticated, async (req, res) => {
+  const userId = req.userId;
+  console.log(userId);
+  
+  const order = await UserHistory.findOne({ userId })
+    .populate({
+      path: "userId",
+      select: "firstname lastname email",
+      populate: {
+        path: "cart"
+      }
+    })
+    .populate({
+      path: "orders",
+      populate: {
+        path: "products.productId", // 👈 correct path
+        model: "Product"            // 👈 use correct model name
+      }
+    });
+
+  console.log(order);
+  res.render("User/dashboard/index.ejs", { title: "Dashboard", role: "user", order });
 });
+
 
 router.post("/review/create/:id",isAuthenticated,async(req,res)=>{
   try {
@@ -218,7 +240,6 @@ router.post("/review/create/:id",isAuthenticated,async(req,res)=>{
 router.get('/', isAuthenticated, HomePageController);
 
 
-//////////////////////////////////
 
 const combinationPoints = {
   // 6 months (age = "6")
@@ -309,5 +330,3 @@ router.post('/sell', isAuthenticated,upload.single('photos'), async (req, res) =
 });
 
 export default router;
-
-

@@ -1,0 +1,206 @@
+
+<body class="bg-gray-100">
+    <div class="min-h-screen container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Manager Management</h1>
+            <button onclick="toggleCreateModal()" 
+                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-150 ease-in-out">
+                Create Manager
+            </button>
+        </div>
+
+        <!-- Manager List Table -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">ID</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Created At</th>
+                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="manager-table"></tbody>
+            </table>
+        </div>
+
+        <!-- Create Manager Modal -->
+        <div id="createManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div class="bg-white rounded-lg p-6 w-[400px]">
+                <h2 class="text-xl font-bold mb-4">Create New Manager</h2>
+                <form id="createManagerForm" onsubmit="createManager(event)">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
+                            Email
+                        </label>
+                        <input type="email" id="email" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+                            Password
+                        </label>
+                        <input type="password" id="password" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" onclick="toggleCreateModal()"
+                            class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                            Cancel
+                        </button>
+                        <button type="submit"
+                            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                            Create
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Notification -->
+        <div id="notification" class="hidden"></div>
+    </div>
+
+    <script>
+        // Function to fetch managers from backend
+        async function fetchManagers() {
+            try {
+                const response = await fetch('/api/v1/admin/managers', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                console.log(data)
+                if (data.success) {
+                    
+                    renderManagerList(data.managers);
+                } else {
+                    showNotification(data.message || 'Failed to fetch managers', 'error');
+                }
+            } catch (error) {
+                console.error('Error fetching managers:', error);
+                showNotification('Failed to fetch managers', 'error');
+            }
+        }
+
+        // Function to render manager list
+        function renderManagerList(managers) {
+            const tableBody = document.getElementById('manager-table');
+            tableBody.innerHTML = '';
+            
+            managers.forEach(manager => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-100 border-b border-gray-200';
+                
+                row.innerHTML = `
+                    <td class="px-4 py-2">${manager._id}</td>
+                    <td class="px-4 py-2">${manager.email}</td>
+                    <td class="px-4 py-2">${new Date(manager.createdAt).toLocaleDateString()}</td>
+                    <td class="px-4 py-2">
+                        <button onclick="deleteManager('${manager._id}')" 
+                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                            Delete
+                        </button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Function to handle manager creation
+        async function createManager(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showNotification('Please fill in all fields', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/v1/admin/create/manager', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+        
+                const data = await response.json();
+                if (data.success) {
+                    // Reset form
+                    document.getElementById('createManagerForm').reset();
+                    
+                    // Show success notification
+                    showNotification('Manager created successfully', 'success');
+                    
+                    // Close modal
+                    toggleCreateModal();
+                    
+                    // Refresh manager list
+                    await fetchManagers();
+                } else {
+                    showNotification(data.message || 'Failed to create manager', 'error');
+                }
+            } catch (error) {
+                console.error('Error creating manager:', error);
+                showNotification('Failed to create manager', 'error');
+            }
+        }
+
+        // Function to delete manager
+        async function deleteManager(managerId) {
+            try {
+                const response = await fetch(`/api/v1/admin/managers/${managerId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showNotification('Manager deleted successfully', 'success');
+                    fetchManagers();
+                } else {
+                    showNotification(data.message || 'Failed to delete manager', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting manager:', error);
+                showNotification('Failed to delete manager', 'error');
+            }
+        }
+
+        // Function to show notification
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white`;
+            
+            notification.classList.remove('hidden');
+            setTimeout(() => {
+                notification.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Function to toggle create manager modal
+        function toggleCreateModal() {
+            const modal = document.getElementById('createManagerModal');
+            modal.classList.toggle('hidden');
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchManagers();
+        });
+    </script>
+</body>

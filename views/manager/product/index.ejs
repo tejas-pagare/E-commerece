@@ -1,0 +1,186 @@
+<body class="bg-green-50">
+    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-green-700">Product Verification</h1>
+            <p class="text-gray-600 mt-2">Manage and verify product listings</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold text-green-700">Total Products</h3>
+                <p class="text-3xl font-bold mt-2">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold text-yellow-600">Pending Verification</h3>
+                <p class="text-3xl font-bold mt-2">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold text-green-700">Verified Products</h3>
+                <p class="text-3xl font-bold mt-2">0</p>
+            </div>
+        </div>
+
+        <!-- Pending Products Section -->
+        <div class="mb-12">
+            <h2 class="text-xl font-semibold text-green-700 mb-4">Pending Verification</h2>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table id="pendingTable" class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Image</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Details</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seller Info</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- Dynamic content will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verified Products Section -->
+        <div>
+            <h2 class="text-xl font-semibold text-green-700 mb-4">Verified Products</h2>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table id="verifiedTable" class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Image</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Details</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seller Info</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- Dynamic content will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to format price in Indian Rupees
+        function formatPrice(price) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR'
+            }).format(price);
+        }
+
+        // Function to fetch and display product data
+        async function loadProductData() {
+            try {
+                // Fetch real data from backend
+                const [pendingResponse, verifiedResponse, statsResponse] = await Promise.all([
+                    fetch('/api/v1/manager/products/pending'),
+                    fetch('/api/v1/manager/products/verified'),
+                    fetch('/api/v1/manager/products/stats')
+                ]);
+
+                const pendingData = await pendingResponse.json();
+                const verifiedData = await verifiedResponse.json();
+                const statsData = await statsResponse.json();
+
+                // Update pending products table
+                const pendingTableBody = document.querySelector('#pendingTable tbody');
+                pendingTableBody.innerHTML = pendingData.products.map(product => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <img src="${product.image.trim()}" alt="${product.title}" class="h-20 w-20 rounded object-cover">
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">${product.title}</div>
+                            <div class="text-sm text-gray-500">${product.description}</div>
+                            <div class="text-xs text-gray-500 mt-1">Category: ${product.category}</div>
+                            <div class="text-xs text-gray-500">Stock: ${product.stock ? 'Available' : 'Out of Stock'}</div>
+                            <div class="text-xs text-gray-500">Quantity: ${product.quantity}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${product.sellerId ? product.sellerId.name : 'N/A'}</div>
+                            <div class="text-sm text-gray-500">${product.sellerId ? product.sellerId.email : 'N/A'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${formatPrice(product.price)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button onclick="handleAction('verify', '${product._id}')" class="text-green-600 hover:text-green-900 mr-3">Verify</button>
+                            <button onclick="handleAction('reject', '${product._id}')" class="text-red-600 hover:text-red-900">Reject</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Update verified products table
+                const verifiedTableBody = document.querySelector('#verifiedTable tbody');
+                verifiedTableBody.innerHTML = verifiedData.products.map(product => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <img src="${product.image.trim()}" alt="${product.title}" class="h-20 w-20 rounded object-cover">
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">${product.title}</div>
+                            <div class="text-sm text-gray-500">${product.description}</div>
+                            <div class="text-xs text-gray-500 mt-1">Category: ${product.category}</div>
+                            <div class="text-xs text-gray-500">Stock: ${product.stock ? 'Available' : 'Out of Stock'}</div>
+                            <div class="text-xs text-gray-500">Quantity: ${product.quantity}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${product.sellerId ? product.sellerId.name : 'N/A'}</div>
+                            <div class="text-sm text-gray-500">${product.sellerId ? product.sellerId.email : 'N/A'}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ${formatPrice(product.price)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                Verified
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Update stats
+                document.querySelectorAll('.text-3xl.font-bold').forEach((stat, index) => {
+                    const stats = {
+                        total: statsData.total || 0,
+                        pending: statsData.pending || 0,
+                        verified: statsData.verified || 0
+                    };
+                    stat.textContent = [stats.total, stats.pending, stats.verified][index];
+                });
+
+            } catch (error) {
+                console.error('Error loading product data:', error);
+                alert('Failed to load product data. Please try again.');
+            }
+        }
+
+        // Function to handle verify/reject actions
+        async function handleAction(action, productId) {
+            if (confirm(`Are you sure you want to ${action} this product?`)) {
+                try {
+                    // Simulate API call
+                    console.log(`${action} product ${productId}`);
+                    // Reload the data after successful action
+                    loadProductData();
+                } catch (error) {
+                    console.error(`Error ${action}ing product:`, error);
+                    alert(`Failed to ${action} product. Please try again.`);
+                }
+            }
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadProductData);
+    </script>
+</body>

@@ -1,0 +1,297 @@
+<body class="bg-gray-100">
+  <div class="w-full min-h-screen mx-auto bg-white shadow-md rounded-lg p-6 relative">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-xl font-bold">Orders Management</h1>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse bg-white text-left text-sm text-gray-700">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-4 py-2">Customer Name</th>
+            <th class="px-4 py-2">Email</th>
+            <th class="px-4 py-2">Total Orders</th>
+            <th class="px-4 py-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="orders-table"></tbody>
+      </table>
+    </div>
+
+    <!-- Order Details Popup -->
+    <div id="order-popup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div class="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto relative">
+        <button onclick="closeOrderPopup()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
+          <i class="fas fa-times"></i>
+        </button>
+        <h2 class="text-xl font-bold mb-4">Order Details</h2>
+        <div id="order-details-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add notification element -->
+  <div id="notification" class="hidden fixed top-4 right-4 px-4 py-2 rounded-lg"></div>
+
+  <script>
+    async function fetchOrders() {
+      try {
+        const response = await fetch('/api/v1/admin/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        const data = await response.json();
+        if (data) {
+          console.log(data);
+          renderOrders(data);
+        } else {
+          showNotification('Invalid data format received', 'error');
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        showNotification('Failed to fetch orders', 'error');
+      }
+    }
+
+    function renderOrders(ordersData) {
+      const tableBody = document.getElementById('orders-table');
+      tableBody.innerHTML = '';
+      
+      Object.entries(ordersData).forEach(([userId, userData]) => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-100 border-b border-gray-200';
+        
+        row.innerHTML = `
+          <td class="px-4 py-2">${userData.name}</td>
+          <td class="px-4 py-2">${userData.email}</td>
+          <td class="px-4 py-2">${userData.orders.length}</td>
+          <td class="px-4 py-2">
+            <button onclick="showOrderDetails('${userId}', ${JSON.stringify(userData).replace(/"/g, '&quot;')})" 
+              class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+              View Orders
+            </button>
+          </td>
+        `;
+        
+        tableBody.appendChild(row);
+      });
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+      try {
+        const response = await fetch(`/api/v1/admin/orders/${orderId}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify({ orderStatus: newStatus }) // Changed from status to orderStatus
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          // Update the status display immediately
+          const statusSpan = document.querySelector(`[data-order-id="${orderId}"] .status-indicator`);
+          const statusSelect = document.querySelector(`[data-order-id="${orderId}"] select`);
+          
+          if (statusSpan) {
+            statusSpan.className = `status-indicator px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(newStatus)}`;
+            statusSpan.textContent = newStatus;
+          }
+          
+          if (statusSelect) {
+            statusSelect.value = newStatus;
+          }
+          
+          // Show success notification
+          showNotification('Order status updated successfully', 'success');
+          
+          // Show status update popup
+          showStatusUpdatePopup(newStatus);
+          
+          // Refresh the orders list in the background
+          await fetchOrders();
+        } else {
+          showNotification(data.message || 'Failed to update status', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating status:', error);
+        showNotification('Failed to update order status', 'error');
+      }
+    }
+
+    async function fetchOrders() {
+      try {
+        const response = await fetch('/api/v1/admin/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+        
+        const data = await response.json();
+        if (data) {
+          renderOrders(data);
+          return data;
+        } else {
+          showNotification('Invalid data format received', 'error');
+        }
+      } catch (error) {
+        console.error('Fetch error:', error);
+        showNotification('Failed to fetch orders', 'error');
+      }
+      return null;
+    }
+
+    function showOrderDetails(userId, userData) {
+      const content = document.getElementById('order-details-content');
+      const orders = userData.orders;
+      
+      let html = `
+        <div class="space-y-4">
+          <div class="font-semibold">Customer: ${userData.name}</div>
+          <div class="font-semibold">Email: ${userData.email}</div>
+          <div class="divide-y">
+      `;
+      
+      orders.forEach(order => {
+        html += `
+          <div class="py-4" data-order-id="${order._id}">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-semibold">Order ID: ${order._id}</span>
+              <div class="flex items-center space-x-2">
+                <select 
+                  onchange="updateOrderStatus('${order._id}', this.value)"
+                  class="px-2 py-1 rounded border text-xs font-semibold"
+                >
+                  <option value="Pending" ${order.orderStatus === 'Pending' ? 'selected' : ''}>Pending</option>
+                  <option value="Processing" ${order.orderStatus === 'Processing' ? 'selected' : ''}>Processing</option>
+                  <option value="Shipped" ${order.orderStatus === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                  <option value="Delivered" ${order.orderStatus === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                  <option value="Cancelled" ${order.orderStatus === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                  <option value="Returned" ${order.orderStatus === 'Returned' ? 'selected' : ''}>Returned</option>
+                </select>
+                <span class="status-indicator px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.orderStatus)}">
+                  ${order.orderStatus}
+                </span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-2">
+              <div>
+                <div class="font-medium mb-2">Products:</div>
+                ${order.products.map(p => `
+                  <div class="flex items-center space-x-3 mb-2">
+                    <img src="${p.productId.image}" alt="${p.productId.title}" class="w-16 h-16 object-cover rounded">
+                    <div>
+                      <div class="font-medium">${p.productId.title}</div>
+                      <div class="text-sm text-gray-600">Quantity: ${p.quantity} x ₹${p.price}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <div>
+                <div class="font-medium">Shipping Address:</div>
+                <div class="ml-4">
+                  ${order.shippingAddress.fullname}<br>
+                  ${order.shippingAddress.street}<br>
+                  ${order.shippingAddress.city}, ${order.shippingAddress.state}<br>
+                  PIN: ${order.shippingAddress.pincode}<br>
+                  Phone: ${order.shippingAddress.phone}
+                </div>
+              </div>
+            </div>
+            <div class="flex justify-between items-center mt-2">
+              <div class="font-semibold">Total Amount: ₹${order.totalAmount}</div>
+              <div>Payment: ${order.paymentMethod} (${order.paymentStatus})</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += `
+          </div>
+        </div>
+      `;
+      
+      content.innerHTML = html;
+      document.getElementById('order-popup').classList.remove('hidden');
+    }
+
+    function showStatusUpdatePopup(newStatus) {
+      // Create popup element
+      const popup = document.createElement('div');
+      popup.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 text-center';
+      popup.innerHTML = `
+        <div class="text-3xl mb-4">✅</div>
+        <div class="text-xl font-semibold mb-2">Status Updated</div>
+        <div class="text-gray-600">Order status has been changed to:</div>
+        <div class="text-lg font-bold mt-2 ${getStatusColor(newStatus)} inline-block px-3 py-1 rounded">
+          ${newStatus}
+        </div>
+      `;
+      
+      // Add to body
+      document.body.appendChild(popup);
+      
+      // Remove after animation
+      setTimeout(() => {
+        popup.classList.add('opacity-0', 'transition-opacity');
+        setTimeout(() => {
+          popup.remove();
+        }, 300);
+      }, 2000);
+    }
+
+    async function getUserData(orderId) {
+      try {
+        const response = await fetch(`/api/v1/admin/orders/user/${orderId}`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        return null;
+      }
+    }
+
+    function closeOrderPopup() {
+      document.getElementById('order-popup').classList.add('hidden');
+    }
+
+    function getStatusColor(status) {
+      const colors = {
+        'Pending': 'bg-yellow-100 text-yellow-800',
+        'Processing': 'bg-blue-100 text-blue-800',
+        'Shipped': 'bg-green-100 text-green-800',
+        'Delivered': 'bg-green-500 text-white',
+        'Cancelled': 'bg-red-100 text-red-800',
+        'Returned': 'bg-orange-100 text-orange-800'
+      };
+      return colors[status] || 'bg-gray-100 text-gray-800';
+    }
+
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg ${
+        type === 'success' ? 'bg-green-500' : 'bg-red-500'
+      } text-white`;
+      
+      notification.classList.remove('hidden');
+      setTimeout(() => {
+        notification.classList.add('hidden');
+      }, 3000);
+    }
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', fetchOrders);
+  </script>
+</body>

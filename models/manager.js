@@ -2,12 +2,11 @@ import mongoose from 'mongoose';
 import crypto from 'crypto';
 
 const managerSchema = new mongoose.Schema({
-    name: {
+    email: {
         type: String,
         required: true,
         trim: true,
-        minlength: 2,
-        maxlength: 50
+       
     },
     password: {
         type: String,
