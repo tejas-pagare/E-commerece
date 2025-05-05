@@ -4,6 +4,7 @@ import Industry from '../models/Industry.js';
 import {industryAuth} from '../middleware/isAuthenticated.js';
 import { loginController, registerController } from '../controller/industry.js';
 import {v4 as uuidv4} from 'uuid';
+import bcrypt from 'bcryptjs';
 const router = express.Router();
 
 router.get('/login', (req,res)=>{
@@ -49,71 +50,12 @@ router.get('/home', industryAuth, async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error });
     }
 });
-
-
-router.get('/cart', industryAuth, async( req,res)=>{
-    try {
-        const id= req.industry;
-        const industry = await Industry.findById(id);
-        res.render('Industry/newCart/cart', {title:'Cart', role:'User', industryName: industry.companyName, email: industry.email, address: industry.address, cart: industry.cart});
-    }
-        catch (error) {
-        console.error("Error fetching industry:", error);}
+/////////////////////////////////////////////////////////upperdone/////////////////////
+router.get("/blog", industryAuth, (req,res)=>{
+    res.render("Industry/blog/blog", {title:'Blog', role:'Industry' });
 })
 
-router.post('/cart',industryAuth ,async(req,res)=>{
-    try {
-        const { _id, quantity, fabric, size, usageDuration, new_quantity, estimated_value } = req.body;
-        
-        const cartItem= {
-            fabric:fabric,
-            size: size,
-            usageDuration: usageDuration,
-            quantity: new_quantity,
-            amount: estimated_value*new_quantity,
-            combination_id: _id,
-            id:uuidv4(),
-        }
-
-        // this is about admin specific
-        // const updatedProduct = await SellProduct.updateMany(
-        //     { combination_id: _id, adminStatus: "Pending" }, 
-        //     { $set: { adminStatus: "Sold" } }, 
-        //     { limit: new_quantity } // Ensures only the required quantity gets updated
-        // ); 
-
-
-        // this is about industry specific
-        const id= req.industry;
-        const updatedIndustry = await Industry.findByIdAndUpdate(
-            id,
-            { $push: { cart: cartItem } },
-            { new: true } // Returns the updated document
-          );
-
-          res.render('Industry/newCart/cart', {title:'Cart', role:'User',updatedIndustry: updatedIndustry})
-        
-    } catch (error) {
-        console.error("Error fetching product:", error);
-        res.status(500).json({msg:'Server Error'})
-    }
-})
-
-router.post('/cartDelete', industryAuth ,async(req,res)=>{
-    try {
-        const { combination_id, id } = req.body;
-        const iid= req.industry;
-        const updatedIndustry = await Industry.findByIdAndUpdate(
-            iid,
-            { $pull: { cart: { id:id } } },
-            { new: true } // Returns the updated document
-             )
-        res.render('Industry/cart', {title:'Cart', role:'Industry', updatedIndustry: updatedIndustry})}
-          catch (error) {
-        console.error("Error deleting product from cart:", error);}
-
-});
-
+///////////////////////////////////////////////////////////////////done////////////
 router.get("/profile", industryAuth, async (req, res) => {
     try {
         const id = req.industry;
@@ -142,11 +84,12 @@ router.get("/profile", industryAuth, async (req, res) => {
       })
     }
   })
-
+//////////////////////////////////////////////////////////////////////////////done/////////
   router.get("/profile/edit", industryAuth, async (req, res) => {
     try {
       const id = req.industry
       const industry = await Industry.findById(id)
+      
   
       if (!industry) {
         return res.status(404).render("error", {
@@ -171,72 +114,89 @@ router.get("/profile", industryAuth, async (req, res) => {
     }
   })
   
-
+//done//////////////////////////////////////////////////////////////////done
   router.post("/profile/edit", industryAuth, async (req, res) => {
     try {
-      const { companyName, email, address, password } = req.body
-       hashpassword = await bcrypt.hash(password, 10);
+      const { companyName, email, address, password } = req.body;
+      const id = req.industry;
+      const existingIndustry = await Industry.findById(id);
   
-      // Validate input
-      if (!companyName || !email || !address || !password) {
-        return res.status(400).render("Industry/profile/editProfile", {
-          title: "Profile Update",
-          role: "User",
-          companyName: companyName || "",
-          email: email || "",
-          address: address || "",
-          password: hashpassword || "", 
-          error: "All fields are required",
-        })
+      if (!existingIndustry) {
+        return res.status(404).render("error", {
+          message: "Industry profile not found",
+          error: { status: 404 },
+        });
       }
   
-      const id = req.industry
+      // Handle password
+      let newPassword = existingIndustry.password;
+      const isMatch = await bcrypt.compare(password, newPassword);
+          if (!isMatch) {
+            newPassword = await bcrypt.hash(password, 10);
+          }
+      // Only hash if the password is changed (and not left blank)
   
       // Update the industry profile
-      // Note: Using both Address and address to ensure compatibility
       const industry = await Industry.findByIdAndUpdate(
         id,
         {
           companyName,
           email,
-          Address: address, 
-          password,
+          Address: address, // Make sure schema matches
+          password: newPassword,
         },
-        { new: true },
-      )
+        { new: true }
+      );
   
       if (!industry) {
         return res.status(404).render("error", {
           message: "Industry profile not found",
           error: { status: 404 },
-        })
+        });
       }
   
-      res.redirect("/industry/profile")
+      res.redirect("/");
     } catch (error) {
-      console.error("Error updating industry profile:", error)
+      console.error("Error updating industry profile:", error);
       res.status(500).render("Industry/profile/editProfile", {
         title: "Profile Update",
-        role: "User",
+        role: "Industry",
         companyName: req.body.companyName || "",
         email: req.body.email || "",
         address: req.body.address || "",
-        password: req.body.password || "",
+        password: "",
         error: "An error occurred while updating your profile",
-      })
+      });
     }
-  })
-
-router.get('/checkout', industryAuth, async (req,res)=>{
+  });
+  /////////////////////////////////////////////undone
+  router.get('/checkout', industryAuth, async (req, res) => {
     try {
-        const id= req.industry;
-        const industry = await Industry.findById(id);
-        res.render('Industry/checkout/checkout', {title:'Checkout', role:'User', industryName: industry.companyName, email: industry.email, address: industry.address, cart: industry.cart});
+        const id = req.industry; // Get the industry ID from the authenticated request
+        const industry = await Industry.findById(id); // Fetch the industry document from the database
+
+        // If no industry found with the given ID, return an error
+        if (!industry) {
+            return res.status(404).json({ message: "Industry not found" });
+        }
+
+        // Render the checkout page, passing the necessary details
+        res.render('Industry/checkout/checkout', {
+            title: 'Checkout',
+            role: 'Industry', // Role should be 'Industry' since we are rendering for industry
+            industryName: industry.companyName,
+            email: industry.email,
+            address: industry.address,
+            cart: industry.cart
+        });
+
     } catch (error) {
         console.error("Error fetching industry:", error);
+        // Send a 500 error response with a message
         res.status(500).json({ message: "Internal Server Error" });
     }
-})
+});
+
 
 // Assuming you have an Order model and industryAuth middleware
 
@@ -244,16 +204,107 @@ router.get('/dashboard', industryAuth, async (req, res) => {
     try {
       const industryId = req.industry;
       // Fetch orders for this industry
-      const orders = await Order.find({ industry: industryId }).sort({ createdAt: -1 });
+      const orders = await industry.findById(industryId).dashboard;
       // Calculate total amount
       const totalAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-      res.render('Industry/dashboard', { orders, totalAmount });
+      res.render('Industry/Dashboard/dashboard', { orders, totalAmount });
     } catch (error) {
       console.error(error);
       res.status(500).render('error', { message: 'Could not load dashboard' });
     }
   });
   
+router.get('/cart', industryAuth, async (req, res) => {
+    try {
+        const id = req.industry;
+        const industry = await Industry.findById(id);
+        
+        // Check if cart exists, otherwise initialize it as an empty array
+        const cart = industry.cart || []; 
+        
+        res.render('Industry/newCart/cart', {
+            title: 'Cart',
+            role: 'Industry',
+            industryName: industry.companyName,
+            email: industry.email,
+            address: industry.address,
+            cart: cart
+        });
+    } catch (error) {
+        console.error("Error fetching industry:", error);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+});
+
+router.post('/cart', industryAuth, async (req, res) => {
+    try {
+        const { _id, quantity, fabric, size, usageDuration, new_quantity, estimated_value } = req.body;
+
+        const cartItem = {
+            fabric: fabric,
+            size: size,
+            usageDuration: usageDuration,
+            quantity: new_quantity,
+            amount: estimated_value * new_quantity,
+            combination_id: _id,
+            id: uuidv4(),
+        };
+
+        // Update the cart for the specific industry
+        const id = req.industry;
+        const updatedIndustry = await Industry.findByIdAndUpdate(
+            id,
+            { $push: { cart: cartItem } },
+            { new: true } // Returns the updated document
+        );
+
+        // Fetch the updated cart and render it again
+        const cart = updatedIndustry.cart || [];
+
+        res.render('Industry/newCart/cart', {
+            title: 'Cart',
+            role: 'Industry',
+            industryName: updatedIndustry.companyName,
+            email: updatedIndustry.email,
+            address: updatedIndustry.address,
+            cart: cart
+        });
+
+    } catch (error) {
+        console.error("Error fetching product:", error);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+});
+
+router.post('/cartDelete', industryAuth, async (req, res) => {
+    try {
+        const { combination_id, id } = req.body;
+        const iid = req.industry;
+
+        // Ensure that we are working with the correct industry
+        const updatedIndustry = await Industry.findByIdAndUpdate(
+            iid,
+            { $pull: { cart: { id: id } } }, // Pull the item with matching `id` from the cart array
+            { new: true } // Return the updated document after the update operation
+        );
+
+        // Check if the cart was updated successfully and exists
+        const updatedCart = updatedIndustry.cart || [];
+
+        // Render the updated cart page
+        res.render('Industry/newCart/cart', {
+            title: 'Cart',
+            role: 'Industry',
+            updatedIndustry: updatedIndustry,
+            cart: updatedCart
+        });
+
+    } catch (error) {
+        console.error("Error deleting product from cart:", error);
+        // Render an error page or send an error response
+        res.status(500).send("Error occurred while deleting item from cart.");
+    }
+});
 
 
 export default router;

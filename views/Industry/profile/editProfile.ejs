@@ -33,6 +33,7 @@
           <nav class="hidden md:flex gap-8">
             <a href="home" class="text-gray-700 hover:text-emerald-600">Home</a>
             <a href="about" class="text-gray-700 hover:text-emerald-600">About</a>
+            <a href="blog" class="text-gray-700 hover:text-emerald-600">Blogs</a>
             <a href="dashboard" class="text-gray-700 hover:text-emerald-600">Dashboard</a>
           </nav>
           <!-- Button group for icons -->
@@ -64,7 +65,7 @@
         
         <!-- Edit Form -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <form id="profileForm" action="/industry/profile/edit" method="POST" class="space-y-6">
+            <form id="profileForm" action="/api/v1/industry/profile/edit" method="POST" class="space-y-6">
                 <!-- Company Name -->
                 <div class="space-y-2">
                     <label for="companyName" class="text-gray-700 font-medium">Company Name</label>
@@ -103,7 +104,7 @@
                     ><%= address %></textarea>
                 </div>
 
-                <div class="space-y-2">
+                <div class="space-y-2" title="this field required">
                     <label for="password" class="text-gray-700 font-medium">Password</label>
                     <input 
                         type="password" 
@@ -117,7 +118,7 @@
                 
                 <!-- Buttons -->
                 <div class="flex justify-end gap-4 pt-4">
-                    <a href="/api/v1/industry/profile" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-8 rounded border border-gray-300 transition duration-300">
+                    <a href="profile" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-8 rounded border border-gray-300 transition duration-300">
                         CANCEL
                     </a>
                     <button 

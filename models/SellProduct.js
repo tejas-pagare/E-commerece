@@ -1,10 +1,23 @@
 import mongoose from "mongoose";
 
 const SellProductSchema = new mongoose.Schema({
-  user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  user_id: {type:String, required:true},
+  // { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }
+  items:{type:String},
+  fabric: {
+    type: String,
+    required: true,
+  },
   size: { type: String },
   gender: { type: String, enum: ['mens', 'womens', 'unisex'], required: true },
-  images: [{ type: String }], // Array of image URLs
+  usageDuration:{
+    type: Number,
+    required: true,
+  },
+  image: {
+    data: Buffer,
+    contentType: String,
+  },
   description: { type: String },
 
   // Scheduling Preferences
@@ -18,14 +31,8 @@ const SellProductSchema = new mongoose.Schema({
   },
   estimated_value: { type: Number }, // In virtual coins
   created_at: { type: Date, default: Date.now },
-  fabric: {
-    type: String,
-    required: true,
-  },
-  usageDuration:{
-    type: Number,
-    required: true,
-  },
+  
+ 
   combination_id: { type: String, unique: true, required: true },// important  Cotton_L_duration
 });
 

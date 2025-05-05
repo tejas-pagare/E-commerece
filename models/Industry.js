@@ -62,14 +62,29 @@ const industrySchema = new mongoose.Schema({
       //   required: true,}
       // ]
     }],
+    // Address: {
+    //   plotno: { type: String },
+    //   street: { type: String },
+    //   city: { type: String },
+    //   state: { type: String },
+    //   pincode: { type: Number },
+    //   phone: { type: String },
+    // }
     Address: {
-      plotno: { type: String },
-      street: { type: String },
-      city: { type: String },
-      state: { type: String },
-      pincode: { type: Number },
-      phone: { type: String },
+      type: String,
+    },
+     // Add dashboard field similar to cart
+  dashboard: [
+    {
+      fabric: { type: String, required: true },
+      size: { type: String, required: true },
+      usageDuration: { type: Number, required: true, enum: [1, 2] },
+      quantity: { type: Number, default: 0 },
+      amount: { type: Number, required: true, default: 0 },
+      combination_id: { type: String, required: true },
+      id: { type: String, required: true },
     }
+  ]
   ,
   createdAt: {
     type: Date,
@@ -80,7 +95,7 @@ const industrySchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
+},{ timestamps: true });
 
 // Hash password before saving
 industrySchema.pre('save', async function (next) {

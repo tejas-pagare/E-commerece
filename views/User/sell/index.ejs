@@ -1,11 +1,11 @@
-<body>
+<!-- <body>
     
     <div class="bg-gray-100 min-h-screen py-8 mt-6">
         <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
             <h1 class="text-3xl font-bold text-center mb-8 text-green-800">Clothing clothes Form</h1>
             
             <form id="clothesForm" class="space-y-6">
-                <!-- Personal Information Section -->
+                
                 <div class="bg-gray-50 p-6 rounded-lg">
                     <h2 class="text-xl font-semibold mb-4 text-gray-700">Personal Information</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -44,11 +44,11 @@
                     </div>
                 </div>
     
-                <!-- clothes Details Section -->
+              
                 <div class="bg-gray-50 p-6 rounded-lg">
                     <h2 class="text-xl font-semibold mb-4 text-gray-700">clothes Details</h2>
                     
-                    <!-- Clothing Items -->
+                    
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Type of Clothing Items (Select all that apply)</label>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -99,7 +99,7 @@
                         </div>
                     </div>
     
-                    <!-- Clothing Material -->
+            
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Clothing Material</label>
                         <select name="material" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -118,7 +118,7 @@
                         <p class="mt-1 text-sm text-gray-500">Select the primary material of your clothing item</p>
                     </div>
     
-                    <!-- Size Information -->
+        
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700"> Sizes</label>
@@ -131,7 +131,7 @@
                         </div>
                     </div>
     
-                    <!-- Gender Category -->
+                
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Gender Category</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -150,7 +150,7 @@
                         </div>
                     </div>
     
-                    <!-- Brand and Age -->
+               
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Brand of Items (Optional)</label>
@@ -162,13 +162,13 @@
                         </div>
                     </div>
     
-                    <!-- Additional Information -->
+             
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700">Description of Items</label>
                         <textarea name="description" rows="4" placeholder="Please provide any additional details about your clothes..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
                     </div>
     
-                    <!-- Preferred Date and Time -->
+                 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Preferred clothes Date</label>
@@ -185,13 +185,12 @@
                         </div>
                     </div>
     
-                    <!-- reciept Upload -->
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700">reciept Upload (for item verification)</label>
                         <input type="file" name="photos" accept="image/*" multiple class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                     </div>
     
-                    <!-- Terms and Conditions -->
+               
                     <div class="bg-white p-6 rounded-lg border border-gray-200 mb-6">
                         <h3 class="text-lg font-semibold mb-4">Terms and Conditions</h3>
                         <div class="space-y-4 text-sm text-gray-600">
@@ -204,7 +203,7 @@
                         </div>
                     </div>
     
-                    <!-- Agreement Checkbox -->
+               
                     <div class="mb-6">
                         <label class="flex items-center space-x-2">
                             <input type="checkbox" required class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
@@ -213,7 +212,7 @@
                     </div>
                 </div>
     
-                <!-- Submit Button -->
+          
                 <div class="flex justify-center">
                     <button type="submit" class="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                         Submit clothes
@@ -453,4 +452,235 @@
             });
         </script>
     </div>
+</body> -->
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clothing Sell/Donation Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="bg-gray-100 min-h-screen py-8 mt-6">
+        <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-8">
+            <h1 class="text-3xl font-bold text-center mb-8 text-green-800">Sell/Donate Your Clothes</h1>
+            <form id="clothesForm"
+                  class="space-y-6"
+                  enctype="multipart/form-data"
+                  autocomplete="off"
+                  action="/api/v1/user/sell"
+                  method="post">
+
+                <!-- Clothing Items (Single select for backend compatibility) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Type of Clothing Item</label>
+                    <select name="items" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Select Item</option>
+                        <option value="t-shirts">T-shirts</option>
+                        <option value="shirts">Shirts</option>
+                        <option value="pants-jeans">Pants/Jeans</option>
+                        <option value="dresses">Dresses</option>
+                        <option value="skirts">Skirts</option>
+                        <option value="jackets-coats">Jackets/Coats</option>
+                        <option value="sweaters">Sweaters</option>
+                    </select>
+                </div>
+
+                <!-- Clothing Material -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Clothing Material</label>
+                    <select name="fabric" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Select material type</option>
+                        <option value="Cotton">Cotton</option>
+                        <option value="Silk">Silk</option>
+                        <option value="Leather">Leather</option>
+                        <option value="Linen">Linen</option>
+                        <option value="Cashmere">Cashmere</option>
+                        <option value="Synthetic">Synthetic</option>
+                        <option value="Wool">Wool</option>
+                        <option value="Denim">Denim</option>
+                        <option value="Polyester">Polyester</option>
+                    </select>
+                </div>
+
+                <!-- Size -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Size</label>
+                    <select name="size" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Select Size</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                    </select>
+                </div>
+
+                <!-- Gender -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="gender" value="mens" required class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span>Men's</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="gender" value="womens" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span>Women's</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="gender" value="unisex" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span>Unisex</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Usage Duration (Age) -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Usage Duration</label>
+                    <select name="age" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Select Usage Duration</option>
+                        <option value="6">Less than 6 months</option>
+                        <option value="1">More than 1 year</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Choose "6" for less than 6 months, "1" for more than 1 year (matches backend logic)</p>
+                </div>
+
+                <!-- Pickup Date -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Preferred Date</label>
+                    <input type="date" name="clothesDate" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+
+                <!-- Time Slot -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Preferred Time Slot</label>
+                    <select name="timeSlot" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Select a time slot</option>
+                        <option value="morning">Morning (9 AM - 12 PM)</option>
+                        <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
+                        <option value="evening">Evening (5 PM - 8 PM)</option>
+                    </select>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Description (optional)</label>
+                    <textarea name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Describe your item (brand, condition, etc.)"></textarea>
+                </div>
+
+                <!-- Photo Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Photo Upload (required)</label>
+                    <input type="file" name="photos" accept="image/*" required class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                </div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" class="w-full py-3 px-6 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 transition">Submit</button>
+                </div>
+            </form>
+
+            <!-- Points Calculation Table (Info Only) -->
+            <div class="bg-white p-6 rounded-lg border border-gray-200 mb-6">
+                <h3 class="text-lg font-semibold mb-4">Terms and Conditions</h3>
+                <div class="space-y-4 text-sm text-gray-600">
+                    <p>1. <strong>Eligibility:</strong> Clothes must be clean and in acceptable condition. We reserve the right to refuse items that do not meet our standards.</p>
+                    <p>2. <strong>Item Limitations:</strong> We do not accept items that are heavily soiled or damaged beyond repair.</p>
+                    <p>3. <strong>Privacy Policy:</strong> All personal information collected will be kept confidential and used solely for the purpose of processing donations.</p>
+                    <p>4. <strong>Donation Acknowledgment:</strong> By submitting this form, you acknowledge that you are donating items without expectation of compensation or reimbursement.</p>
+                    <p>5. <strong>Point System:</strong> Donations may be eligible for a point system where points can be redeemed for discounts or rewards. Details will be provided upon confirmation of your donation.</p>
+                    <p>6. <strong>Scheduling:</strong> Please select a preferred donation date and time slot; we will do our best to accommodate your request.</p>
+                </div>
+            
+                <div class="mt-6">
+                    <h4 class="text-md font-semibold mb-2 text-blue-700">How Your Points and Price Are Calculated</h4>
+                    <p class="text-gray-700 mb-2">
+                        Your virtual points and estimated price are determined by the <strong>size</strong>, <strong>fabric type</strong>, and <strong>usage duration</strong> of your donation. See the table below for all possible combinations:
+                    </p>
+                    <div class="overflow-x-auto mb-2">
+                        <table class="min-w-full border text-sm text-left text-gray-700">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-3 py-2 border">Size</th>
+                                    <th class="px-3 py-2 border">Fabric</th>
+                                    <th class="px-3 py-2 border">Usage Duration</th>
+                                    <th class="px-3 py-2 border">Virtual Points (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 6 months -->
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">200</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">250</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">300</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">300</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">350</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">400</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">220</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">270</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">320</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">450</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">550</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">600</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">400</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">450</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">500</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">120</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">150</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">180</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">250</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">320</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">370</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">270</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">320</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">400</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">100</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">120</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">150</td></tr>
+                    
+                                <!-- More than 1 year -->
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">140</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">180</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">220</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">220</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">260</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">300</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">160</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">200</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">240</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">300</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">350</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">400</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">260</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">320</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">350</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">70</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">90</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">110</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">180</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">220</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">260</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">160</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">200</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">240</td></tr>
+                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">60</td></tr>
+                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">80</td></tr>
+                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">100</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+        </div>
+    </div>
 </body>
+</html>
+
+
+

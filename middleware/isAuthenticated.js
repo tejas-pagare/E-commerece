@@ -12,7 +12,7 @@ const isAuthenticated = async (req, res, next) => {
 
     }
 
-    const decode = jwt.decode(token, "JWT_SECRET");
+    const decode = jwt.verify(token, "JWT_SECRET");
     if (!decode) {
       return res.redirect("/");
 
