@@ -41,41 +41,6 @@ router.get("/store", (req, res) => {
   return res.render("User/store/index.ejs", { title: "Store", role: "user" });
 });
 
-router.post("/sell", async (req, res) => {
-  try {
-    const filter = req.query;
-   
-
-    const query = {};
-    query.verified = true;
-
-    // Add category filter if present
-    if (filter?.category) {
-      query.category = filter.category.toLowerCase();
-    }
-
-    
-    if (filter?.min || filter?.max) {
-      query.price = {};
-      if (filter?.min) query.price.$gte = Number(filter.min);
-      if (filter?.max) query.price.$lte = Number(filter.max);
-    }
-    console.log(query)
-    const products = await Product.find(query);
-
-    res.status(200).json({
-      message: "Retrieved Products",
-      products,
-      success: true,
-    });
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    res.status(500).json({
-      message: "Some error occurred",
-      success: false,
-    });
-  }
-});
 
 router.get("/account/address", isAuthenticated, addressRenderController);
 router.get("/account/update/address",isAuthenticated,async(req,res)=>{
@@ -276,5 +241,92 @@ router.get('/', isAuthenticated, HomePageController);
 
 
 
+const combinationPoints = {
+  // 6 months (age = "6")
+  "CottonS6": 200, "CottonM6": 250, "CottonL6": 300,
+  "SilkS6": 300, "SilkM6": 350, "SilkL6": 400,
+  "LinenS6": 220, "LinenM6": 270, "LinenL6": 320,
+  "LeatherS6": 450, "LeatherM6": 550, "LeatherL6": 600,
+  "CashmereS6": 400, "CashmereM6": 450, "CashmereL6": 500,
+  "SyntheticS6": 120, "SyntheticM6": 150, "SyntheticL6": 180,
+  "WoolS6": 250, "WoolM6": 320, "WoolL6": 370,
+  "DenimS6": 270, "DenimM6": 320, "DenimL6": 400,
+  "PolyesterS6": 100, "PolyesterM6": 120, "PolyesterL6": 150,
+  // More than 1 year (age = "1")
+  "CottonS1": 140, "CottonM1": 180, "CottonL1": 220,
+  "SilkS1": 220, "SilkM1": 260, "SilkL1": 300,
+  "LinenS1": 160, "LinenM1": 200, "LinenL1": 240,
+  "LeatherS1": 300, "LeatherM1": 350, "LeatherL1": 400,
+  "CashmereS1": 260, "CashmereM1": 320, "CashmereL1": 350,
+  "SyntheticS1": 70, "SyntheticM1": 90, "SyntheticL1": 110,
+  "WoolS1": 180, "WoolM1": 220, "WoolL1": 260,
+  "DenimS1": 160, "DenimM1": 200, "DenimL1": 240,
+  "PolyesterS1": 60, "PolyesterM1": 80, "PolyesterL1": 100,
+};
+
+import multer from 'multer';
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+});
+
+// POST /sell route
+router.post('/sell', isAuthenticated,upload.single('photos'), async (req, res) => {
+  try {
+    // Validate file presence
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'Photo is required.' });
+    }
+    console.log(req.userId);
+
+    // Build combination_id (fabric + size + age)
+    const combination_id = req.body.fabric + req.body.size + req.body.age;
+
+    // Lookup estimated value
+    const estimated_value = combinationPoints[combination_id];
+
+    if (estimated_value === undefined) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid combination: ${combination_id}. Please check your input.`
+      });
+    }
+    // Create new SellProduct document
+    const newProduct = new SellProduct({
+      user_id: req.userId,
+      items: req.body.items,
+      fabric: req.body.fabric,
+      size: req.body.size,
+      gender: req.body.gender,
+      usageDuration: req.body.age,
+      image: {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      },
+      description: req.body.description,
+      clothesDate: req.body.clothesDate,
+      timeSlot: req.body.timeSlot,
+    
+      combination_id: combination_id,
+      estimated_value: estimated_value
+    });
+
+    await newProduct.save().catch(err => {
+      console.error("Mongoose validation error:", err);
+      throw err;
+    });
+    
+    // res.render("User/sell/index.ejs", { title: "Sell Product", role: "user" });
+    res.redirect('sell');
+
+  } catch (error) {
+    console.error('Error submitting product:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error'
+    });
+  }
+});
 
 export default router;
