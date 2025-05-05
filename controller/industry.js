@@ -16,12 +16,12 @@ const loginController = async (req, res) => {
       return res.redirect("/api/v1/industry/login");
     }
 
-    const token = jwt.sign({ userId: industryCheck._id, role: "user" }, "process.env.JWT_SECRET", { expiresIn: "5h" });
+    const token = jwt.sign({ industry_id: industryCheck._id, role: "industry" }, "JWT_SECRET", { expiresIn: "5h" });
 
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
-      maxAge: 3600000,
+      maxAge: 3600000000,
     });
 
     res.redirect("/api/v1/industry/home");
