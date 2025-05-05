@@ -1,146 +1,152 @@
 <% if (role==="user" && (!(title==="login" ||title==="signup" ||title==="Home" ))) { %>
     <div>
-        <header class="bg-white shadow-sm">
-            <div class="container mx-auto px-4 py-4">
+        <header class="bg-white shadow-md">
+            <div class="container mx-auto px-4 py-3">
                 <!-- Top Bar -->
-                <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center justify-between mb-3">
                     <!-- Logo -->
                     <div class="flex items-center">
-
-                        <span class="ml-2 text-2xl font-bold text-green-600">SwiftMart</span>
+                        <span class="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">SwiftMart</span>
                     </div>
 
                     <!-- Search Bar -->
                     <div class="hidden sm:block flex-1 max-w-2xl mx-8">
                         <div class="relative">
                             <input type="text" placeholder="Search for products"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                            <button class="absolute right-3 top-2">
-                                <i class="fas fa-search text-gray-400"></i>
+                                class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-150 ease-in-out">
+                            <button class="absolute right-3 top-2.5 text-green-600 hover:text-green-700 transition-colors">
+                                <i class="fas fa-search"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Right Icons -->
                     <div class="flex items-center space-x-6">
-
                         <div class="flex items-center space-x-4">
-
-                            <a href="/api/v1/user/account"><button class="relative">
-                                    <i class="far fa-user text-xl"></i>
-                                </button></a>
-                            <a href="/api/v1/user/cart">
-                                <button class="relative">
-                                    <i class="fas fa-shopping-cart text-xl"></i>
-                                    <span
-                                        class="absolute -top-2 -right-2 bg-green-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
-                                </button>
+                            <a href="/api/v1/user/account" class="relative p-2 hover:bg-green-50 rounded-full transition-colors">
+                                <i class="far fa-user text-xl text-gray-700 hover:text-green-600"></i>
+                            </a>
+                            <a href="/api/v1/user/cart" class="relative p-2 hover:bg-green-50 rounded-full transition-colors">
+                                <i class="fas fa-shopping-cart text-xl text-gray-700 hover:text-green-600"></i>
+                                <span class="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">3</span>
                             </a>
                             <form action="/api/v1/user/logout" method="get">
-                                <button type="submit"
-                                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Logout</button>
+                                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-150 ease-in-out shadow-sm">
+                                    Logout
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
 
                 <!-- Navigation -->
-                <nav class="flex items-center space-x-6">
-                    <button class="hidden md:block bg-green-500 text-white px-4 py-2 rounded-lg flex items-center">
+                <nav class="flex items-center space-x-6 border-t border-gray-100 pt-3">
+                    <button class="hidden md:flex items-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-150 ease-in-out shadow-sm">
                         <i class="fas fa-bars mr-2"></i>
                         All Departments
                     </button>
-                    <a href="/api/v1/user/" class="text-gray-700 hover:text-green-500">Home</a>
-                    <a href="/api/v1/user/store" class="text-gray-700 hover:text-green-500">Store</a>
-                    <a href="/api/v1/user/vendors" class="text-gray-700 hover:text-green-500">Vendors</a>
-                    <a href="/api/v1/user/blog" class="text-gray-700 hover:text-green-500">Blog</a>
-                    <a href="/api/v1/user/sell" class="text-gray-700 hover:text-green-500">Sell Product</a>
-                    <a href="/api/v1/user/contact" class="text-gray-700 hover:text-green-500">About us</a>
-                    <a href="/api/v1/user/dashboard" class="text-gray-700 hover:text-green-500">Dashboard</a>
-                    
-
+                    <div class="flex items-center space-x-6">
+                        <a href="/api/v1/user/" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Home</a>
+                        <a href="/api/v1/user/store" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Store</a>
+                        <a href="/api/v1/user/vendors" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Vendors</a>
+                        <a href="/api/v1/user/blog" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Blog</a>
+                        <a href="/api/v1/user/sell" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Sell Product</a>
+                        <a href="/api/v1/user/contact" class="text-gray-700 hover:text-green-600 font-medium transition-colors">About us</a>
+                        <a href="/api/v1/user/dashboard" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Dashboard</a>
+                    </div>
                 </nav>
             </div>
         </header>
-
     </div>
-    <% }else if(role==="seller" &&(!(title==="login" ||title==="signup" ||title==="Home" )) ) { %>
-
-
-        <div>
-            <header class="bg-white shadow-sm">
-                <div class="container mx-auto px-4 py-4">
-                    <!-- Top Bar -->
-                    <div class="flex items-center justify-between mb-4">
-                        <!-- Logo -->
-                        <div class="flex items-center">
-                            <a href="/api/v1/seller">
-                                <span class="ml-2 text-2xl font-bold text-green-600">SwiftMart</span>
-                            </a>
-                        </div>
-
-                        <!-- Right Icons -->
-                        <div class="flex items-center space-x-6">
-                            <a href="/api/v1/seller/account" class="text-gray-700 hover:text-green-500">Profile</a>
-
-                            <!-- Logout -->
-                            <form action="/api/v1/seller/logout" method="get">
-                                <button type="submit"
-                                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Logout</button>
-                            </form>
-                        </div>
+<% } else if(role==="seller" &&(!(title==="login" ||title==="signup" ||title==="Home" ))) { %>
+    <div>
+        <header class="bg-white shadow-md">
+            <div class="container mx-auto px-4 py-4">
+                <!-- Top Bar -->
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <div class="flex items-center">
+                        <a href="/api/v1/seller">
+                            <span class="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">SwiftMart</span>
+                        </a>
                     </div>
 
-                    <!-- Navigation -->
-                    <nav class="flex items-center space-x-6">
-                        <a href="/api/v1/seller/create" class="text-gray-700 hover:text-green-500">Create
-                            Product</a>
-                        <a href="/api/v1/seller" class="text-gray-700 hover:text-green-500">Listed
-                            Products</a>
-
-                    </nav>
+                    <!-- Right Icons -->
+                    <div class="flex items-center space-x-6">
+                        <a href="/api/v1/seller/account" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Profile</a>
+                        <form action="/api/v1/seller/logout" method="get">
+                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-150 ease-in-out shadow-sm">
+                                Logout
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </header>
-        </div>
-        <% }else if(role==="admin" &&(!(title==="login" ||title==="signup" ||title==="Home" ))){ %>
-            <div>
-                <header class="bg-white shadow-sm">
-                    <div class="container mx-auto px-4 py-4">
-                        <!-- Top Bar -->
-                        <div class="flex items-center justify-between mb-4">
-                            <!-- Logo -->
-                            <div class="flex items-center">
-                                <a href="/api/v1/seller">
-                                    <span class="ml-2 text-2xl font-bold text-green-600">SwiftMart</span>
-                                </a>
-                            </div>
 
-                            <!-- Right Icons -->
-                            <div class="flex items-center space-x-6">
-                                <a href="/api/v1/user/account"
-                                    class="text-gray-700 hover:text-green-500">Profile</a>
-
-                                <!-- Logout -->
-                                <form action="/api/v1/seller/logout" method="get">
-                                    <button type="submit"
-                                        class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Logout</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Navigation -->
-                        <nav class="flex items-center space-x-6">
-                            <a href="/api/v1/admin/dashboard"
-                                class="text-gray-700 hover:text-green-500">Dashboard</a>
-                            <a href="/api/v1/admin/customers"
-                                class="text-gray-700 hover:text-green-500">Customers</a>
-                            <a href="/api/v1/admin/products" class="text-gray-700 hover:text-green-500">Products</a>
-                            <a href="/api/v1/admin/seller" class="text-gray-700 hover:text-green-500">Seller</a>
-                            <a href="/api/v1/admin/secondHand"
-                                class="text-gray-700 hover:text-green-500">SecondHandProducts</a>
-
-                        </nav>
-                    </div>
-                </header>
+                <!-- Navigation -->
+                <nav class="flex items-center space-x-6 mt-4 pt-3 border-t border-gray-100">
+                    <a href="/api/v1/seller/create" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Create Product</a>
+                    <a href="/api/v1/seller" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Listed Products</a>
+                </nav>
             </div>
-            <% } %>
+        </header>
+    </div>
+<% } else if(role==="admin" &&(!(title==="login" ||title==="signup" ||title==="Home" ))){ %>
+    <nav class="bg-gradient-to-r from-green-500 to-green-600 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                    <a href="/api/v1/admin" class="text-white text-2xl font-bold hover:text-green-100 transition-colors">SwiftMart</a>
+                </div>
+
+                <!-- Navigation Links -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="/api/v1/admin/dashboard" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
+                    <a href="/api/v1/admin/customers" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Customers</a>
+                    <a href="/api/v1/admin/products" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Products</a>
+                    <a href="/api/v1/admin/seller" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Seller</a>
+                    <a href="/api/v1/admin/secondHand" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">SecondHandProducts</a>
+                    <a href="/api/v1/admin/order" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Order</a>
+                </div>
+
+                <!-- Profile and Logout -->
+                <div class="flex items-center space-x-4">
+                    <a href="/api/v1/admin/profile" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Profile</a>
+                    <form action="/api/v1/admin/logout" method="get">
+                        <button type="submit" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu button -->
+        <div class="md:hidden absolute right-4 top-4">
+            <button type="button" class="text-white hover:text-green-100 p-2 rounded-md transition-colors" onclick="toggleMobileMenu()">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg rounded-b-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a href="/api/v1/admin/dashboard" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Dashboard</a>
+                <a href="/api/v1/admin/customers" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Customers</a>
+                <a href="/api/v1/admin/products" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Products</a>
+                <a href="/api/v1/admin/seller" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Seller</a>
+                <a href="/api/v1/admin/secondHand" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">SecondHandProducts</a>
+                <a href="/api/v1/admin/order" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Order</a>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+    </script>
+<% } %>
