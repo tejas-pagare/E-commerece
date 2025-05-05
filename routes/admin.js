@@ -3,6 +3,7 @@ import User from "../models/user.js";
 import Product from "../models/product.js";
 import Seller from "../models/seller.js";
 import Manager from "../models/manager.js";
+import Order from "../models/orders.js";
 const router = express.Router();
 
 router.get("/login", (req, res) => {
@@ -233,10 +234,13 @@ router.get("/seller/details", async (req, res) => {
   }
 });
 
-
+router.get("/manager", (req, res) => {
+  return res.render("admin/manager/index.ejs", { title: "Manager", role: "admin" });
+});
 
 router.post('/create/manager', async (req, res) => {
-    const { name, password } = req.body;
+    const { email, password } = req.body;
+    console.log(email,password)
 
     try {
         // Check if manager already exists
@@ -246,12 +250,308 @@ router.post('/create/manager', async (req, res) => {
         }
 
         // Create new manager
-        const manager = new Manager({ name, password });
+        const manager = new Manager({ email, password });
         await manager.save();
 
         res.status(201).json({ message: 'Manager created successfully!' });
     } catch (error) {
         res.status(500).json({ message: 'Error creating manager', error });
+    }
+});
+
+router.get("/order", (req, res) => {
+  return res.render("admin/Orders/index.ejs", { title: "Orders", role: "admin" });
+});
+
+router.post("/orders", async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate({
+        path: 'userId',
+        select: 'firstname lastname email'
+      })
+      .populate({
+        path: 'products.productId',
+        select: 'title image price'
+      });
+
+    const userOrders = orders.reduce((acc, order) => {
+      const userId = order.userId._id;
+      if (!acc[userId]) {
+        acc[userId] = {
+          _id: userId,
+          name: `${order.userId.firstname} ${order.userId.lastname}`,
+          email: order.userId.email,
+          orders: []
+        };
+      }
+      acc[userId].orders.push({
+        _id: order._id,
+        orderStatus: order.orderStatus,
+        totalAmount: order.totalAmount,
+        paymentStatus: order.paymentStatus,
+        paymentMethod: order.paymentMethod,
+        products: order.products,
+        shippingAddress: order.shippingAddress
+      });
+      return acc;
+    }, {});
+  
+    console.log(userOrders)
+    res.json(userOrders);
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+router.get("/orders", async (req, res) => {
+  try {
+    const users = await User.find({})
+      .populate({
+        path: 'orders',
+        populate: {
+          path: 'products.productId',
+          model: 'Product'
+        }
+      });
+
+    const ordersData = users.reduce((acc, user) => {
+      if (user.orders && user.orders.length > 0) {
+        acc[user._id] = {
+          _id: user._id,
+          name: `${user.firstname} ${user.lastname}`,
+          email: user.email,
+          orders: user.orders
+        };
+      }
+      return acc;
+    }, {});
+
+    res.json({
+      success: true,
+      orders: ordersData
+    });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching orders'
+    });
+  }
+});
+
+router.get("/orders/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId).populate({
+      path: 'orders',
+      populate: {
+        path: 'products.productId',
+        model: 'Product'
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      orders: user.orders
+    });
+  } catch (error) {
+    console.error('Error fetching user orders:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching user orders'
+    });
+  }
+});
+
+router.put('/orders/:orderId/status', async (req, res) => {
+  try {
+      const { orderId } = req.params;
+      const { orderStatus } = req.body;
+
+      // Validate order status
+      const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
+      if (!validStatuses.includes(orderStatus)) {
+          return res.status(400).json({
+              success: false,
+              message: 'Invalid order status'
+          });
+      }
+
+      // Find and update the order
+      const order = await Order.findById(orderId);
+      
+      if (!order) {
+          return res.status(404).json({
+              success: false,
+              message: 'Order not found'
+          });
+      }
+
+      // Update order status
+      order.orderStatus = orderStatus;
+      await order.save();
+
+      // Send success response
+      res.status(200).json({
+          success: true,
+          message: 'Order status updated successfully',
+          order
+      });
+
+  } catch (error) {
+      console.error('Error updating order status:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Internal server error'
+      });
+  }
+});
+
+// Route to fetch order user data by order ID
+router.get('/orders/user/:orderId', async (req, res) => {
+  try {
+    const orderId = req.params.orderId;
+    
+    // Find the order and populate user and product details
+    const order = await Order.findById(orderId)
+      .populate('userId')
+      .populate({
+        path: 'products.productId',
+        select: 'title price image'
+      });
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    // Get user data with all their orders
+    const userData = await User.findById(order.userId._id)
+      .select('name email')
+      .populate({
+        path: 'orders',
+        populate: {
+          path: 'products.productId',
+          select: 'title price image'
+        }
+      });
+
+    res.json({
+      success: true,
+      userId: userData._id,
+      userData: {
+        name: userData.name,
+        email: userData.email,
+        orders: userData.orders
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching order user data:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
+
+
+
+
+// Update order status
+router.put('/orders/:orderId/status', async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        const { orderStatus } = req.body;
+
+        // Validate order status
+        const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
+        if (!validStatuses.includes(orderStatus)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid order status'
+            });
+        }
+
+        // Find and update the order
+        const order = await Order.findById(orderId);
+        
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        // Update order status
+        order.orderStatus = orderStatus;
+        await order.save();
+
+        // Send success response
+        res.status(200).json({
+            success: true,
+            message: 'Order status updated successfully',
+            order
+        });
+
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+
+// Get all managers
+router.get('/managers', async (req, res) => {
+    try {
+        const managers = await Manager.find().select('email createdAt');
+        
+        res.json({
+            success: true,
+            managers
+        });
+    } catch (error) {
+        console.error('Error fetching managers:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch managers'
+        });
+    }
+});
+
+// Delete manager
+router.delete('/managers/:id', async (req, res) => {
+    try {
+        const managerId = req.params.id;
+        const manager = await Manager.findById(managerId);
+        
+        if (!manager) {
+            return res.status(404).json({
+                success: false,
+                message: 'Manager not found'
+            });
+        }
+
+        await manager.deleteOne();
+        
+        res.json({
+            success: true,
+            message: 'Manager deleted successfully'
+        });
+    } catch (error) {
+        console.error('Error deleting manager:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to delete manager'
+        });
     }
 });
 
