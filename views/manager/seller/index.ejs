@@ -1,0 +1,179 @@
+
+<body class="bg-green-50">
+    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-green-700">Seller Verification</h1>
+            <p class="text-gray-600 mt-2">Manage and verify seller registrations</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold text-green-700">Total Sellers</h3>
+                <p class="text-3xl font-bold mt-2">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold text-yellow-600">Pending Verification</h3>
+                <p class="text-3xl font-bold mt-2">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-semibold text-green-700">Verified Sellers</h3>
+                <p class="text-3xl font-bold mt-2">0</p>
+            </div>
+        </div>
+
+        <!-- Pending Sellers Section -->
+        <div class="mb-12">
+            <h2 class="text-xl font-semibold text-green-700 mb-4">Pending Verification</h2>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <!-- For pending sellers table -->
+                    <table id="pendingTable" class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profile Photo</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Registration Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aadhar Card</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- Dynamic content will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verified Sellers Section -->
+        <div>
+            <h2 class="text-xl font-semibold text-green-700 mb-4">Verified Sellers</h2>
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <!-- For verified sellers table -->
+                    <table id="verifiedTable" class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verification Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <!-- Dynamic content will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to fetch and display seller data
+        async function loadSellerData() {
+            try {
+                // Fetch both pending and verified sellers
+                const [pendingResponse, verifiedResponse, statsResponse] = await Promise.all([
+                    fetch('/api/v1/manager/sellers/pending'),
+                    fetch('/api/v1/manager/sellers/verified'),
+                    fetch('/api/v1/manager/sellers/stats')
+                ]);
+
+                const pendingData = await pendingResponse.json();
+                const verifiedData = await verifiedResponse.json();
+                const statsData = await statsResponse.json();
+                    console.log(pendingData)
+                // Update pending sellers table
+                const pendingTableBody = document.querySelector('#pendingTable tbody');
+                pendingTableBody.innerHTML = pendingData.sellers.map(seller => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <img src="${seller.profileImage}" alt="Profile" class="h-12 w-12 rounded-full object-cover">
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${seller.storeName || 'N/A'}</div>
+                            <div class="text-sm text-gray-500">GSTN: ${seller.gstn}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${seller.name}</div>
+                            <div class="text-sm text-gray-500">${seller.email}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${new Date(seller.createdAt).toLocaleDateString()}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="${seller.identityVerification.aadharCard}" target="_blank" class="text-blue-600 hover:text-blue-900">
+                                <img src="${seller.identityVerification.aadharCard}" alt="Aadhar Card" class="h-12 w-20 object-cover rounded">
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button onclick="handleAction('verify', '${seller._id}')" class="text-green-600 hover:text-green-900 mr-3">Verify</button>
+                            <button onclick="handleAction('reject', '${seller._id}')" class="text-red-600 hover:text-red-900">Reject</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Update verified sellers table
+                const verifiedTableBody = document.querySelector('#verifiedTable tbody');
+                verifiedTableBody.innerHTML = verifiedData.sellers.map(seller => `
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">${seller.storeName || 'N/A'}</div>
+                            <div class="text-sm text-gray-500">GSTN: ${seller.gstn}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${seller.name}</div>
+                            <div class="text-sm text-gray-500">${seller.email}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${new Date(seller.createdAt).toLocaleDateString()}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                Verified
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Update stats
+                document.querySelectorAll('.text-3xl.font-bold').forEach((stat, index) => {
+                    stat.textContent = [statsData.total, statsData.pending, statsData.verified][index];
+                });
+            } catch (error) {
+                console.error('Error loading seller data:', error);
+            }
+        }
+
+        // Function to handle verify/reject actions
+        async function handleAction(action, sellerId) {
+            if (confirm(`Are you sure you want to ${action} this seller?`)) {
+                try {
+                    const response = await fetch(`/api/v1/manager/seller/${action}/${sellerId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // Reload the data after successful action
+                        loadSellerData();
+                    } else {
+                        throw new Error(`Failed to ${action} seller`);
+                    }
+                } catch (error) {
+                    console.error(`Error ${action}ing seller:`, error);
+                    alert(`Failed to ${action} seller. Please try again.`);
+                }
+            }
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', loadSellerData);
+    </script>
+</body>
