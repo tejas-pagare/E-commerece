@@ -240,10 +240,6 @@ router.post("/review/create/:id",isAuthenticated,async(req,res)=>{
 router.get('/', isAuthenticated, HomePageController);
 
 
-
-
-//////////////////////////////////
-
 const combinationPoints = {
   // 6 months (age = "6")
   "CottonS6": 200, "CottonM6": 250, "CottonL6": 300,
@@ -333,5 +329,3 @@ router.post('/sell', isAuthenticated,upload.single('photos'), async (req, res) =
 });
 
 export default router;
-
-
