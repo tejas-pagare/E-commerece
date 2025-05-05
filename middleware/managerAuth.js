@@ -4,7 +4,7 @@ import Manager from '../models/manager.js';
 const managerAuth = async (req, res, next) => {
     try {
         // Get token from header
-        const token = req.header('Authorization')?.replace('Bearer ', '');
+        const token = req.header('Authorization');
         
         if (!token) {
             return res.status(401).json({
