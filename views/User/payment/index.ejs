@@ -47,12 +47,49 @@
             <button id="edit-address" class="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">Edit</button>
           </div>
           <div id="address-edit" class="hidden">
-            <input id="plotno" value="<%= user.Address.plotno %>" class="w-full p-2 mb-2 border rounded" required />
-            <input id="street" value="<%= user.Address.street %>" class="w-full p-2 mb-2 border rounded" required />
-            <input id="city" value="<%= user.Address.city %>" class="w-full p-2 mb-2 border rounded" required />
-            <input id="state" value="<%= user.Address.state %>" class="w-full p-2 mb-2 border rounded" required />
-            <input id="pincode" value="<%= user.Address.pincode %>" class="w-full p-2 mb-2 border rounded" required pattern="\d{6}" />
-            <input id="phone-input" value="<%= user.Address.phone %>" class="w-full p-2 mb-2 border rounded" required pattern="\d{10}" placeholder="Phone Number" />
+            <input 
+              id="plotno" 
+              value="<%= user.Address.plotno %>" 
+              class="w-full p-2 mb-2 border rounded" 
+              placeholder="Plot/House Number"
+              required 
+            />
+            <input 
+              id="street" 
+              value="<%= user.Address.street %>" 
+              class="w-full p-2 mb-2 border rounded" 
+              placeholder="Street Name/Area"
+              required 
+            />
+            <input 
+              id="city" 
+              value="<%= user.Address.city %>" 
+              class="w-full p-2 mb-2 border rounded" 
+              placeholder="City"
+              required 
+            />
+            <input 
+              id="state" 
+              value="<%= user.Address.state %>" 
+              class="w-full p-2 mb-2 border rounded" 
+              placeholder="State"
+              required 
+            />
+            <input 
+              id="pincode" 
+              value="<%= user.Address.pincode %>" 
+              class="w-full p-2 mb-2 border rounded" 
+              placeholder="PIN Code (6 digits)"
+              required 
+            />
+            <input 
+              id="phone-input" 
+              value="<%= user.Address.phone %>" 
+              class="w-full p-2 mb-2 border rounded" 
+              placeholder="Phone Number (10 digits)"
+              required 
+            />
+            <div id="address-error" class="text-red-500 text-sm mb-2 hidden"></div>
             <button id="save-address" class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">Save</button>
           </div>
           <div class="mt-4 flex justify-between">
@@ -218,5 +255,50 @@
         });
       </script>
     </div>
+    <script>
+      document.getElementById('save-address').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const plotno = document.getElementById('plotno').value.trim();
+        const street = document.getElementById('street').value.trim();
+        const city = document.getElementById('city').value.trim();
+        const state = document.getElementById('state').value.trim();
+        const pincode = document.getElementById('pincode').value.trim();
+        const phone = document.getElementById('phone-input').value.trim();
+        const errorDiv = document.getElementById('address-error');
+        
+        // Reset error message
+        errorDiv.classList.add('hidden');
+        errorDiv.textContent = '';
+        
+        // Validation checks
+        if (!plotno || !street || !city || !state || !pincode || !phone) {
+          errorDiv.textContent = 'All fields are required';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+        
+        if (!/^\d{6}$/.test(pincode)) {
+          errorDiv.textContent = 'PIN Code must be 6 digits';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+        
+        if (!/^\d{10}$/.test(phone)) {
+          errorDiv.textContent = 'Phone number must be 10 digits';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+        
+        // If all validations pass, you can proceed with saving the address
+        // Add your save address logic here
+        
+        // Show success message
+        errorDiv.textContent = 'Address saved successfully!';
+        errorDiv.classList.remove('hidden');
+        errorDiv.classList.remove('text-red-500');
+        errorDiv.classList.add('text-green-500');
+      });
+    </script>
   </body>
   

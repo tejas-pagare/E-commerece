@@ -30,6 +30,7 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Returned"],
     default: "Pending",
+    
   },
   trackingId: {
     type: String, // Store tracking number for this seller's shipment
