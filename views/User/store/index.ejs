@@ -8,6 +8,10 @@
         <h3 class="font-semibold text-green-700 mb-2">Select Category</h3>
         <div class="space-y-2">
           <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
+            <input type="radio" name="category" value="" checked class="accent-green-600 focus:ring-2 focus:ring-green-400" />
+            <span class="text-gray-700">All Types</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
             <input type="radio" name="category" value="silk" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
             <span class="text-gray-700">Silk</span>
           </label>
@@ -50,69 +54,7 @@
           </label>
         </div>
       </div>
-      <div class="mt-8">
-        <h3 class="font-semibold text-green-700 mb-2">Color</h3>
-        <div class="flex flex-wrap gap-3">
-          <label class="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="color" value="white" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="inline-block w-4 h-4 rounded-full bg-gray-200 border"></span>
-            <span class="text-gray-700">White</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="color" value="black" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="inline-block w-4 h-4 rounded-full bg-gray-900 border"></span>
-            <span class="text-gray-700">Black</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="color" value="green" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="inline-block w-4 h-4 rounded-full bg-green-500 border"></span>
-            <span class="text-gray-700">Green</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="color" value="blue" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="inline-block w-4 h-4 rounded-full bg-blue-500 border"></span>
-            <span class="text-gray-700">Blue</span>
-          </label>
-        </div>
-      </div>
-      <div class="mt-8">
-        <h3 class="font-semibold text-green-700 mb-2">Size</h3>
-        <div class="flex flex-wrap gap-3">
-          <label class="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="size" value="S" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">S</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="size" value="M" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">M</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="size" value="L" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">L</span>
-          </label>
-          <label class="flex items-center gap-2 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="size" value="XL" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">XL</span>
-          </label>
-        </div>
-      </div>
-      <div class="mt-8">
-        <h3 class="font-semibold text-green-700 mb-2">Brand</h3>
-        <div class="space-y-2">
-          <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="brand" value="swiftmart" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">SwiftMart</span>
-          </label>
-          <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="brand" value="ecofab" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">EcoFab</span>
-          </label>
-          <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="checkbox" name="brand" value="cottonworld" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">CottonWorld</span>
-          </label>
-        </div>
-      </div>
+      
     </aside>
 
     <!-- Main Content -->
@@ -146,7 +88,7 @@
 
     async function fetchAndRenderProducts(filter = {}) {
       try {
-        let url = new URL("http://localhost:8000/api/v1/user/sell");
+        let url = new URL("http://localhost:8000/api/v1/user/products/filter");
 
         Object.keys(filter).forEach(key => {
           if (filter[key]) {
@@ -154,7 +96,7 @@
           }
         });
         const response = await fetch(url, {
-          method: "POST",
+          method: "GET",
           credentials: 'include'
         });
         const data = await response.json();
@@ -182,32 +124,33 @@
       }
     }
 
-    // Collect all filter values (category, price, color, size, brand)
+    // Update the filter collection to match backend expectations
     function getFilters() {
       const filter = {};
       const category = document.querySelector("input[name='category']:checked");
-      if (category) filter.category = category.value;
+      if (category && category.value !== "") {
+        filter.category = category.value;
+      }
 
       const price = document.querySelector("input[name='price']:checked");
-      if (price) filter.min = price.value.split('-')[0] || 0;
-
-      // Colors
-      const colors = Array.from(document.querySelectorAll("input[name='color']:checked")).map(cb => cb.value);
-      if (colors.length) filter.colors = colors.join(',');
-
-      // Sizes
-      const sizes = Array.from(document.querySelectorAll("input[name='size']:checked")).map(cb => cb.value);
-      if (sizes.length) filter.sizes = sizes.join(',');
-
-      // Brands
-      const brands = Array.from(document.querySelectorAll("input[name='brand']:checked")).map(cb => cb.value);
-      if (brands.length) filter.brands = brands.join(',');
+      if (price && price.value !== "0-") {
+        const [min, max] = price.value.split('-');
+        if (min) filter.minPrice = parseInt(min);
+        if (max) filter.maxPrice = parseInt(max);
+      }
 
       return filter;
     }
 
     // Add event listeners for all filters
-    document.querySelectorAll("input[name='category'], input[name='price'], input[name='color'], input[name='size'], input[name='brand']").forEach(input => {
+    document.querySelectorAll("input[name='category'], input[name='price']").forEach(input => {
+      input.addEventListener("change", () => {
+        fetchAndRenderProducts(getFilters());
+      });
+    });
+
+    // Add event listeners for all filters
+    document.querySelectorAll("input[name='category'], input[name='price']").forEach(input => {
       input.addEventListener("change", () => {
         fetchAndRenderProducts(getFilters());
       });

@@ -329,4 +329,52 @@ router.post('/sell', isAuthenticated,upload.single('photos'), async (req, res) =
   }
 });
 
+// Add this route for filtered products
+router.get("/products/filter", isAuthenticated, async (req, res) => {
+  try {
+    const { category, material, gender, size, minPrice, maxPrice } = req.query;
+    
+    // Build filter object
+    const filter = {};
+    
+    if (category) {
+      filter.category = category;
+    }
+    
+    if (material) {
+      filter.fabric = material;
+    }
+    
+    if (gender) {
+      filter.gender = gender;
+    }
+    
+    if (size) {
+      filter.size = size;
+    }
+    
+    // Add price range filter if provided
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    // Find products with applied filters
+    const filteredProducts = await Product.find(filter);
+
+    // Return filtered products as JSON
+    res.status(200).json({
+      success: true,
+      products: filteredProducts
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error filtering products",
+      error: error.message
+    });
+  }
+});
+
 export default router;

@@ -39,7 +39,7 @@
               <tr class="hover:bg-green-100 transition">
                 <td class="border p-3 text-center"><%= item.orderId.toString() %></td>
                 <td class="border p-3 text-center"><%= item.purchaseDate.toISOString().split("T")[0] %></td>
-                <td class="border p-3 text-center">$<%= item.totalAmount %></td>
+                <td class="border p-3 text-center">Rs.<%= item.totalAmount %></td>
                 <td class="border p-3 text-center"><%= item.status %></td>
                 <td class="border p-3 text-center">
                   <button 
