@@ -16,6 +16,11 @@ router.get('/signup', (req, res) => {
 router.post('/login', loginController );
 router.post('/signup', registerController);
 
+router.get("/logout", industryAuth, (req,res)=>{
+  res.clearCookie("token");
+  return res.redirect("/");
+});
+
 router.get('/about',industryAuth ,(req, res) => {
     res.render('Industry/aboutus/aboutus', {title:'About',role:'Industry'})
 })
@@ -196,24 +201,7 @@ router.get("/profile", industryAuth, async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
-
-
-// Assuming you have an Order model and industryAuth middleware
-
-router.get('/dashboard', industryAuth, async (req, res) => {
-    try {
-      const industryId = req.industry;
-      // Fetch orders for this industry
-      const orders = await industry.findById(industryId).dashboard;
-      // Calculate total amount
-      const totalAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-      res.render('Industry/Dashboard/dashboard', { orders, totalAmount });
-    } catch (error) {
-      console.error(error);
-      res.status(500).render('error', { message: 'Could not load dashboard' });
-    }
-  });
-  
+/////////////////////////////////////////////////////////////done////////////
 router.get('/cart', industryAuth, async (req, res) => {
     try {
         const id = req.industry;
@@ -305,6 +293,96 @@ router.post('/cartDelete', industryAuth, async (req, res) => {
         res.status(500).send("Error occurred while deleting item from cart.");
     }
 });
-
-
+// /////////////////////////////////////////////
+// router.get('/dashboard', industryAuth, async (req, res) => {
+//     try {
+//       const industryId = req.industry;
+//       // Fetch orders for this industry
+//       const orders = await industry.findById(industryId).dashboard;
+//       // Calculate total amount
+//       const totalAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
+//       res.render('Industry/Dashboard/dashboard', { orders, totalAmount });
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).render('error', { message: 'Could not load dashboard' });
+//     }
+//   });
+router.post('/checkout', industryAuth, async (req, res) => {
+    try {
+      const industryId = req.industry;
+      const industry = await Industry.findById(industryId);
+  
+      if (!industry) {
+        return res.status(404).json({ message: 'Industry not found' });
+      }
+  
+      const cartItems = industry.cart;
+  
+      // For each cart item
+      for (const item of cartItems) {
+        const { combination_id, quantity } = item;
+  
+        // Update first `quantity` SellProduct entries to Sold
+        const products = await SellProduct.find({
+          combination_id: combination_id,
+          adminStatus: 'Pending'
+        }).limit(quantity);
+  
+        const productIdsToUpdate = products.map(p => p._id);
+  
+        await SellProduct.updateMany(
+          { _id: { $in: productIdsToUpdate } },
+          { $set: { adminStatus: 'Sold' } }
+        );
+  
+        // Push to dashboard
+        industry.dashboard.push(item);
+      }
+  
+      // Clear cart
+      industry.cart = [];
+  
+      await industry.save();
+  
+      res.render('Industry/Dashboard/dashboard', {
+        title: 'Dashboard',
+        role: 'Industry',
+        orders: industry.dashboard,
+        totalAmount: industry.dashboard.reduce((acc, item) => acc + item.amount, 0)
+      });
+  
+    } catch (error) {
+      console.error('Checkout error:', error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  });
+  
+  router.get("/dashboard", industryAuth ,async (req, res) => {
+    try {
+      // Assume user is authenticated and ID is available
+      const Id = req.industry;
+      console.log(Id);
+      if (!Id) {
+        return res.status(400).send("Industry ID missing");
+      }
+  
+      const industry = await Industry.findById(Id);
+      if (!industry) {
+        return res.status(404).send("Industry not found");
+      }
+  
+      const orders = industry.dashboard || [];
+      const totalAmount = orders.reduce((sum, order) => sum + (order.amount || 0), 0);
+  
+      res.render("Industry/Dashboard/dashboard", {
+        title: 'Dashboard',
+        role: 'Industry',
+        orders,
+        totalAmount,
+      });
+    } catch (err) {
+      console.error("Dashboard error:", err);
+      res.status(500).send("Server error");
+    }
+  });
 export default router;
