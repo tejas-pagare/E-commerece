@@ -5,6 +5,8 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
 import Product from '../models/product.js';
 import cloudinary, { upload } from '../config/cloudinary.js';
+import Order from '../models/orders.js';
+import mongoose from 'mongoose';
 const router = express.Router();
 
 router.get("/login", (req, res) => {
@@ -291,5 +293,84 @@ router.get("/", isAuthenticated, async (req, res) => {
     })
   }
 })
+
+// Route to get sold products for a seller
+router.get('/sold-products', isAuthenticated, async (req, res) => {
+    try {
+        const sellerId = req.userId;
+
+        // Find orders with products from this seller using aggregation pipeline
+        const orders = await Order.aggregate([
+            // Unwind the products array to work with individual products
+            { $unwind: '$products' },
+            
+            // Lookup to get product details
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'products.productId',
+                    foreignField: '_id',
+                    as: 'productDetails'
+                }
+            },
+            { $unwind: '$productDetails' },
+            
+            // Match products that belong to the current seller and valid order statuses
+            {
+                $match: {
+                    'productDetails.sellerId': new mongoose.Types.ObjectId(sellerId),
+                    'orderStatus': { 
+                        $in: ['Delivered', 'Shipped', 'Processing'] 
+                    }
+                }
+            },
+            
+            // Format the output data
+            {
+                $project: {
+                    id: '$_id',
+                    name: '$productDetails.title',
+                    price: '$products.price',
+                    quantity: '$products.quantity',
+                    buyerName: '$shippingAddress.fullname',
+                    orderDate: {
+                        $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$createdAt"
+                        }
+                    },
+                    status: '$orderStatus',
+                    totalAmount: {
+                        $round: [
+                            { $multiply: ['$products.price', '$products.quantity'] },
+                            2
+                        ]
+                    }
+                }
+            },
+            
+            // Sort by order date, most recent first
+            { $sort: { orderDate: -1 } }
+        ]);
+
+        // Render the page with the fetched data
+        res.render('seller/SoldProduct/index', {
+            soldProducts: orders || [],
+            title: 'Sold Products',
+            role: 'seller',
+            error:""
+        });
+
+    } catch (error) {
+        console.error('Error fetching sold products:', error);
+        // Render the page with empty data in case of error
+        res.render('seller/SoldProduct/index', {
+            soldProducts: [],
+            title: 'Sold Products',
+            role: 'seller',
+            error: 'Failed to fetch sold products'
+        });
+    }
+});
 
 export default router;

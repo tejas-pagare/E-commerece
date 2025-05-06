@@ -4,6 +4,7 @@ import Product from "../models/product.js";
 import Seller from "../models/seller.js";
 import Manager from "../models/manager.js";
 import Order from "../models/orders.js";
+
 const router = express.Router();
 
 router.get("/login", (req, res) => {
@@ -16,35 +17,54 @@ router.get("/secondHand", (req, res) => {
 
 router.get("/dashboard", async (req, res) => {
 
-  const users = await User.find({}).populate(["cart.productId", "products"]);
-  const products = await Product.find({}).populate("sellerId");
-  let totalCartAmount = 0;
-  let customerOrders = 0;
-  let sellerOrders = 0;
-  let UserCount = 0;
-  users.forEach(user => {
-    if (user.role === "user") {
-      UserCount += 1;
-      user.cart.forEach(cartItem => {
-        if (cartItem.productId) {
-          totalCartAmount += cartItem.productId.price * cartItem.quantity;
-        }
-      });
-      customerOrders += user.cart.length;
-    } else if (user.role === "seller") {
-      sellerOrders += user.products.length;
-    }
-  });
+  try {
+    const users = await User.find({}).populate(["cart.productId", "products"]);
+    const products = await Product.find({}).populate("sellerId");
+    let totalCartAmount = 0;
+    let customerOrders = 0;
+    let sellerOrders = 0;
+    let UserCount = 0;
+    let CustomerCount = 0; // Added CustomerCount variable
 
-  res.render("admin/dashboard/index.ejs", {
-    title: "Dashboard",
-    role: "admin",
-    totalCartAmount,
-    customerOrders,
-    CustomerCount: UserCount,
-    registeredProducts: products
-  });
-})
+    users.forEach(user => {
+      const isSeller = user.products && user.products.length > 0;
+      
+      if (!isSeller) {
+        UserCount += 1;
+        CustomerCount += 1; // Increment CustomerCount for non-sellers
+        if (user.cart && Array.isArray(user.cart)) {
+          user.cart.forEach(cartItem => {
+            if (cartItem.productId) {
+              totalCartAmount += cartItem.productId.price * cartItem.quantity;
+            }
+          });
+          customerOrders += user.cart.length;
+        }
+      } else {
+        sellerOrders += user.products.length;
+      }
+    });
+
+    res.render("admin/dashboard/index.ejs", {
+      title: "Admin Dashboard",
+      role: "admin",
+      totalCartAmount,
+      customerOrders,
+      sellerOrders,
+      UserCount,
+      CustomerCount, // Added CustomerCount to template data
+      users,
+      products,
+      registeredProducts: products // Add this line to pass products as registeredProducts
+    });
+  } catch (error) {
+    console.error("Dashboard Error:", error);
+    res.status(500).render("error", {
+      message: "Error loading dashboard",
+      error: error
+    });
+  }
+});
 router.post("/dashboard", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -553,6 +573,53 @@ router.delete('/managers/:id', async (req, res) => {
             message: 'Failed to delete manager'
         });
     }
+});
+
+
+router.get("/delivery", async (req, res) => {
+  try {
+    // // Get pending orders (orders without delivery partner assigned)
+    // const orders = await Order.find({ deliveryPartner: null })
+    //   .populate('userId', 'firstname lastname email')
+    //   .populate('address');
+
+    // // Get all delivery partners
+    // const deliveryPartners = await DeliveryPartner.find({ isAvailable: true });
+
+    // // Get orders assigned today
+    // const today = new Date();
+    // today.setHours(0, 0, 0, 0);
+    // const assignedToday = await Order.countDocuments({
+    //   deliveryPartner: { $ne: null },
+    //   updatedAt: { $gte: today }
+    // });
+
+    return res.render("admin/Delivery/index.ejs", {
+      title: "Delivery Management",
+      role: "admin",
+      // pendingOrders: orders.length,
+      // availablePartners: deliveryPartners.length,
+      // assignedToday,
+      // orders: orders.map(order => ({
+      //   _id: order._id,
+      //   customer: {
+      //     name: `${order.userId.firstname} ${order.userId.lastname}`,
+      //     email: order.userId.email
+      //   },
+      //   address: order.address
+      // })),
+      // deliveryPartners: deliveryPartners.map(partner => ({
+      //   _id: partner._id,
+      //   name: partner.name
+      // }))
+    });
+  } catch (error) {
+    console.error('Error loading delivery management page:', error);
+    return res.status(500).render('error', {
+      message: 'Error loading delivery management page',
+      error: error
+    });
+  }
 });
 
 

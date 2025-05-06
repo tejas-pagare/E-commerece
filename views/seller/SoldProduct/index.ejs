@@ -1,0 +1,117 @@
+
+<body class="bg-green-50">
+    <div class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-green-800 mb-6">Sold Products</h2>
+        
+      
+        <!-- Table Content -->
+        <div class="overflow-x-auto bg-white rounded-lg shadow">
+            <table class="min-w-full table-auto">
+                <thead class="bg-green-600 text-white">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Order ID</th>
+                        <th class="px-6 py-3 text-left">Product Name</th>
+                        <th class="px-6 py-3 text-left">Price</th>
+                        <th class="px-6 py-3 text-left">Quantity</th>
+                        <th class="px-6 py-3 text-left">Total</th>
+                        <th class="px-6 py-3 text-left">Buyer Name</th>
+                        <th class="px-6 py-3 text-left">Order Date</th>
+                        <th class="px-6 py-3 text-left">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody" class="divide-y divide-green-100">
+                    <% if (soldProducts && soldProducts.length > 0) { %>
+                        <% soldProducts.forEach(product => { %>
+                            <tr class="hover:bg-green-50">
+                                <td class="px-6 py-4">#<%= product.id %></td>
+                                <td class="px-6 py-4 font-medium text-green-800"><%= product.name %></td>
+                                <td class="px-6 py-4">Rs.<%= product.price.toFixed(2) %></td>
+                                <td class="px-6 py-4"><%= product.quantity %></td>
+                                <td class="px-6 py-4 font-medium">Rs.<%= product.totalAmount.toFixed(2) %></td>
+                                <td class="px-6 py-4"><%= product.buyerName %></td>
+                                <td class="px-6 py-4"><%= product.orderDate %></td>
+                                <td class="px-6 py-4">
+                                    <span class="px-3 py-1 rounded-full text-sm font-medium 
+                                        <%= product.status === 'Delivered' ? 'bg-green-100 text-green-800' : 
+                                            product.status === 'Shipped' ? 'bg-green-200 text-green-800' : 
+                                            'bg-green-300 text-green-800' %>">
+                                        <%= product.status %>
+                                    </span>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                                No sold products found
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('filterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const params = new URLSearchParams(formData);
+            
+            try {
+                const response = await fetch(`/api/v1/seller/sold-products/filter?${params}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateTable(data.soldProducts);
+                } else {
+                    alert('Error filtering products');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error filtering products');
+            }
+        });
+
+        function updateTable(products) {
+            const tbody = document.getElementById('productsTableBody');
+            if (!products || products.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                            No sold products found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = products.map(product => `
+                <tr class="hover:bg-green-50">
+                    <td class="px-6 py-4">#${product.id}</td>
+                    <td class="px-6 py-4 font-medium text-green-800">${product.name}</td>
+                    <td class="px-6 py-4">$${product.price.toFixed(2)}</td>
+                    <td class="px-6 py-4">${product.quantity}</td>
+                    <td class="px-6 py-4 font-medium">$${product.totalAmount.toFixed(2)}</td>
+                    <td class="px-6 py-4">${product.buyerName}</td>
+                    <td class="px-6 py-4">${product.orderDate}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-sm font-medium ${
+                            product.status === 'Delivered' ? 'bg-green-100 text-green-800' :
+                            product.status === 'Shipped' ? 'bg-green-200 text-green-800' :
+                            'bg-green-300 text-green-800'
+                        }">
+                            ${product.status}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+
+
