@@ -1,0 +1,64 @@
+<main class="flex-1 p-10 bg-gradient-to-b from-green-50 to-green-100">
+    <h1 class="text-3xl font-bold text-green-800 mb-6">Admin Dashboard: All Donated Clothes</h1>
+  
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-semibold text-green-800 mb-4">Donated Clothes List</h2>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full table-auto text-left border-collapse">
+          <thead>
+            <tr class="bg-green-300 text-green-900">
+              <th class="px-4 py-2 font-semibold">User</th>
+              <th class="px-4 py-2 font-semibold">Item</th>
+              <th class="px-4 py-2 font-semibold">Fabric</th>
+              <th class="px-4 py-2 font-semibold">Size</th>
+              <th class="px-4 py-2 font-semibold">Gender</th>
+              <th class="px-4 py-2 font-semibold">Usage</th>
+              <th class="px-4 py-2 font-semibold">Date</th>
+              <th class="px-4 py-2 font-semibold">Slot</th>
+              <th class="px-4 py-2 font-semibold">User Status</th>
+              <th class="px-4 py-2 font-semibold">Admin Status</th>
+              <th class="px-4 py-2 font-semibold">Value</th>
+              <th class="px-4 py-2 font-semibold">Image</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white text-sm">
+            <% products.forEach(p => { %>
+              <tr class="border-t">
+                <td class="px-4 py-2"><%= p.username %></td>
+                <td class="px-4 py-2"><%= p.items %></td>
+                <td class="px-4 py-2"><%= p.fabric %></td>
+                <td class="px-4 py-2"><%= p.size || 'N/A' %></td>
+                <td class="px-4 py-2 capitalize"><%= p.gender %></td>
+                <td class="px-4 py-2"><%= p.readableUsage %></td>
+                <td class="px-4 py-2"><%= p.clothesDate.toISOString().split('T')[0] %></td>
+                <td class="px-4 py-2 capitalize"><%= p.timeSlot %></td>
+                <td class="px-4 py-2">
+                    <form action="sellproduct" method="POST">
+                        <input type="hidden" name="id" value="<%= p.id %>"/>
+                        <select name="userStatus" class="border rounded px-2 py-1">
+                          <option value="Pending" <%= p.userStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                          <option value="Verified" <%= p.userStatus === 'Verified' ? 'selected' : '' %>>Verified</option>
+                          <option value="Rejected" <%= p.userStatus === 'Rejected' ? 'selected' : '' %>>Reject</option>
+                        </select>
+                        <button type="submit" class="ml-2 text-white bg-green-600 px-2 py-1 rounded">Update</button>
+                      </form>
+                      
+                </td>
+                <td class="px-4 py-2"><%= p.adminStatus %></td>
+                <td class="px-4 py-2"><%= p.estimated_value || 'N/A' %></td>
+                <td class="px-4 py-2">
+                  <% if (p.imageSrc) { %>
+                    <img src="<%= p.imageSrc %>" alt="img" class="w-12 h-12 object-cover rounded" />
+                  <% } else { %>
+                    <span class="text-gray-400">N/A</span>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  

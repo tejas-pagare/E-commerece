@@ -174,7 +174,37 @@ console.log(address);
   }
 });
 
+router.get("/dashboard/sellproduct", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.userId;
+    console.log(userId);
+    const products = await SellProduct.find({ user_id: userId });
+    const name= await User.findById(userId).select("firstname");
 
+    // Only send required 9 fields + formatted image + readable usage
+    const dataWithImages = products.map(item => ({
+      name: name.firstname,
+      size: item.size,
+      gender: item.gender,
+      fabric: item.fabric,
+      usageDuration: item.usageDuration,
+      readableUsage: item.usageDuration > 1 ? '> 1 year' : '< 6 months',
+      imageSrc: item.image?.data
+        ? `data:${item.image.contentType};base64,${item.image.data.toString('base64')}`
+        : null,
+      clothesDate: item.clothesDate,
+      timeSlot: item.timeSlot,
+      userStatus: item.userStatus,
+      estimated_value: item.estimated_value
+    }));
+
+    res.render("User/dashboard/sellproduct/dummyboard", {title:"sellproduct",role:"user", products: dataWithImages, username:name.firstname });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
 
 router.get("/dashboard", isAuthenticated, async (req, res) => {
   const userId = req.userId;

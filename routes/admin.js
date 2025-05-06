@@ -4,7 +4,7 @@ import Product from "../models/product.js";
 import Seller from "../models/seller.js";
 import Manager from "../models/manager.js";
 import Order from "../models/orders.js";
-
+import SellProduct from "../models/SellProduct.js"
 const router = express.Router();
 
 router.get("/login", (req, res) => {
@@ -83,7 +83,47 @@ router.get("/customers", async (req, res) => {
   console.log(customers);
   return res.render("admin/Customers/index.ejs", { title: "Customers", role: "admin", customers });
 });
+router.get("/dashboard/sellproduct", async (req, res) => {
+  try {
+    const products = await SellProduct.find().populate("user_id", "firstname");
 
+    const dataWithUsernames = products.map(item => ({
+      id: item._id,
+      username: item.user_id.firstname,
+      items: item.items,
+      fabric: item.fabric,
+      size: item.size,
+      gender: item.gender,
+      usageDuration: item.usageDuration,
+      readableUsage: item.usageDuration > 1 ? '> 1 year' : '< 6 months',
+      imageSrc: item.image?.data
+        ? `data:${item.image.contentType};base64,${item.image.data.toString('base64')}`
+        : null,
+      clothesDate: item.clothesDate,
+      timeSlot: item.timeSlot,
+      userStatus: item.userStatus,
+      adminStatus: item.adminStatus,
+      estimated_value: item.estimated_value
+    }));
+
+    res.render("admin/dashboard/sellproduct/dummyboard", { title: "Admin Product Dashboard",role: "admin" , products: dataWithUsernames });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+router.post("/dashboard/sellproduct", async (req, res) =>{
+  const {id , userStatus} = req.body;
+  try {
+    await SellProduct.findByIdAndUpdate(id, { userStatus });
+    res.redirect("/api/v1/admin/dashboard/sellproduct");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error updating user status");
+  }
+  
+})
 router.get("/customer/details", async (req, res) => {
   try {
     const customers = await User.find({});
