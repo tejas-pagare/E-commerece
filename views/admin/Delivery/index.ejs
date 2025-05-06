@@ -1,0 +1,202 @@
+
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800">Delivery Partner Assignment</h1>
+            <p class="text-gray-600 mt-2">Manage and assign orders to delivery partners</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-blue-100 rounded-full">
+                        <i class="fas fa-box text-blue-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-gray-600 text-sm">Pending Orders</h2>
+                        <p class="text-2xl font-semibold text-gray-800">5</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-green-100 rounded-full">
+                        <i class="fas fa-motorcycle text-green-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-gray-600 text-sm">Available Partners</h2>
+                        <p class="text-2xl font-semibold text-gray-800">3</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 bg-purple-100 rounded-full">
+                        <i class="fas fa-check-circle text-purple-600"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-gray-600 text-sm">Assigned Today</h2>
+                        <p class="text-2xl font-semibold text-gray-800">8</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-6 border-b">
+                <h2 class="text-xl font-semibold text-gray-800">Pending Orders</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery Location</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assign To</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">#ORD001</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">John Doe</div>
+                                <div class="text-sm text-gray-500">john@example.com</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">123 Main Street</div>
+                                <div class="text-sm text-gray-500">New York, 10001</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Pending Assignment
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <select class="delivery-partner-select block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                        data-order-id="ORD001">
+                                    <option value="">Select Partner</option>
+                                    <option value="DP001">Mike Wilson</option>
+                                    <option value="DP002">Sarah Johnson</option>
+                                    <option value="DP003">David Brown</option>
+                                </select>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button class="assign-btn text-blue-600 hover:text-blue-900"
+                                        data-order-id="ORD001">
+                                    Assign
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">#ORD002</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">Jane Smith</div>
+                                <div class="text-sm text-gray-500">jane@example.com</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-900">456 Oak Avenue</div>
+                                <div class="text-sm text-gray-500">Chicago, 60601</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Pending Assignment
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <select class="delivery-partner-select block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                        data-order-id="ORD002">
+                                    <option value="">Select Partner</option>
+                                    <option value="DP001">Mike Wilson</option>
+                                    <option value="DP002">Sarah Johnson</option>
+                                    <option value="DP003">David Brown</option>
+                                </select>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button class="assign-btn text-blue-600 hover:text-blue-900"
+                                        data-order-id="ORD002">
+                                    Assign
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 transform transition-transform duration-300 translate-x-full">
+        <div class="bg-white border-l-4 border-green-500 rounded-lg shadow-lg p-4 max-w-sm">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const borderColor = type === 'success' ? 'border-green-500' : 'border-red-500';
+            const iconColor = type === 'success' ? 'text-green-500' : 'text-red-500';
+            
+            toast.querySelector('div').className = `bg-white border-l-4 ${borderColor} rounded-lg shadow-lg p-4 max-w-sm`;
+            toast.querySelector('i').className = `fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} ${iconColor}`;
+            toastMessage.textContent = message;
+            
+            // Show toast
+            toast.classList.remove('translate-x-full');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        // Handle assignment
+        document.querySelectorAll('.assign-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const orderId = button.dataset.orderId;
+                const select = document.querySelector(`.delivery-partner-select[data-order-id="${orderId}"]`);
+                const partnerId = select.value;
+    
+                if (!partnerId) {
+                    showToast('Please select a delivery partner', 'error');
+                    return;
+                }
+    
+                button.disabled = true;
+                button.textContent = 'Assigning...';
+    
+                // Simulate success without API call
+                setTimeout(() => {
+                    showToast('Order assigned successfully');
+                    button.disabled = false;
+                    button.textContent = 'Assign';
+                    
+                    // Optional: Update the UI to reflect assignment
+                    const statusCell = button.closest('tr').querySelector('td:nth-child(4) span');
+                    statusCell.className = 'px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800';
+                    statusCell.textContent = 'Assigned';
+                }, 1000);
+            });
+        });
+    </script>
+</body>
