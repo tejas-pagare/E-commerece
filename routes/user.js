@@ -95,7 +95,18 @@ router.get("/checkout",isAuthenticated,async(req,res)=>{
   user.cart?.forEach((e)=>{
     total += Math.round(e?.productId?.price)*e.quantity
   })
-  return res.render("User/payment/index.ejs",{title:"Checkout Page",role:"user",user,total})
+  const result = await SellProduct.aggregate([
+    { $match: { user_id: req.userId } },
+    {
+      $group: {
+        _id: '$user_id',
+        totalEstimatedValue: { $sum: '$estimated_value' }
+      }
+    }
+  ]);
+
+  const extra = result[0].totalEstimatedValue || 0;
+  return res.render("User/payment/index.ejs",{title:"Checkout Page",role:"user",user,total,extra})
 });
 router.post("/payment", isAuthenticated, async (req, res) => {
   try {
@@ -123,10 +134,23 @@ console.log(address);
       price: item.productId.price,
     }));
 
-    const totalAmount = products.reduce(
+    const result = await SellProduct.aggregate([
+      { $match: { user_id: req.userId } },
+      {
+        $group: {
+          _id: '$user_id',
+          totalEstimatedValue: { $sum: '$estimated_value' }
+        }
+      }
+    ]);
+  
+    const extra = result[0].totalEstimatedValue || 0;
+
+    let totalAmount = products.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
+    totalAmount-=extra;
 
     const newOrder = new Order({
       userId: user._id,
@@ -159,14 +183,14 @@ console.log(address);
       orderId: newOrder._id,
       products,
       totalAmount,
-      status: "Completed",
+      status: "Pending",
     });
 
     await userHistory.save();
 
     user.cart = [];
     await user.save();
-
+    console.log("como")
     res.status(200).json({ message: "Payment processed and order placed successfully" });
   } catch (err) {
     console.error("Payment error:", err);

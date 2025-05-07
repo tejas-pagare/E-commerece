@@ -30,6 +30,17 @@
               <p>Total:</p>
               <p>Rs <%= total %></p>
             </div>
+             <!-- Discount/Extra Section -->
+             <% if (extra) { %>
+              <div class="flex justify-between font-bold text-lg text-green-700 mt-4">
+                <p>Extra (Discount):</p>
+                <p>Rs <%= extra %></p>
+              </div>
+              <div class="flex justify-between font-bold text-lg text-green-700 mt-2">
+                <p>Final Total:</p>
+                <p>Rs <%= total - extra %></p>
+              </div>
+              <% } %>
           </div>
           <div class="mt-4 text-right">
             <button id="to-address" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Proceed to Address</button>
@@ -120,6 +131,17 @@
                 <p>Total:</p>
                 <p>Rs <%= total %></p>
               </div>
+               <!-- Discount/Extra Section -->
+            <% if (extra) { %>
+              <div class="flex justify-between font-bold text-lg text-green-700 mt-4">
+                <p>Extra (Discount):</p>
+                <p>Rs <%= extra %></p>
+              </div>
+              <div class="flex justify-between font-bold text-lg text-green-700 mt-2">
+                <p>Final Total:</p>
+                <p>Rs <%= total - extra %></p>
+              </div>
+              <% } %>
             </div>
             <!-- User Details -->
             <div>
