@@ -61,6 +61,6 @@ const industryAuth= async (req,res,next)=>{
     return res.redirect("/api/v1/indusrty/login");
   }
 }
-   
+
 
 export{industryAuth};
