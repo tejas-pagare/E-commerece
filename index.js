@@ -50,7 +50,7 @@ app.use("/api/v1/manager", managerRouter);
 
 
 app.get("/", (req, res) => {
-  res.render("Home/index.ejs", { title: "Home", role: "seller" });
+  res.render("Home/index.ejs", { title: "Home", role: "" });
 })
 
 app.get("*", (req, res) => {

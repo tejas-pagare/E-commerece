@@ -1,4 +1,4 @@
-<% if (role==="user" && (!(title==="login" ||title==="signup" ||title==="Home" ))) { %>
+<% if (role==="user" && !(title && (title.toLowerCase() === "login" || title.toLowerCase() === "signup"))) { %>
     <div>
         <header class="bg-white shadow-md">
             <div class="container mx-auto px-4 py-3">
@@ -62,7 +62,7 @@
             </div>
         </header>
     </div>
-<% } else if(role==="seller" &&(!(title==="login" ||title==="signup" ||title==="Home" ))) { %>
+<% } else if(role==="seller" && !(title && (title.toLowerCase() === "login" || title.toLowerCase() === "signup"))) { %>
     <div>
         <header class="bg-white shadow-md">
             <div class="container mx-auto px-4 py-4">
@@ -96,7 +96,7 @@
             </div>
         </header>
     </div>
-<% } else if(role==="admin" &&(!(title==="login" ||title==="signup" ||title==="Home" ))){ %>
+<% } else if(role==="admin" && !(title && (title.toLowerCase() === "login" || title.toLowerCase() === "signup"))){ %>
     <nav class="bg-gradient-to-r from-green-500 to-green-600 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
