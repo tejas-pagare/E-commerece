@@ -1,486 +1,20 @@
-<!-- <body>
-    
-    <div class="bg-gray-100 min-h-screen py-8 mt-6">
-        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
-            <h1 class="text-3xl font-bold text-center mb-8 text-green-800">Clothing clothes Form</h1>
-            
-            <form id="clothesForm" class="space-y-6">
-                
-                <div class="bg-gray-50 p-6 rounded-lg">
-                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Personal Information</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Full Name</label>
-                            <input type="text" name="fullName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Email Address</label>
-                            <input type="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Phone Number</label>
-                            <input type="tel" name="phone" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Street Address</label>
-                            <input type="text" name="address" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">City</label>
-                            <input type="text" name="city" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">State/Province</label>
-                            <input type="text" name="state" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Zip/Postal Code</label>
-                            <input type="text" name="zip" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Country</label>
-                            <input type="text" name="country" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                    </div>
-                </div>
-    
-              
-                <div class="bg-gray-50 p-6 rounded-lg">
-                    <h2 class="text-xl font-semibold mb-4 text-gray-700">clothes Details</h2>
-                    
-                    
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Type of Clothing Items (Select all that apply)</label>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="t-shirts" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>T-shirts</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="shirts" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Shirts</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="pants-jeans" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Pants/Jeans</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="dresses" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Dresses</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="skirts" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Skirts</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="jackets-coats" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Jackets/Coats</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="sweaters" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Sweaters</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="underwear" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Underwear</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="socks" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Socks</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="shoes" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Shoes</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" name="items" value="accessories" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Accessories</span>
-                            </label>
-                        </div>
-                    </div>
-    
-            
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Clothing Material</label>
-                        <select name="material" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="">Select material type</option>
-                            <option value="silk">Silk</option>
-                            <option value="cotton">Cotton</option>
-                            <option value="linen">Linen</option>
-                            <option value="leather">Leather</option>
-                            <option value="cashmere">Cashmere</option>
-                            <option value="synthetic">Synthetic</option>
-                            <option value="wool">Wool</option>
-                            <option value="denim">Denim</option>
-                            <option value="polyester">Polyester</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <p class="mt-1 text-sm text-gray-500">Select the primary material of your clothing item</p>
-                    </div>
-    
-        
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700"> Sizes</label>
-                            <select name="adultSizes" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="">Select Size</option>
-                                <option value="silk">S</option>
-                                <option value="cotton">M</option>
-                                <option value="linen">L</option>
-                            </select>
-                        </div>
-                    </div>
-    
-                
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Gender Category</label>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="gender" value="mens" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Men's</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="gender" value="womens" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Women's</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="radio" name="gender" value="unisex" class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500">
-                                <span>Unisex</span>
-                            </label>
-                        </div>
-                    </div>
-    
-               
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Brand of Items (Optional)</label>
-                            <input type="text" name="brand" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Age of Items (Approximate)</label>
-                            <input type="text" name="age" placeholder="e.g., 1 year, 6 months" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                    </div>
-    
-             
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700">Description of Items</label>
-                        <textarea name="description" rows="4" placeholder="Please provide any additional details about your clothes..." class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
-                    </div>
-    
-                 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Preferred clothes Date</label>
-                            <input type="date" name="clothesDate" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Preferred Time Slot</label>
-                            <select name="timeSlot" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                                <option value="">Select a time slot</option>
-                                <option value="morning">Morning (9 AM - 12 PM)</option>
-                                <option value="afternoon">Afternoon (12 PM - 5 PM)</option>
-                                <option value="evening">Evening (5 PM - 8 PM)</option>
-                            </select>
-                        </div>
-                    </div>
-    
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700">reciept Upload (for item verification)</label>
-                        <input type="file" name="photos" accept="image/*" multiple class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                    </div>
-    
-               
-                    <div class="bg-white p-6 rounded-lg border border-gray-200 mb-6">
-                        <h3 class="text-lg font-semibold mb-4">Terms and Conditions</h3>
-                        <div class="space-y-4 text-sm text-gray-600">
-                            <p>1. <strong>Eligibility:</strong> Clothes must be clean and in acceptable condition. We reserve the right to refuse items that do not meet our standards.</p>
-                            <p>3. <strong>Item Limitations:</strong> We do not accept items that are heavily soiled or damaged beyond repair.</p>
-                            <p>4. <strong>Privacy Policy:</strong> All personal information collected will be kept confidential and used solely for the purpose of processing clothes.</p>
-                            <p>5. <strong>clothes Acknowledgment:</strong> By submitting this form, you acknowledge that you are donating items without expectation of compensation or reimbursement.</p>
-                            <p>6. <strong>Point System:</strong> clothes may be eligible for a point system where points can be redeemed for discounts or rewards. Details will be provided upon confirmation of your clothes.</p>
-                            <p>7. <strong>Scheduling:</strong> Please select a preferred clothes date and time slot; we will do our best to accommodate your request.</p>
-                        </div>
-                    </div>
-    
-               
-                    <div class="mb-6">
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" required class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="text-sm text-gray-700">I agree to the clothes guidelines and point system</span>
-                        </label>
-                    </div>
-                </div>
-    
-          
-                <div class="flex justify-center">
-                    <button type="submit" class="bg-green-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        Submit clothes
-                    </button>
-                </div>
-            </form>
-        </div>
-    
-        <script>
-            // Form handling
-            document.getElementById('clothesForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Get form data
-                const formData = new FormData(this);
-                const data = Object.fromEntries(formData.entries());
-                
-                // Validate all fields
-                if (validateForm()) {
-                    // Here you would typically send the data to your server
-                    console.log('Form submitted:', data);
-                    alert('Thank you for your clothes! We will contact you shortly.');
-                }
-            });
-    
-           
-            function validateForm() {
-                let isValid = true;
-                const errorMessages = [];
-    
-                // Personal Information Validation
-                const fullName = document.querySelector('input[name="fullName"]').value.trim();
-                if (fullName.length < 2) {
-                    errorMessages.push('Please enter a valid full name (minimum 2 characters)');
-                    isValid = false;
-                }
-    
-                const email = document.querySelector('input[name="email"]').value.trim();
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(email)) {
-                    errorMessages.push('Please enter a valid email address');
-                    isValid = false;
-                }
-    
-                const phone = document.querySelector('input[name="phone"]').value.trim();
-                const phoneRegex = /^\+?[\d\s-]{10,}$/;
-                if (!phoneRegex.test(phone)) {
-                    errorMessages.push('Please enter a valid phone number');
-                    isValid = false;
-                }
-    
-                // Address Validation
-                const address = document.querySelector('input[name="address"]').value.trim();
-                if (address.length < 5) {
-                    errorMessages.push('Please enter a valid street address');
-                    isValid = false;
-                }
-    
-                const city = document.querySelector('input[name="city"]').value.trim();
-                if (city.length < 2) {
-                    errorMessages.push('Please enter a valid city name');
-                    isValid = false;
-                }
-    
-                const state = document.querySelector('input[name="state"]').value.trim();
-                if (state.length < 2) {
-                    errorMessages.push('Please enter a valid state/province');
-                    isValid = false;
-                }
-    
-                const zip = document.querySelector('input[name="zip"]').value.trim();
-                const zipRegex = /^\d{5,10}$/;
-                if (!zipRegex.test(zip)) {
-                    errorMessages.push('Please enter a valid zip/postal code');
-                    isValid = false;
-                }
-    
-                // Clothing Items Validation
-                const checkedItems = document.querySelectorAll('input[name="items"]:checked');
-                if (checkedItems.length === 0) {
-                    errorMessages.push('Please select at least one clothing item type');
-                    isValid = false;
-                }
-    
-                // Material Validation
-                const material = document.querySelector('select[name="material"]').value;
-                if (!material) {
-                    errorMessages.push('Please select a clothing material');
-                    isValid = false;
-                }
-    
-                // Size Validation
-                const adultSizes = document.querySelector('input[name="adultSizes"]').value;
-                if (!adultSizes) {
-                    errorMessages.push('Please enter the size');
-                    isValid = false;
-                }
-    
-                // Gender Validation
-                const gender = document.querySelector('input[name="gender"]:checked');
-                if (!gender) {
-                    errorMessages.push('Please select a gender category');
-                    isValid = false;
-                }
-    
-                // Condition Validation
-                const condition = document.querySelector('input[name="condition"]:checked');
-                if (!condition) {
-                    errorMessages.push('Please select the condition of items');
-                    isValid = false;
-                }
-    
-                // Date Validation
-                const clothesDate = document.querySelector('input[name="clothesDate"]').value;
-                if (!clothesDate) {
-                    errorMessages.push('Please select a preferred date');
-                    isValid = false;
-                } else {
-                    const selectedDate = new Date(clothesDate);
-                    const today = new Date();
-                    if (selectedDate < today) {
-                        errorMessages.push('Please select a future date');
-                        isValid = false;
-                    }
-                }
-    
-                // Time Slot Validation
-                const timeSlot = document.querySelector('select[name="timeSlot"]').value;
-                if (!timeSlot) {
-                    errorMessages.push('Please select a preferred time slot');
-                    isValid = false;
-                }
-    
-                // Photo Upload Validation
-                const photos = document.querySelector('input[name="photos"]').files;
-                if (photos.length === 0) {
-                    errorMessages.push('Please upload at least one photo of your items');
-                    isValid = false;
-                } else {
-                    // Check file types
-                    for (let i = 0; i < photos.length; i++) {
-                        if (!photos[i].type.startsWith('image/')) {
-                            errorMessages.push('Please upload only image files');
-                            isValid = false;
-                            break;
-                        }
-                        // Check file size (max 5MB)
-                        if (photos[i].size > 5 * 1024 * 1024) {
-                            errorMessages.push('Each image should be less than 5MB');
-                            isValid = false;
-                            break;
-                        }
-                    }
-                }
-    
-                // Terms Agreement Validation
-                const termsAgreement = document.querySelector('input[type="checkbox"]').checked;
-                if (!termsAgreement) {
-                    errorMessages.push('Please agree to the terms and conditions');
-                    isValid = false;
-                }
-    
-                // Display error messages if any
-                if (errorMessages.length > 0) {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4';
-                    errorDiv.innerHTML = `
-                        <strong class="font-bold">Please correct the following errors:</strong>
-                        <ul class="list-disc pl-5 mt-2">
-                            ${errorMessages.map(msg => `<li>${msg}</li>`).join('')}
-                        </ul>
-                    `;
-                    
-                    // Remove any existing error messages
-                    const existingError = document.querySelector('.bg-red-100');
-                    if (existingError) {
-                        existingError.remove();
-                    }
-                    
-                    // Insert error message at the top of the form
-                    const form = document.getElementById('clothesForm');
-                    form.insertBefore(errorDiv, form.firstChild);
-                }
-    
-                return isValid;
-            }
-    
-            // Real-time validation for email
-            document.querySelector('input[name="email"]').addEventListener('input', function() {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(this.value.trim())) {
-                    this.setCustomValidity('Please enter a valid email address');
-                } else {
-                    this.setCustomValidity('');
-                }
-            });
-    
-            // Real-time validation for phone
-            document.querySelector('input[name="phone"]').addEventListener('input', function() {
-                const phoneRegex = /^\+?[\d\s-]{10,}$/;
-                if (!phoneRegex.test(this.value.trim())) {
-                    this.setCustomValidity('Please enter a valid phone number');
-                } else {
-                    this.setCustomValidity('');
-                }
-            });
-    
-            // Real-time validation for zip code
-            document.querySelector('input[name="zip"]').addEventListener('input', function() {
-                const zipRegex = /^\d{5,10}$/;
-                if (!zipRegex.test(this.value.trim())) {
-                    this.setCustomValidity('Please enter a valid zip/postal code');
-                } else {
-                    this.setCustomValidity('');
-                }
-            });
-    
-            // Real-time validation for file upload
-            document.querySelector('input[name="photos"]').addEventListener('change', function() {
-                const files = this.files;
-                if (files.length === 0) {
-                    this.setCustomValidity('Please upload at least one photo');
-                    return;
-                }
-    
-                for (let i = 0; i < files.length; i++) {
-                    if (!files[i].type.startsWith('image/')) {
-                        this.setCustomValidity('Please upload only image files');
-                        return;
-                    }
-                    if (files[i].size > 5 * 1024 * 1024) {
-                        this.setCustomValidity('Each image should be less than 5MB');
-                        return;
-                    }
-                }
-                this.setCustomValidity('');
-            });
-        </script>
-    </div>
-</body> -->
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Clothing Sell/Donation Form</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
     <div class="bg-gray-100 min-h-screen py-8 mt-6">
         <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-md p-8">
             <h1 class="text-3xl font-bold text-center mb-8 text-green-800">Sell/Donate Your Clothes</h1>
-            <form id="clothesForm"
-                  class="space-y-6"
-                  enctype="multipart/form-data"
-                  autocomplete="off"
-                  action="/api/v1/user/sell"
-                  method="post">
+            
+            <div id="notification" class="hidden p-4 mb-4 text-sm rounded-lg" role="alert"></div>
 
-                <!-- Clothing Items (Single select for backend compatibility) -->
+            <form id="clothesForm" class="space-y-6" autocomplete="off">
+
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Type of Clothing Item</label>
                     <select name="items" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -495,7 +29,6 @@
                     </select>
                 </div>
 
-                <!-- Clothing Material -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Clothing Material</label>
                     <select name="fabric" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -512,7 +45,6 @@
                     </select>
                 </div>
 
-                <!-- Size -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Size</label>
                     <select name="size" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -523,7 +55,6 @@
                     </select>
                 </div>
 
-                <!-- Gender -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
                     <div class="flex gap-4">
@@ -542,7 +73,6 @@
                     </div>
                 </div>
 
-                <!-- Usage Duration (Age) -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Usage Duration</label>
                     <select name="age" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -550,16 +80,13 @@
                         <option value="6">Less than 6 months</option>
                         <option value="1">More than 1 year</option>
                     </select>
-                    <p class="text-xs text-gray-500 mt-1">Choose "6" for less than 6 months, "1" for more than 1 year (matches backend logic)</p>
                 </div>
 
-                <!-- Pickup Date -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Preferred Date</label>
                     <input type="date" name="clothesDate" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
 
-                <!-- Time Slot -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Preferred Time Slot</label>
                     <select name="timeSlot" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -570,117 +97,93 @@
                     </select>
                 </div>
 
-                <!-- Description -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Description (optional)</label>
                     <textarea name="description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Describe your item (brand, condition, etc.)"></textarea>
                 </div>
 
-                <!-- Photo Upload -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Photo Upload (required)</label>
                     <input type="file" name="photos" accept="image/*" required class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                 </div>
 
-                <!-- Submit Button -->
                 <div>
-                    <button type="submit" class="w-full py-3 px-6 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 transition">Submit</button>
+                    <button type="submit" id="submit-btn" class="w-full py-3 px-6 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 transition">Submit</button>
                 </div>
             </form>
 
-            <!-- Points Calculation Table (Info Only) -->
-            <div class="bg-white p-6 rounded-lg border border-gray-200 mb-6">
-                <h3 class="text-lg font-semibold mb-4">Terms and Conditions</h3>
-                <div class="space-y-4 text-sm text-gray-600">
-                    <p>1. <strong>Eligibility:</strong> Clothes must be clean and in acceptable condition. We reserve the right to refuse items that do not meet our standards.</p>
-                    <p>2. <strong>Item Limitations:</strong> We do not accept items that are heavily soiled or damaged beyond repair.</p>
-                    <p>3. <strong>Privacy Policy:</strong> All personal information collected will be kept confidential and used solely for the purpose of processing donations.</p>
-                    <p>4. <strong>Donation Acknowledgment:</strong> By submitting this form, you acknowledge that you are donating items without expectation of compensation or reimbursement.</p>
-                    <p>5. <strong>Point System:</strong> Donations may be eligible for a point system where points can be redeemed for discounts or rewards. Details will be provided upon confirmation of your donation.</p>
-                    <p>6. <strong>Scheduling:</strong> Please select a preferred donation date and time slot; we will do our best to accommodate your request.</p>
+            <div class="bg-white p-6 rounded-lg border border-gray-200 mt-8">
+                <h3 class="text-lg font-semibold mb-4">How Your Points and Price Are Calculated</h3>
+                <p class="text-gray-700 mb-2">
+                    Your virtual points and estimated price are determined by the <strong>size</strong>, <strong>fabric type</strong>, and <strong>usage duration</strong> of your donation.
+                </p>
                 </div>
-            
-                <div class="mt-6">
-                    <h4 class="text-md font-semibold mb-2 text-blue-700">How Your Points and Price Are Calculated</h4>
-                    <p class="text-gray-700 mb-2">
-                        Your virtual points and estimated price are determined by the <strong>size</strong>, <strong>fabric type</strong>, and <strong>usage duration</strong> of your donation. See the table below for all possible combinations:
-                    </p>
-                    <div class="overflow-x-auto mb-2">
-                        <table class="min-w-full border text-sm text-left text-gray-700">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="px-3 py-2 border">Size</th>
-                                    <th class="px-3 py-2 border">Fabric</th>
-                                    <th class="px-3 py-2 border">Usage Duration</th>
-                                    <th class="px-3 py-2 border">Virtual Points (₹)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- 6 months -->
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">200</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">250</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">300</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">300</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">350</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">400</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">220</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">270</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">320</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">450</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">550</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">600</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">400</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">450</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">500</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">120</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">150</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">180</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">250</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">320</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">370</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">270</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">320</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">400</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">100</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">120</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">6 months</td><td class="px-3 py-2 border">150</td></tr>
-                    
-                                <!-- More than 1 year -->
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">140</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">180</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Cotton</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">220</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">220</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">260</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Silk</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">300</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">160</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">200</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Linen</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">240</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">300</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">350</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Leather</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">400</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">260</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">320</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Cashmere</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">350</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">70</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">90</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Synthetic</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">110</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">180</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">220</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Wool</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">260</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">160</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">200</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Denim</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">240</td></tr>
-                                <tr><td class="px-3 py-2 border">S</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">60</td></tr>
-                                <tr><td class="px-3 py-2 border">M</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">80</td></tr>
-                                <tr><td class="px-3 py-2 border">L</td><td class="px-3 py-2 border">Polyester</td><td class="px-3 py-2 border">More than 1 year</td><td class="px-3 py-2 border">100</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    </div>
         </div>
     </div>
+
+    <script>
+        const form = document.getElementById('clothesForm');
+        const submitBtn = document.getElementById('submit-btn');
+        const notification = document.getElementById('notification');
+
+        function showNotification(message, isError = false) {
+            notification.textContent = message;
+            notification.className = isError 
+                ? 'p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50' 
+                : 'p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50';
+            notification.classList.remove('hidden');
+        }
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+           
+            const formData = new FormData(form);
+
+           
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            
+            const xhr = new XMLHttpRequest();
+
+           
+            xhr.open('POST', '/api/v1/user/sell', true);
+
+           
+            xhr.onload = function() {
+                
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    
+                    showNotification('Thank you! Your submission was successful.', false);
+                    form.reset(); 
+                    setTimeout(() => {
+                        window.location.href = '/api/v1/user/dashboard/sellproduct';
+                    }, 2000);
+                } else {
+                    
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        showNotification(`Error: ${response.message || 'Something went wrong.'}`, true);
+                    } catch (e) {
+                        showNotification('An unexpected error occurred. Please try again.', true);
+                    }
+                }
+            };
+
+            
+            xhr.onerror = function() {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit';
+                showNotification('A network error occurred. Please check your connection and try again.', true);
+            };
+
+           
+            xhr.send(formData);
+        });
+    </script>
 </body>
 </html>
-
-
-
