@@ -1,7 +1,6 @@
 <body class="font-sans bg-green-50">
   <div class="flex min-h-screen">
 
-    <!-- Sidebar -->
     <aside id="sidebar" class="w-72 bg-white p-8 shadow-xl border-r border-green-100 hidden md:block rounded-tr-3xl">
       <h2 class="text-2xl font-extrabold text-green-800 mb-8">Filters</h2>
       <div>
@@ -20,7 +19,7 @@
             <span class="text-gray-700">Fabric</span>
           </label>
           <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="radio" name="category" value="cotton" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
+            <input type="radio" name="category" value="Cotton" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
             <span class="text-gray-700">Cotton</span>
           </label>
           <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
@@ -37,46 +36,46 @@
           </label>
         </div>
       </div>
+      
       <div class="mt-8">
         <h3 class="font-semibold text-green-700 mb-2">Price Range</h3>
         <div class="space-y-2">
           <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
             <input type="radio" name="price" value="0-" checked class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">All</span>
+            <span class="text-gray-700">All Prices</span>
           </label>
           <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
-            <input type="radio" name="price" value="200-1000" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">Rs.200 above</span>
+            <input type="radio" name="price" value="0-500" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
+            <span class="text-gray-700">Under Rs. 500</span>
+          </label>
+          <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
+            <input type="radio" name="price" value="500-1000" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
+            <span class="text-gray-700">Rs. 500 to Rs. 1000</span>
           </label>
           <label class="flex items-center gap-3 cursor-pointer px-2 py-1 rounded-lg hover:bg-green-50 transition">
             <input type="radio" name="price" value="1000-" class="accent-green-600 focus:ring-2 focus:ring-green-400" />
-            <span class="text-gray-700">Rs.1000 above</span>
+            <span class="text-gray-700">Over Rs. 1000</span>
           </label>
         </div>
       </div>
       
     </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 p-6">
       <button id="toggleSidebar" class="bg-green-600 text-white px-4 py-2 rounded-md mb-6 md:hidden shadow">
         <i class="fas fa-filter mr-2"></i> Filters
       </button>
 
-      <!-- Page Heading -->
       <div class="mb-8">
         <h1 class="text-3xl font-extrabold text-green-800">Stores</h1>
         <p class="text-green-600 mt-1 text-lg">We have <span class="font-semibold text-green-700">9 vendors</span> now</p>
       </div>
 
-      <!-- Product Grid -->
       <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-        <!-- Products will be inserted here -->
-      </div>
+        </div>
     </main>
   </div>
 
-  <!-- Font Awesome for icons (optional, for filter icon) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script>
@@ -84,51 +83,63 @@
       document.getElementById('sidebar').classList.toggle('hidden');
     });
 
-    let cart = [];
-
-    async function fetchAndRenderProducts(filter = {}) {
-      try {
-        let url = new URL("http://localhost:8000/api/v1/user/products/filter");
-
-        Object.keys(filter).forEach(key => {
+    function fetchAndRenderProducts(filter = {}) {
+      const grid = document.getElementById("productGrid");
+      grid.innerHTML = '<p class="text-gray-500 col-span-full text-center">Loading products...</p>';
+      
+      const params = new URLSearchParams();
+      Object.keys(filter).forEach(key => {
           if (filter[key]) {
-            url.searchParams.append(key, filter[key]);
+              params.append(key, filter[key]);
           }
-        });
-        const response = await fetch(url, {
-          method: "GET",
-          credentials: 'include'
-        });
-        const data = await response.json();
-        const products = data.products || [];
+      });
+      const url = /api/v1/user/products/filter?${params.toString()};
 
-        const grid = document.getElementById("productGrid");
-        grid.innerHTML = "";
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
 
-        products.forEach(product => {
-          grid.innerHTML += `
-            <div class="bg-white border border-green-100 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 p-7 flex flex-col items-center group">
-              <div class="bg-green-50 rounded-2xl shadow mb-4 p-2">
-                <img src="${product.image}" alt="${product.title}" class="w-36 h-36 object-cover rounded-xl transition-transform group-hover:scale-105" />
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const data = JSON.parse(xhr.responseText);
+          const products = data.products || [];
+          
+          grid.innerHTML = ""; 
+
+          if (products.length === 0) {
+            grid.innerHTML = '<p class="text-gray-500 col-span-full text-center">No products found matching your criteria.</p>';
+            return;
+          }
+
+          products.forEach(product => {
+            grid.innerHTML += `
+              <div class="bg-white border border-green-100 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 p-7 flex flex-col items-center group">
+                <div class="bg-green-50 rounded-2xl shadow mb-4 p-2">
+                  <img src="${product.image}" alt="${product.title}" class="w-36 h-36 object-cover rounded-xl transition-transform group-hover:scale-105" />
+                </div>
+                <h3 class="text-lg font-bold text-green-900 mb-1 text-center">${product.title}</h3>
+                <p class="text-green-700 font-bold text-xl mb-2">Rs.${product.price}</p>
+                <a href="/api/v1/product/${product._id}" class="mt-auto bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-2 rounded-full hover:from-green-600 hover:to-green-700 font-semibold shadow transition-all duration-200">
+                  View
+                </a>
               </div>
-              <h3 class="text-lg font-bold text-green-900 mb-1 text-center">${product.title}</h3>
-              <p class="text-green-700 font-bold text-xl mb-2">Rs.${product.price}</p>
-              <a href="/api/v1/product/${product._id}" class="mt-auto bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-2 rounded-full hover:from-green-600 hover:to-green-700 font-semibold shadow transition-all duration-200">
-                View
-              </a>
-            </div>
-          `;
-        });
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
+            `;
+          });
+        } else {
+          grid.innerHTML = '<p class="text-red-500 col-span-full text-center">Failed to load products.</p>';
+        }
+      };
+      
+      xhr.onerror = function () {
+        grid.innerHTML = '<p class="text-red-500 col-span-full text-center">A network error occurred.</p>';
+      };
+
+      xhr.send();
     }
 
-    // Update the filter collection to match backend expectations
     function getFilters() {
       const filter = {};
       const category = document.querySelector("input[name='category']:checked");
-      if (category && category.value !== "") {
+      if (category && category.value) {
         filter.category = category.value;
       }
 
@@ -138,25 +149,15 @@
         if (min) filter.minPrice = parseInt(min);
         if (max) filter.maxPrice = parseInt(max);
       }
-
       return filter;
     }
 
-    // Add event listeners for all filters
     document.querySelectorAll("input[name='category'], input[name='price']").forEach(input => {
       input.addEventListener("change", () => {
         fetchAndRenderProducts(getFilters());
       });
     });
 
-    // Add event listeners for all filters
-    document.querySelectorAll("input[name='category'], input[name='price']").forEach(input => {
-      input.addEventListener("change", () => {
-        fetchAndRenderProducts(getFilters());
-      });
-    });
-
-    // Fetch products on page load
     fetchAndRenderProducts();
   </script>
 </body>
