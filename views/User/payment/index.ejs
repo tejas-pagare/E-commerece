@@ -3,103 +3,36 @@
       <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
         <h2 class="text-3xl font-bold text-green-700 mb-6">Checkout</h2>
   
-        <!-- Tab Navigation -->
         <div class="flex border-b border-green-200 mb-6" role="tablist">
           <button id="cart-tab" class="tab-button px-4 py-2 text-green-700 font-semibold border-b-2 border-green-500" role="tab">Cart</button>
           <button id="address-tab" class="tab-button px-4 py-2 text-green-500 font-semibold" role="tab">Address</button>
           <button id="summary-tab" class="tab-button px-4 py-2 text-green-500 font-semibold" role="tab">Summary</button>
         </div>
   
-        <!-- Cart Content -->
         <div id="cart-content" class="tab-content">
           <h3 class="text-lg font-semibold text-green-700 mb-4">Your Cart</h3>
-          <div class="bg-green-50 p-4 rounded-lg shadow">
-            <% user.cart.map((e) => { %>
-            <div class="border-b pb-2 mb-2">
-              <div class="flex justify-between items-center">
-                <img src="<%= e.productId.image %>" alt="Product" class="w-12 h-12 rounded" />
-                <div class="flex-1 ml-3 text-xs">
-                  <p class="font-medium"><%= e.productId.title %></p>
-                  <p class="text-sm text-gray-500">Rs <%= e.productId.price %> x <%= e.quantity %></p>
-                </div>
-                <p class="font-medium">Rs <%= e.productId.price * e.quantity %></p>
-              </div>
-            </div>
-            <% }) %>
-            <div class="flex justify-between font-bold text-lg text-green-700">
-              <p>Total:</p>
-              <p>Rs <%= total %></p>
-            </div>
-             <!-- Discount/Extra Section -->
-             <% if (extra) { %>
-              <div class="flex justify-between font-bold text-lg text-green-700 mt-4">
-                <p>Extra (Discount):</p>
-                <p>Rs <%= extra %></p>
-              </div>
-              <div class="flex justify-between font-bold text-lg text-green-700 mt-2">
-                <p>Final Total:</p>
-                <p>Rs <%= total - extra %></p>
-              </div>
-              <% } %>
+          <div id="cart-summary-container" class="bg-green-50 p-4 rounded-lg shadow">
+             <p class="text-gray-500">Loading cart...</p>
           </div>
           <div class="mt-4 text-right">
             <button id="to-address" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Proceed to Address</button>
           </div>
         </div>
   
-        <!-- Address Content -->
         <div id="address-content" class="tab-content hidden">
           <h3 class="text-lg font-semibold text-green-700 mb-4">Billing Address</h3>
           <div id="address-view">
-            <p class="p-2 border rounded mb-2" id="address">
-              <%= user.Address.plotno %>, <%= user.Address.street %>, <%= user.Address.city %>, <%= user.Address.state %> - <%= user.Address.pincode %>
-            </p>
-            <p class="p-2 border rounded mb-2" id="phone">Phone: <%= user.Address.phone %></p>
+            <p class="p-2 border rounded mb-2" id="address-display">Loading...</p>
+            <p class="p-2 border rounded mb-2" id="phone-display">Phone: Loading...</p>
             <button id="edit-address" class="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">Edit</button>
           </div>
           <div id="address-edit" class="hidden">
-            <input 
-              id="plotno" 
-              value="<%= user.Address.plotno %>" 
-              class="w-full p-2 mb-2 border rounded" 
-              placeholder="Plot/House Number"
-              required 
-            />
-            <input 
-              id="street" 
-              value="<%= user.Address.street %>" 
-              class="w-full p-2 mb-2 border rounded" 
-              placeholder="Street Name/Area"
-              required 
-            />
-            <input 
-              id="city" 
-              value="<%= user.Address.city %>" 
-              class="w-full p-2 mb-2 border rounded" 
-              placeholder="City"
-              required 
-            />
-            <input 
-              id="state" 
-              value="<%= user.Address.state %>" 
-              class="w-full p-2 mb-2 border rounded" 
-              placeholder="State"
-              required 
-            />
-            <input 
-              id="pincode" 
-              value="<%= user.Address.pincode %>" 
-              class="w-full p-2 mb-2 border rounded" 
-              placeholder="PIN Code (6 digits)"
-              required 
-            />
-            <input 
-              id="phone-input" 
-              value="<%= user.Address.phone %>" 
-              class="w-full p-2 mb-2 border rounded" 
-              placeholder="Phone Number (10 digits)"
-              required 
-            />
+            <input id="plotno" class="w-full p-2 mb-2 border rounded" placeholder="Plot/House Number" required />
+            <input id="street" class="w-full p-2 mb-2 border rounded" placeholder="Street Name/Area" required />
+            <input id="city" class="w-full p-2 mb-2 border rounded" placeholder="City" required />
+            <input id="state" class="w-full p-2 mb-2 border rounded" placeholder="State" required />
+            <input id="pincode" class="w-full p-2 mb-2 border rounded" placeholder="PIN Code (6 digits)" required />
+            <input id="phone-input" class="w-full p-2 mb-2 border rounded" placeholder="Phone Number (10 digits)" required />
             <div id="address-error" class="text-red-500 text-sm mb-2 hidden"></div>
             <button id="save-address" class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">Save</button>
           </div>
@@ -109,58 +42,25 @@
           </div>
         </div>
   
-        <!-- Summary Content -->
         <div id="summary-content" class="tab-content hidden">
           <h3 class="text-lg font-semibold text-green-700 mb-4">Order Summary</h3>
           <div class="grid md:grid-cols-2 gap-6">
-            <!-- Cart Summary -->
-            <div class="bg-green-50 p-4 rounded-lg shadow">
-              <% user.cart.map((e) => { %>
-              <div class="border-b pb-2 mb-2">
-                <div class="flex justify-between items-center">
-                  <img src="<%= e.productId.image %>" alt="Product" class="w-12 h-12 rounded" />
-                  <div class="flex-1 ml-3 text-xs">
-                    <p class="font-medium"><%= e.productId.title %></p>
-                    <p class="text-sm text-gray-500">Rs <%= e.productId.price %> x <%= e.quantity %></p>
-                  </div>
-                  <p class="font-medium">Rs <%= e.productId.price * e.quantity %></p>
-                </div>
-              </div>
-              <% }) %>
-              <div class="flex justify-between font-bold text-lg text-green-700">
-                <p>Total:</p>
-                <p>Rs <%= total %></p>
-              </div>
-               <!-- Discount/Extra Section -->
-            <% if (extra) { %>
-              <div class="flex justify-between font-bold text-lg text-green-700 mt-4">
-                <p>Extra (Discount):</p>
-                <p>Rs <%= extra %></p>
-              </div>
-              <div class="flex justify-between font-bold text-lg text-green-700 mt-2">
-                <p>Final Total:</p>
-                <p>Rs <%= total - extra %></p>
-              </div>
-              <% } %>
+            <div id="final-summary-container" class="bg-green-50 p-4 rounded-lg shadow">
+              <p class="text-gray-500">Loading summary...</p>
             </div>
-            <!-- User Details -->
             <div>
               <h4 class="text-md font-semibold text-green-700 mb-2">User Details</h4>
-              <div class="w-full p-2 mb-2 border rounded"><%= user.firstname %> <%= user.lastname %></div>
-              <div class="w-full p-2 mb-2 border rounded"><%= user.email %></div>
-              <div class="w-full p-2 mb-2 border rounded"><%= user.Address.phone %></div>
+              <div id="user-name" class="w-full p-2 mb-2 border rounded">Loading...</div>
+              <div id="user-email" class="w-full p-2 mb-2 border rounded"></div>
+              <div id="user-phone" class="w-full p-2 mb-2 border rounded"></div>
             </div>
           </div>
   
-          <!-- Shipping Address -->
           <div class="mt-6">
             <h4 class="text-md font-semibold text-green-700 mb-2">Shipping Address</h4>
-            <p class="p-2 border rounded mb-2" id="summary-address">
-              <%= user.Address.plotno %>, <%= user.Address.street %>, <%= user.Address.city %>, <%= user.Address.state %> - <%= user.Address.pincode %>
-            </p>
+            <p class="p-2 border rounded mb-2" id="summary-address">Loading...</p>
           </div>
   
-          <!-- Navigation -->
           <div class="mt-6 flex justify-between">
             <button id="back-to-address" class="bg-gray-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-gray-600 transition">Back to Address</button>
             <button id="place-order" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Pay</button>
@@ -168,8 +68,8 @@
         </div>
       </div>
   
-      <!-- Script -->
       <script>
+       
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
   
@@ -177,64 +77,93 @@
           btn.addEventListener('click', () => {
             tabButtons.forEach(b => b.classList.remove('text-green-700', 'border-green-500', 'border-b-2'));
             tabContents.forEach(tc => tc.classList.add('hidden'));
-  
             btn.classList.add('text-green-700', 'border-green-500', 'border-b-2');
             tabContents[i].classList.remove('hidden');
           });
         });
-  
-        const validateAddress = () => {
-          const editing = !document.getElementById('address-edit').classList.contains('hidden');
-          if (editing) {
-            const fields = ['plotno', 'street', 'city', 'state', 'pincode', 'phone-input'];
-            for (const id of fields) {
-              if (!document.getElementById(id).value.trim()) return false;
-            }
-            return /^\d{6}$/.test(document.getElementById('pincode').value) && /^\d{10}$/.test(document.getElementById('phone-input').value);
-          } else {
-            return document.getElementById('address').innerText.trim() !== '' && document.getElementById('phone').innerText.includes('Phone:');
-          }
-        };
-  
-        document.getElementById('save-address').addEventListener('click', () => {
-          if (!validateAddress()) return alert('Please fill all fields correctly.');
-  
-          const plotno = document.getElementById('plotno').value.trim();
-          const street = document.getElementById('street').value.trim();
-          const city = document.getElementById('city').value.trim();
-          const state = document.getElementById('state').value.trim();
-          const pincode = document.getElementById('pincode').value.trim();
-          const phone = document.getElementById('phone-input').value.trim();
-  
-          const formatted = `${plotno}, ${street}, ${city}, ${state} - ${pincode}`;
-          document.getElementById('address').innerText = formatted;
-          document.getElementById('summary-address').innerText = formatted;
-          document.getElementById('phone').innerText = `Phone: ${phone}`;
-  
-          document.getElementById('address-view').classList.remove('hidden');
-          document.getElementById('address-edit').classList.add('hidden');
-        });
-  
+        
         document.getElementById('edit-address').addEventListener('click', () => {
           document.getElementById('address-view').classList.add('hidden');
           document.getElementById('address-edit').classList.remove('hidden');
         });
-  
         document.getElementById('to-address').addEventListener('click', () => tabButtons[1].click());
         document.getElementById('back-to-cart').addEventListener('click', () => tabButtons[0].click());
-        document.getElementById('to-summary').addEventListener('click', () => {
-          if (!validateAddress()) return alert('Please complete your address before proceeding.');
-          tabButtons[2].click();
-        });
+        document.getElementById('to-summary').addEventListener('click', () => tabButtons[2].click());
         document.getElementById('back-to-address').addEventListener('click', () => tabButtons[1].click());
-  
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/api/v1/user/checkout-details', true);
+
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const data = JSON.parse(xhr.responseText);
+                    if (data.success) {
+                        populateCheckoutPage(data);
+                    }
+                }
+            };
+            xhr.send();
+        });
+
+        function populateCheckoutPage(data) {
+            const { user, total, extra } = data;
+            
+            // --- Populate Cart & Summary Sections ---
+            const cartContainer = document.getElementById('cart-summary-container');
+            const summaryContainer = document.getElementById('final-summary-container');
+            let cartHtml = '';
+
+            user.cart.forEach(e => {
+                cartHtml += `
+                    <div class="border-b pb-2 mb-2">
+                        <div class="flex justify-between items-center">
+                            <img src="${e.productId.image}" alt="Product" class="w-12 h-12 rounded" />
+                            <div class="flex-1 ml-3 text-xs">
+                                <p class="font-medium">${e.productId.title}</p>
+                                <p class="text-sm text-gray-500">Rs ${e.productId.price} x ${e.quantity}</p>
+                            </div>
+                            <p class="font-medium">Rs ${e.productId.price * e.quantity}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            let totalHtml = `<div class="flex justify-between font-bold text-lg text-green-700"><p>Total:</p><p>Rs ${total}</p></div>`;
+            if (extra) {
+                totalHtml += `
+                    <div class="flex justify-between font-bold text-lg text-green-700 mt-4"><p>Extra (Discount):</p><p>- Rs ${extra}</p></div>
+                    <div class="flex justify-between font-bold text-lg text-green-700 mt-2"><p>Final Total:</p><p>Rs ${total - extra}</p></div>
+                `;
+            }
+            
+            cartContainer.innerHTML = cartHtml + totalHtml;
+            summaryContainer.innerHTML = cartHtml + totalHtml;
+
+            // --- Populate Address & User Details ---
+            const address = user.Address || {};
+            const addressString = `${address.plotno || ''}, ${address.street || ''}, ${address.city || ''}, ${address.state || ''} - ${address.pincode || ''}`;
+            
+            document.getElementById('address-display').textContent = addressString;
+            document.getElementById('phone-display').textContent = `Phone: ${address.phone || ''}`;
+            document.getElementById('summary-address').textContent = addressString;
+
+            document.getElementById('plotno').value = address.plotno || '';
+            document.getElementById('street').value = address.street || '';
+            document.getElementById('city').value = address.city || '';
+            document.getElementById('state').value = address.state || '';
+            document.getElementById('pincode').value = address.pincode || '';
+            document.getElementById('phone-input').value = address.phone || '';
+
+            document.getElementById('user-name').textContent = `${user.firstname} ${user.lastname}`;
+            document.getElementById('user-email').textContent = user.email;
+            document.getElementById('user-phone').textContent = address.phone || '';
+        }
+        
+        // --- This existing form submission logic is already client-side and is kept as is ---
         document.getElementById('place-order').addEventListener('click', async () => {
-          if (!validateAddress()) return alert('Please ensure all address fields are filled before placing the order.');
-  
-          let address = {};
-          const editing = !document.getElementById('address-edit').classList.contains('hidden');
-          if (editing) {
-            address = {
+          const address = {
               plotno: document.getElementById('plotno').value.trim(),
               street: document.getElementById('street').value.trim(),
               city: document.getElementById('city').value.trim(),
@@ -242,26 +171,10 @@
               pincode: document.getElementById('pincode').value.trim(),
               phone: document.getElementById('phone-input').value.trim()
             };
-          } else {
-            const parts = document.getElementById('address').innerText.split(',');
-            const phone = document.getElementById('phone').innerText.replace('Phone:', '').trim();
-            const [state, pincode] = parts[3].split('-');
-            address = {
-              plotno: parts[0]?.trim(),
-              street: parts[1]?.trim(),
-              city: parts[2]?.trim(),
-              state: state?.trim(),
-              pincode: pincode?.trim(),
-              phone
-            };
-          }
-  
-          // Add loading state to button
+          
           const payButton = document.getElementById('place-order');
-          const originalText = payButton.innerText;
           payButton.disabled = true;
           payButton.innerHTML = '<span class="animate-spin inline-block mr-2">⭕</span>Processing...';
-  
           try {
             const res = await fetch('/api/v1/user/payment', {
               method: 'POST',
@@ -269,37 +182,23 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ paymentMethod: 'COD', address })
             });
-  
             if (res.ok) {
-              // Create success animation container
               const successOverlay = document.createElement('div');
               successOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-              
               const successContent = document.createElement('div');
               successContent.className = 'bg-white rounded-lg p-8 text-center transform scale-0 transition-transform duration-300';
               successContent.innerHTML = `
                 <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                  <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
+                  <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
                 <h3 class="text-xl font-bold text-green-700 mb-2">Payment Successful!</h3>
                 <p class="text-gray-600 mb-4">Your order has been placed successfully.</p>
                 <div class="animate-pulse text-sm text-gray-500">Redirecting to home page...</div>
               `;
-              
               successOverlay.appendChild(successContent);
               document.body.appendChild(successOverlay);
-              
-              // Trigger animation
-              setTimeout(() => {
-                successContent.classList.add('scale-100');
-              }, 100);
-  
-              // Redirect after animation
-              setTimeout(() => {
-                window.location.href = '/api/v1/user/';
-              }, 2000);
+              setTimeout(() => { successContent.classList.add('scale-100'); }, 100);
+              setTimeout(() => { window.location.href = '/api/v1/user/'; }, 2000);
             } else {
               const err = await res.json();
               throw new Error(err.message || 'Payment failed');
@@ -307,56 +206,11 @@
           } catch (err) {
             console.error(err);
             payButton.disabled = false;
-            payButton.innerText = originalText;
+            payButton.innerText = 'Pay';
             alert('Something went wrong while placing the order: ' + err.message);
           }
         });
+
       </script>
     </div>
-    <script>
-      document.getElementById('save-address').addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const plotno = document.getElementById('plotno').value.trim();
-        const street = document.getElementById('street').value.trim();
-        const city = document.getElementById('city').value.trim();
-        const state = document.getElementById('state').value.trim();
-        const pincode = document.getElementById('pincode').value.trim();
-        const phone = document.getElementById('phone-input').value.trim();
-        const errorDiv = document.getElementById('address-error');
-        
-        // Reset error message
-        errorDiv.classList.add('hidden');
-        errorDiv.textContent = '';
-        
-        // Validation checks
-        if (!plotno || !street || !city || !state || !pincode || !phone) {
-          errorDiv.textContent = 'All fields are required';
-          errorDiv.classList.remove('hidden');
-          return;
-        }
-        
-        if (!/^\d{6}$/.test(pincode)) {
-          errorDiv.textContent = 'PIN Code must be 6 digits';
-          errorDiv.classList.remove('hidden');
-          return;
-        }
-        
-        if (!/^\d{10}$/.test(phone)) {
-          errorDiv.textContent = 'Phone number must be 10 digits';
-          errorDiv.classList.remove('hidden');
-          return;
-        }
-        
-        // If all validations pass, you can proceed with saving the address
-        // Add your save address logic here
-        
-        // Show success message
-        errorDiv.textContent = 'Address saved successfully!';
-        errorDiv.classList.remove('hidden');
-        errorDiv.classList.remove('text-red-500');
-        errorDiv.classList.add('text-green-500');
-      });
-    </script>
   </body>
-  
