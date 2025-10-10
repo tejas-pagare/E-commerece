@@ -1,46 +1,38 @@
 <body>
     <div class="flex min-h-screen ">
-        <!-- Sidebar -->
         <%- include('../../partials/profileSidebar.ejs') %>
 
-            <!-- Address Update Form -->
-            <div class="flex justify-center items-center w-full">
-                <form id="addressForm" class="bg-white p-6  w-full border-green-600">
+        <div class="flex justify-center items-center w-full">
+            <div class="w-full max-w-lg">
+                <div id="notification" class="hidden p-4 mb-4 text-sm rounded-lg" role="alert"></div>
+                <form id="addressForm" class="bg-white p-6 rounded-lg shadow-md w-full border-green-600">
                     <h2 class="text-2xl font-bold text-green-700 text-center mb-4">Update Address</h2>
 
                     <label class="block text-green-700 font-medium">Plot No:</label>
-                    <input value=<%=user.Address.plotno%> type="text" name="plotno" id="plotno" required
-                    class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3" >
+                    <input type="text" name="plotno" id="plotno" required
+                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
 
                     <label class="block text-green-700 font-medium">Street:</label>
-                    <input value=<%=user.Address.street %> type="text" name="street" id="street" required
-                    class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
+                    <input type="text" name="street" id="street" required
+                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
 
                     <label class="block text-green-700 font-medium">City:</label>
-                    <input value=<%=user.Address.city %> type="text" name="city" id="city" required
-                    pattern="^[A-Za-z\s]+$"
-                    title="City should contain only letters"
-                    class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
+                    <input type="text" name="city" id="city" required pattern="^[A-Za-z\s]+$" title="City should contain only letters"
+                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
 
                     <label class="block text-green-700 font-medium">State:</label>
-                    <input value=<%=user.Address.state %> type="text" name="state" id="state" required
-                    pattern="^[A-Za-z\s]+$"
-                    title="State should contain only letters"
-                    class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
+                    <input type="text" name="state" id="state" required pattern="^[A-Za-z\s]+$" title="State should contain only letters"
+                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
 
                     <label class="block text-green-700 font-medium">Pincode:</label>
-                    <input value=<%=user.Address.pincode %> type="number" name="pincode" id="pincode" required
-                    pattern="^[0-9]{6}$"
-                    title="Pincode must be a 6-digit number"
-                    class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
+                    <input type="number" name="pincode" id="pincode" required pattern="^[0-9]{6}$" title="Pincode must be a 6-digit number"
+                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
 
                     <label class="block text-green-700 font-medium">Phone:</label>
-                    <input value=<%=user.Address.phone %> type="tel" name="phone" id="phone" required
-                    pattern="^[6-9]\d{9}$"
-                    title="Phone number must start with 6-9 and be 10 digits long"
-                    class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3">
+                    <input type="tel" name="phone" id="phone" required pattern="^[6-9]\d{9}$" title="Phone number must start with 6-9 and be 10 digits long"
+                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
 
-                    <button type="submit"
+                    <button type="submit" id="submit-btn"
                         class="w-full bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700 transition">
                         Update Address
                     </button>
@@ -49,36 +41,79 @@
     </div>
 
     <script>
-        document.getElementById("addressForm").addEventListener("submit", async function (event) {
-            event.preventDefault();
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById("addressForm");
+            const submitBtn = document.getElementById('submit-btn');
+            const notification = document.getElementById('notification');
 
-            const formData = {
-                plotno: document.getElementById("plotno").value,
-                street: document.getElementById("street").value,
-                city: document.getElementById("city").value,
-                state: document.getElementById("state").value,
-                pincode: document.getElementById("pincode").value,
-                phone: document.getElementById("phone").value,
-            };
-
-            try {
-                const response = await fetch("/api/v1/user/account/update/address", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify(formData),
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    alert("Address updated successfully!");
-                    window.location.href = "/api/v1/user/account/address";
-                } else {
-                    alert(data.message || "Failed to update address.");
+            
+            const xhrFetch = new XMLHttpRequest();
+            xhrFetch.open('GET', '/api/v1/user/account/address/details', true);
+            xhrFetch.onload = function() {
+                if (xhrFetch.status >= 200 && xhrFetch.status < 300) {
+                    const data = JSON.parse(xhrFetch.responseText);
+                    if (data.success) {
+                        const address = data.address;
+                        document.getElementById("plotno").value = address.plotno || '';
+                        document.getElementById("street").value = address.street || '';
+                        document.getElementById("city").value = address.city || '';
+                        document.getElementById("state").value = address.state || '';
+                        document.getElementById("pincode").value = address.pincode || '';
+                        document.getElementById("phone").value = address.phone || '';
+                        // Remove placeholder styles
+                        document.querySelectorAll('input').forEach(el => el.classList.remove('bg-gray-100'));
+                    }
                 }
-            } catch (error) {
-                alert("Something went wrong. Please try again.");
+            };
+            xhrFetch.send();
+
+            
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving...';
+
+                const formData = {
+                    plotno: document.getElementById("plotno").value,
+                    street: document.getElementById("street").value,
+                    city: document.getElementById("city").value,
+                    state: document.getElementById("state").value,
+                    pincode: document.getElementById("pincode").value,
+                    phone: document.getElementById("phone").value,
+                };
+                
+                const xhrSubmit = new XMLHttpRequest();
+                xhrSubmit.open('POST', '/api/v1/user/account/update/address', true);
+                xhrSubmit.setRequestHeader('Content-Type', 'application/json');
+                
+                xhrSubmit.onload = function() {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Update Address';
+                    const data = JSON.parse(xhrSubmit.responseText);
+
+                    if (data.success) {
+                        showNotification('Address updated successfully!', false);
+                        setTimeout(() => { window.location.href = "/api/v1/user/account/address"; }, 1500);
+                    } else {
+                        showNotification(data.message || "Failed to update address.", true);
+                    }
+                };
+                
+                xhrSubmit.onerror = function() {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Update Address';
+                    showNotification("An error occurred. Please try again.", true);
+                };
+
+                xhrSubmit.send(JSON.stringify(formData));
+            });
+
+            function showNotification(message, isError = false) {
+                notification.textContent = message;
+                notification.className = isError 
+                    ? 'p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50' 
+                    : 'p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50';
+                notification.classList.remove('hidden');
             }
         });
     </script>

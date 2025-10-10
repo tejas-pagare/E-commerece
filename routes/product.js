@@ -1,45 +1,43 @@
 import express from "express";
 import Product from "../models/product.js";
-import isAuthenticated from "../middleware/isAuthenticated.js";
-import User from "../models/user.js";
 
 const router = express.Router();
 
 
-router.get("/", isAuthenticated, async (req, res) => {
+router.get("/details/:id", async (req, res) => {
   try {
+    const id = req.params.id;
+    const product = await Product.findById(id);
 
-    const userId = req.userId;
-    const productListed = await User.findById(userId).populate("products").select("products");
-    
-    return res.render("seller/listedProduct/index.ejs", { title: "Listed Product", role: req?.role, productListed: productListed?.products })
-  } catch (error) {
-    res.json({
-      message: "Intenal error"
-    })
-  }
-})
-router.get("/:id", async (req, res) => {
-  const id = req.params.id;
-
-  try {
-    const product = await Product.findOne({ _id: id });
-    console.log(product);
     if (!product) {
-      return res.json({
-        messag: "No such product"
-      });
+      return res.status(404).json({ success: false, message: "Product not found" });
     }
-    const products = await Product.find({category:product.category,_id:{$ne:product._id}});
-    res.render('User/product/index.ejs', { title: 'Product page', product, filteredProducts: product, role: "user",products })
+
+    // Also find related products to send along with the main product
+    const relatedProducts = await Product.find({
+      category: product.category,
+      _id: { $ne: product._id } // Exclude the main product itself
+    }).limit(4); // Limit to 4 related products
+
+    res.json({ success: true, product, relatedProducts });
 
   } catch (error) {
-    return res.json({
-      message: "Server error"
-    })
+    console.error("Error fetching product details:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
 
+
+router.get("/:id", (req, res) => {
+  // We no longer fetch data here. We just render the template.
+  // The 'role' and 'title' are still needed for the main layout.
+  res.render('User/product/index.ejs', {
+    title: 'Product Page',
+    role: "user",
+    // We pass the productId so the client-side script can use it
+    productId: req.params.id
+  });
+});
 
 export default router;
