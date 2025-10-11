@@ -79,10 +79,28 @@ router.post("/dashboard", async (req, res) => {
 });
 
 router.get("/customers", async (req, res) => {
-  const customers = await User.find({});
-  console.log(customers);
-  return res.render("admin/Customers/index.ejs", { title: "Customers", role: "admin", customers });
+  return res.render("admin/Customers/index.ejs", { 
+    title: "Customers", 
+    role: "admin"
+  });
 });
+
+router.get("/api/customers", async (req, res) => {
+  try {
+    const customers = await User.find({});
+    return res.json({
+      success: true,
+      customers
+    });
+  } catch (error) {
+    return res.json({
+      success: false,
+      message: "Failed to fetch customers",
+      error: error.message
+    });
+  }
+});
+
 router.get("/dashboard/sellproduct", async (req, res) => {
   try {
     const products = await SellProduct.find().populate("user_id", "firstname");
@@ -133,7 +151,7 @@ router.get("/customer/details", async (req, res) => {
   } catch (error) {
     return res.json({
       message: "Server error",
-      sucess: false
+      success: false
     })
   }
 })
@@ -152,7 +170,7 @@ router.delete("/product/:id", async (req, res) => {
     await Seller.findOneAndUpdate({ _id: product._id }, { $pull: { id } })
     res.json({
       message: "Product deleted successfully",
-      sucess: true
+      success: true
     })
   } catch (error) {
     res.json({
@@ -171,8 +189,8 @@ router.get("/products/details", async (req, res) => {
     })
   } catch (error) {
     res.json({
-      message: "Sever Error",
-      sucess: false
+      message: "Server Error",
+      success: false
     })
   }
 });
@@ -184,19 +202,20 @@ router.delete("/customer/:id", async (req, res) => {
     if (!user) {
       return res.json({
         message: "No user with give id exists",
-        sucess: false
+        success: false
       })
     }
 
     await user.deleteOne();
     return res.json({
-      message: "User deleted sucessFully",
-      sucess: true
+      message: "User deleted successfully",
+      success: true
     })
   } catch (error) {
+    console.log(error);
     return res.json({
       message: "Server error",
-      sucess: false
+      success: false
     })
   }
 });
@@ -221,7 +240,7 @@ router.get("/product/approve/:id", async (req, res) => {
   } catch (error) {
     res.json({
       message: "Server Error",
-      sucess: false
+      success: false
     })
   }
 });
@@ -273,7 +292,7 @@ router.get("/seller/approve/:id", async (req, res) => {
   } catch (error) {
     res.json({
       message: "Server Error",
-      sucess: false
+      success: false
     })
   }
 })
