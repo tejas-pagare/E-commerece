@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Swift Mart</title>
+  <title>EcoWear Collective</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-emerald-50 via-green-100 to-emerald-200 min-h-screen font-sans">
 
-  <!-- ========= HEADER ========= -->
-    <header class="bg-white shadow-sm sticky top-0 z-20">
+  <!-- ========= HEADER (DO NOT CHANGE) ========= -->
+  <header class="bg-white shadow-sm sticky top-0 z-20">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
       <!-- Logo -->
       <div class="flex items-center gap-2">
@@ -49,7 +49,9 @@
       
     </div>
   </header>
-  <!-- ========= HERO ========= -->
+  <!-- ========= /HEADER ========= -->
+
+  <!-- Hero Section -->
   <section class="relative flex flex-col md:flex-row items-center max-w-7xl mx-auto px-6 py-12 mb-10">
     <div class="md:w-1/2 mb-10 md:mb-0">
       <h1 class="text-5xl font-extrabold text-gray-800 mb-4 leading-tight">
@@ -66,16 +68,25 @@
     <div class="md:w-1/2 flex justify-center relative">
       <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
         alt="Eco Fashion"
-        class="rounded-2xl shadow-2xl w-80 h-80 object-cover border-4 border-emerald-100 animate-fade-in">
+        class="rounded-2xl shadow-2xl w-80 h-80 object-cover border-4 border-emerald-100 animate-fade-in"
+      >
+      <!-- Decorative Leaf SVG -->
+      <svg class="absolute -bottom-6 -right-6 w-16 h-16 text-green-200 opacity-60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 21c0-4.418 3.582-8 8-8s8 3.582 8 8M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"></path>
+      </svg>
     </div>
+    <div class="absolute top-0 left-0 w-32 h-32 bg-emerald-100 rounded-full -z-10 blur-2xl"></div>
+    <div class="absolute bottom-0 right-0 w-48 h-48 bg-emerald-200 rounded-full -z-10 blur-2xl"></div>
   </section>
 
-  <!-- ========= MAIN CONTENT ========= -->
   <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 px-6">
 
-    <!-- Sidebar -->
+    <!-- Sidebar Fabric Selector -->
     <aside class="md:w-1/4 mb-10 md:mb-0">
       <h2 class="text-xl font-bold text-emerald-800 mb-6 flex items-center gap-2">
+        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 21c0-4.418 3.582-8 8-8s8 3.582 8 8M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"></path>
+        </svg>
         Filter by Fabric
       </h2>
       <ul class="space-y-4">
@@ -91,23 +102,26 @@
           { name: 'Synthetic', img: 'https://media.istockphoto.com/id/1186706715/photo/close-up-fabric-fiber-in-underwater.jpg?s=612x612&w=0&k=20&c=OQ-gl9rSaTyAFd49-H5cib_tJEHzXENBLGUSoM8R7aw=' }
         ]; %>
         <% fabrics.forEach(fab => { %>
-          <li>
-            <button class="flex items-center w-full gap-3 p-3 rounded-lg bg-white shadow hover:bg-emerald-50 transition group">
-              <img src="<%= fab.img %>" class="w-10 h-10 rounded-full object-cover border-2 border-emerald-100 group-hover:scale-105 transition" alt="<%= fab.name %>">
-              <span class="font-medium text-gray-700 group-hover:text-emerald-700"><%= fab.name %></span>
-            </button>
-          </li>
+        <li>
+          <button class="flex items-center w-full gap-3 p-3 rounded-lg bg-white shadow hover:bg-emerald-50 transition group">
+            <img src="<%= fab.img %>" class="w-10 h-10 rounded-full object-cover border-2 border-emerald-100 group-hover:scale-105 transition" alt="<%= fab.name %>">
+            <span class="font-medium text-gray-700 group-hover:text-emerald-700"><%= fab.name %></span>
+          </button>
+        </li>
         <% }) %>
       </ul>
     </aside>
 
-    <!-- Order Table -->
+    <!-- Order Table Section -->
     <main class="md:w-3/4" id="order">
       <h2 class="text-2xl font-bold text-emerald-800 mb-6 flex items-center gap-2">
+        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h4M9 17H5a2 2 0 01-2-2v-1a2 2 0 012-2h4M9 17l-2 4m2-4l2 4"></path>
+        </svg>
         Order Your Sustainable Wear
       </h2>
       <div class="overflow-x-auto">
-        <table class="min-w-full bg-white rounded-xl shadow text-gray-700" id="orderTable">
+        <table class="min-w-full bg-white rounded-xl shadow text-gray-700">
           <thead>
             <tr class="bg-emerald-100 text-emerald-800 text-center">
               <th class="py-3 px-4">Material</th>
@@ -119,158 +133,84 @@
               <th class="py-3 px-4">Add to Cart</th>
             </tr>
           </thead>
-          <tbody id="orderBody">
-            <tr><td colspan="7" class="text-center py-4 text-gray-500">Loading...</td></tr>
+          <tbody>
+            <% combinations.forEach(function(comb) { %>
+              <tr class="border-b hover:bg-green-50 text-center transition">
+                <form action="/api/v1/industry/cart" method="POST" class="contents">
+                  <input type="hidden" name="_id" value="<%= comb._id %>">
+                  <input type="hidden" name="fabric" value="<%= comb.fabric %>">
+                  <input type="hidden" name="size" value="<%= comb.size %>">
+                  <input type="hidden" name="usageDuration" value="<%= comb.usageDuration %>">
+                  <input type="hidden" name="estimated_value" value="<%= comb.estimated_value %>">
+                  <td class="py-3 px-4">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 rounded text-emerald-700 font-semibold">
+                      <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      <%= comb.fabric %>
+                    </span>
+                  </td>
+                  <td class="py-3 px-4">
+                    <% if (comb.usageDuration == 1) { %>
+                      More than 1 year
+                    <% } else if (comb.usageDuration == 6) { %>
+                      More than 6 months and less than 1 year
+                    <% } else { %>
+                      <%= comb.usageDuration %> months
+                    <% } %>
+                  </td>
+                  <td class="py-3 px-4"><%= comb.size %></td>
+                  <td class="py-3 px-4">
+                    <span class="inline-block px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold"><%= comb.quantity %></span>
+                  </td>
+                  <td class="py-3 px-4 font-semibold text-emerald-700">₹<%= comb.estimated_value %></td>
+                  <td class="py-3 px-4">
+                    <input 
+                      type="number" 
+                      name="new_quantity" 
+                      min="1" 
+                      max="<%= comb.quantity %>" 
+                      value="1"
+                      class="w-20 border border-emerald-300 rounded-lg px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                    />
+                  </td>
+                  <td class="py-3 px-4">
+                    <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 shadow transition font-semibold flex items-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m13-9v9m-6 0a2 2 0 104 0 2 2 0 00-4 0z" />
+                      </svg>
+                      Add to Cart
+                    </button>
+                  </td>
+                </form>
+              </tr>
+            <% }) %>
           </tbody>
         </table>
       </div>
     </main>
   </div>
 
-  <!-- ========= FOOTER ========= -->
+  <!-- Footer -->
   <footer class="bg-white border-t py-6 mt-16">
     <div class="max-w-7xl mx-auto text-center text-gray-500 text-sm">
       &copy; 2025 Swift Mart. Crafted for a greener tomorrow.
     </div>
   </footer>
-
-  <!-- ========= SCRIPT ========= -->
-  <script>
-let allOrders = []; // store fetched data for filtering later
-
-function loadOrders() {
-  const xhr = new XMLHttpRequest();
-  xhr.open("GET", "http://localhost:8000/api/v1/industry/fetchhome", true);
-  xhr.withCredentials = true;
-
-  xhr.onload = function () {
-    const tbody = document.getElementById("orderBody");
-    tbody.innerHTML = "";
-
-    if (xhr.status === 200) {
-      try {
-        const data = JSON.parse(xhr.responseText);
-        if (Array.isArray(data)) {
-          allOrders = data; // ✅ store all data globally
-          renderOrders(data); // render all initially
-          attachCartEvents();
-          attachFilterEvents(); // ✅ enable filters
-        } else {
-          tbody.innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">No data found</td></tr>`;
-        }
-      } catch {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">Invalid response format</td></tr>`;
-      }
-    } else if (xhr.status === 401) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">Access Denied — please login.</td></tr>`;
-    } else {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">Server Error (${xhr.status})</td></tr>`;
-    }
-  };
-
-  xhr.onerror = function () {
-    document.getElementById("orderBody").innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">Network Error</td></tr>`;
-  };
-
-  xhr.send();
-}
-
-// ✅ Function to render rows dynamically
-function renderOrders(data) {
-  const tbody = document.getElementById("orderBody");
-  tbody.innerHTML = "";
-
-  if (!data || data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="text-gray-500 py-4">No items available</td></tr>`;
-    return;
-  }
-
-  data.forEach(comb => {
-    const tr = document.createElement("tr");
-    tr.className = "border-b hover:bg-green-50 text-center transition";
-    tr.innerHTML = `
-      <td class="py-3 px-4 font-semibold text-gray-700">${comb.fabric}</td>
-      <td class="py-3 px-4">${comb.usageDuration} months</td>
-      <td class="py-3 px-4">${comb.size}</td>
-      <td class="py-3 px-4">${comb.quantity}</td>
-      <td class="py-3 px-4 font-semibold text-emerald-700">₹${comb.estimated_value}</td>
-      <td class="py-3 px-4">
-        <input type="number" min="1" max="${comb.quantity}" value="1"
-          class="w-20 border border-emerald-300 rounded-lg px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-emerald-300 quantity-input"/>
-      </td>
-      <td class="py-3 px-4">
-        <button 
-          class="addToCart bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 shadow transition font-semibold flex items-center gap-2"
-          data-id="${comb._id}"
-          data-fabric="${comb.fabric}"
-          data-size="${comb.size}"
-          data-duration="${comb.usageDuration}"
-          data-price="${comb.estimated_value}"
-        >
-          🛒 Add to Cart
-        </button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-
-  attachCartEvents();
-}
-
-// ✅ Handle Add to Cart click
-function attachCartEvents() {
-  document.querySelectorAll(".addToCart").forEach(button => {
-    button.addEventListener("click", async () => {
-      const parent = button.closest("tr");
-      const quantityInput = parent.querySelector(".quantity-input");
-      const qty = parseInt(quantityInput.value);
-
-      if (qty < 1) return alert("Quantity must be at least 1");
-
-      const payload = {
-        _id: button.dataset.id,
-        fabric: button.dataset.fabric,
-        size: button.dataset.size,
-        usageDuration: button.dataset.duration,
-        estimated_value: button.dataset.price,
-        new_quantity: qty
-      };
-
-      const res = await fetch("http://localhost:8000/api/v1/industry/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload)
-      });
-
-      if (res.status === 200) {
-        window.location.href = "cart"; // ✅ redirect to cart
-      } else if (res.status === 401) {
-        alert("⚠️ Please login first.");
-      } else {
-        alert("❌ Failed to add item to cart.");
-      }
-    });
-  });
-}
-
-// ✅ Filtering functionality
-function attachFilterEvents() {
-  document.querySelectorAll("aside button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const selected = btn.querySelector("span").innerText.trim();
-      const filtered = allOrders.filter(item => item.fabric.toLowerCase() === selected.toLowerCase());
-      renderOrders(filtered);
-
-      // Highlight selected filter
-      document.querySelectorAll("aside button").forEach(b => b.classList.remove("ring-2", "ring-emerald-500"));
-      btn.classList.add("ring-2", "ring-emerald-500");
-    });
-  });
-}
-
-document.addEventListener("DOMContentLoaded", loadOrders);
-</script>
-
 </body>
+<script>
+  // Quantity input validation
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('input[name="bulkQuantity"]').forEach(input => {
+      input.addEventListener("input", () => {
+        const max = parseInt(input.max);
+        if (parseInt(input.value) > max) {
+          input.value = max;
+        } else if (parseInt(input.value) < 1) {
+          input.value = 1;
+        }
+      });
+    });
+  });
+</script>
 </html>

@@ -24,7 +24,23 @@ router.get("/logout", industryAuth, (req,res)=>{
 router.get('/about',industryAuth ,(req, res) => {
     res.render('Industry/aboutus/aboutus', {title:'About',role:'Industry'})
 })
-router.get('/home', industryAuth, async (req, res) => {
+
+
+
+//  imp sending ejs file just
+router.get('/home', industryAuth ,async (req, res) => {
+    try {
+        res.render('Industry/homepage/home', { title: 'Home', role:'User' });
+    } catch (error) {
+        console.error("Error fetching combinations with details:", error);
+        res.status(500).json({ message: "Internal Server Error", error });
+    }
+});
+
+
+
+// imp  sending just json data for home
+router.get('/fetchhome', industryAuth, async (req, res) => {
     try {
         console.log(req.industry);
         const combinations = await SellProduct.aggregate([
@@ -49,12 +65,15 @@ router.get('/home', industryAuth, async (req, res) => {
           }
         ]);
          console.log(req.industry);
-        res.render('Industry/homepage/home', { title: 'Home', role:'User' ,combinations });
+        res.json(combinations);
     } catch (error) {
         console.error("Error fetching combinations with details:", error);
         res.status(500).json({ message: "Internal Server Error", error });
     }
 });
+
+
+
 /////////////////////////////////////////////////////////upperdone/////////////////////
 router.get("/blog", industryAuth, (req,res)=>{
     res.render("Industry/blog/blog", {title:'Blog', role:'Industry' });
