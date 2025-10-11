@@ -33,7 +33,7 @@ const SellProductSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now },
   
  
-  combination_id: { type: String, unique: true, required: true },// important  Cotton_L_duration
+  combination_id: { type: String,  required: true },// important  Cotton_L_duration
 });
 
 const SellProduct =  mongoose.model("SellProduct", SellProductSchema);
