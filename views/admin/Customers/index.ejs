@@ -40,7 +40,25 @@
     </div>
   </div>
 
+  
   <script>
+    function fetchCustomers() {
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function() {
+        const data = JSON.parse(this.responseText);
+        if (data.success) {
+          renderCustomers(data.customers);
+        } else {
+          console.error('Failed to fetch customers:', data.message);
+        }
+      };
+      xhttp.onerror = function() {
+        console.error('Error fetching customers:', this.statusText);
+      };
+      xhttp.open("GET", "/api/v1/admin/api/customers", true);
+      xhttp.send();
+    }
+
     function viewCustomer(id) {
       alert("Viewing customer: " + id);
       // Add your logic here to view customer details
@@ -51,26 +69,25 @@
       // Add your logic here to edit customer details
     }
 
-   async function deleteCustomer (id) {
+   function deleteCustomer (id) {
       if (confirm("Are you sure you want to delete this customer?")) {
-       
-      const response =   await fetch(`http://localhost:8000/api/v1/admin/customer/${id}`,{
-          method:"Delete",
-          
-        });
-       getCustomer()
+        const xhttp = new XMLHttpRequest();
+        xhttp.onload = function() {
+          const data = JSON.parse(this.responseText);
+          if (data.success) {
+            fetchCustomers();
+          } else {
+            alert('Failed to delete customer');
+          }
+        };
+        xhttp.onerror = function() {
+          console.error('Error deleting customer:', this.statusText);
+          alert('Error deleting customer');
+        };
+        xhttp.open("DELETE", `/api/v1/admin/customer/${id}`, true);
+        xhttp.send();
       }
     }
-
-    async function getCustomer(){
-      const response = await fetch("http://localhost:8000/api/v1/admin/customer/details",{
-        method:"GET"
-      });
-      const data = await response.json();
-      
-      renderCustomers(data.customers);
-    }
-
 
     function renderCustomers(customers) {
       const tableBody = document.getElementById("customer-table");
@@ -96,7 +113,11 @@
         tableBody.appendChild(row);
       });
     }
-    getCustomer()
+
+    // Initial load
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchCustomers();
+    });
 
 
 
@@ -113,5 +134,7 @@
       document.getElementById("popover").classList.add("hidden");
     }
   </script>
+</body>
+</html>
 </body>
 </html>
