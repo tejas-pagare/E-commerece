@@ -77,12 +77,22 @@
   }, 2000)
 }
 
-
-    async function getProducts() {
-      const response = await fetch("http://localhost:8000/api/v1/admin/products/details", { method: "GET" });
-      const data = await response.json();
-      console.log(data);
-      displayCustomers(data.products);
+    function getProducts() {
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function() {
+        if (this.status === 200) {
+          const data = JSON.parse(this.responseText);
+          console.log(data);
+          displayCustomers(data.products);
+        } else {
+          showNotification("Failed to load products", "error");
+        }
+      };
+      xhttp.onerror = function() {
+        showNotification("Error connecting to server", "error");
+      };
+      xhttp.open("GET", "http://localhost:8000/api/v1/admin/products/details", true);
+      xhttp.send();
     }
 
     function displayCustomers(products) {
@@ -127,37 +137,66 @@
       document.getElementById("popover").classList.add("hidden");
     }
 
-    async function deleteCustomer(id) {
+    function deleteCustomer(id) {
       if (confirm("Are you sure you want to delete this customer?")) {
-        try {
-          await fetch(`http://localhost:8000/api/v1/admin/product/${id}`, { method: "DELETE" });
-          getProducts();
-        } catch (error) {
-          alert("Failed to delete product");
+        const xhttp = new XMLHttpRequest();
+        xhttp.onload = function() {
+          if (this.status === 200) {
+            getProducts();
+          } else {
+            showNotification("Failed to delete product", "error");
+          }
+        };
+        xhttp.onerror = function() {
+          showNotification("Error connecting to server", "error");
+        };
+        xhttp.open("DELETE", `http://localhost:8000/api/v1/admin/product/${id}`, true);
+        xhttp.send();
+      }
+    }
+    
+    function approveProduct(id){
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function() {
+        if (this.status === 200) {
+          const data = JSON.parse(this.responseText);
+          if(data.success){
+            showNotification(data.message, "success");
+            getProducts();
+          } else {
+            showNotification(data.message, "error");
+          }
+        } else {
+          showNotification("Failed to approve product", "error");
         }
-      }
-    }
-    async function approveProduct(id){
-      const response = await fetch(`/api/v1/admin/product/approve/${id}`,{method:"GET"});
-      const data = await response.json();
-      if(data.success){
-        showNotification(data.message,"success");
-        getProducts()
-      }else{
-        showNotification(data.message,"error");
-      }
+      };
+      xhttp.onerror = function() {
+        showNotification("Error connecting to server", "error");
+      };
+      xhttp.open("GET", `/api/v1/admin/product/approve/${id}`, true);
+      xhttp.send();
     }
 
-
-    async function disApproveProduct(id){
-      const response = await fetch(`/api/v1/admin/product/disapprove/${id}`,{method:"GET"});
-      const data = await response.json();
-      if(data.success){
-        showNotification(data.message,"success");
-        getProducts()
-      }else{
-        showNotification(data.message,"error");
-      }
+    function disApproveProduct(id){
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function() {
+        if (this.status === 200) {
+          const data = JSON.parse(this.responseText);
+          if(data.success){
+            showNotification(data.message, "success");
+            getProducts();
+          } else {
+            showNotification(data.message, "error");
+          }
+        } else {
+          showNotification("Failed to disapprove product", "error");
+        }
+      };
+      xhttp.onerror = function() {
+        showNotification("Error connecting to server", "error");
+      };
+      xhttp.open("GET", `/api/v1/admin/product/disapprove/${id}`, true);
+      xhttp.send();
     }
    document.addEventListener("DOMContentLoaded",()=>getProducts()) 
   </script>
