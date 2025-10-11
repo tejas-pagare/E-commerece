@@ -1,37 +1,105 @@
 <body class="bg-gray-100 text-gray-800">
     <main class="flex">
-        <!-- Sidebar -->
         <%- include('../../partials/profileSidebar.ejs') %>
-            <!-- Main Section -->
-            <section class="flex-1 p-6 bg-white rounded-lg shadow-md">
-                <h1 class="text-2xl font-bold mb-6">My Account</h1>
-                <hr class="mb-6">
 
-                <!-- Update Account Form -->
-                <form action="/api/v1/user/account/update" method="post">
-                    <h2 class="text-xl font-semibold mb-4">Account Details</h2>
+        <section class="flex-1 p-6 bg-white rounded-lg shadow-md">
+            <h1 class="text-2xl font-bold mb-6">My Account</h1>
+            <hr class="mb-6">
+            
+            <div id="notification" class="hidden p-4 mb-4 text-sm rounded-lg" role="alert"></div>
 
-                    <label class="block font-bold">First Name *</label>
-                    <input id="firstname" name="firstname" value="<%= user.firstname %>" type="text"
-                        placeholder="First name" class="w-full p-2 mt-1 border border-gray-300 rounded">
+            <form id="update-form">
+                <h2 class="text-xl font-semibold mb-4">Account Details</h2>
 
-                    <label class="block font-bold mt-4">Last Name *</label>
-                    <input id="lastname" name="lastname" value="<%= user.lastname %>" type="text"
-                        placeholder="Last name" class="w-full p-2 mt-1 border border-gray-300 rounded">
+                <label class="block font-bold">First Name *</label>
+                <input id="firstname" name="firstname" type="text"
+                    placeholder="Loading..." class="w-full p-2 mt-1 border border-gray-300 rounded">
 
-                    <label class="block font-bold mt-4">Email *</label>
-                    <input id="email" name="email" value="<%= user.email %>" type="email" placeholder="Email"
-                        class="w-full p-2 mt-1 border border-gray-300 rounded">
+                <label class="block font-bold mt-4">Last Name *</label>
+                <input id="lastname" name="lastname" type="text"
+                    placeholder="Loading..." class="w-full p-2 mt-1 border border-gray-300 rounded">
 
-                    <hr class="mb-6">
+                <label class="block font-bold mt-4">Email *</label>
+                <input id="email" name="email" type="email" placeholder="Loading..."
+                    class="w-full p-2 mt-1 border border-gray-300 rounded">
 
-                    <button type="submit" class="mt-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Save
-                        Changes</button>
-                </form>
+                <hr class="my-6">
 
-            </section>
+                <button type="submit" id="submit-btn" class="mt-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                    Save Changes
+                </button>
+            </form>
+        </section>
     </main>
 
-    <!-- JavaScript to Handle Form Submission -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('update-form');
+            const submitBtn = document.getElementById('submit-btn');
+            const notification = document.getElementById('notification');
+            
+            
+            const xhrFetch = new XMLHttpRequest();
+            xhrFetch.open('GET', '/api/v1/user/account/details', true);
+            
+            xhrFetch.onload = function() {
+                if (xhrFetch.status >= 200 && xhrFetch.status < 300) {
+                    const data = JSON.parse(xhrFetch.responseText);
+                    if (data.success) {
+                        const user = data.user;
+                        document.getElementById('firstname').value = user.firstname;
+                        document.getElementById('lastname').value = user.lastname;
+                        document.getElementById('email').value = user.email;
+                    }
+                }
+            };
+            xhrFetch.send();
 
+            
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving...';
+                
+                const formData = {
+                    firstname: document.getElementById('firstname').value,
+                    lastname: document.getElementById('lastname').value,
+                    email: document.getElementById('email').value
+                };
+
+                const xhrSubmit = new XMLHttpRequest();
+                xhrSubmit.open('POST', '/api/v1/user/account/update', true);
+                xhrSubmit.setRequestHeader('Content-Type', 'application/json');
+
+                xhrSubmit.onload = function() {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Save Changes';
+
+                    if (xhrSubmit.status >= 200 && xhrSubmit.status < 300) {
+                        showNotification('Account updated successfully!', false);
+                        // Optionally redirect after a short delay
+                        setTimeout(() => { window.location.href = "/api/v1/user/account"; }, 1500);
+                    } else {
+                        showNotification('Failed to update account. Please try again.', true);
+                    }
+                };
+                
+                xhrSubmit.onerror = function() {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Save Changes';
+                    showNotification('A network error occurred.', true);
+                };
+
+                xhrSubmit.send(JSON.stringify(formData));
+            });
+
+            function showNotification(message, isError = false) {
+                notification.textContent = message;
+                notification.className = isError 
+                    ? 'p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50' 
+                    : 'p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50';
+                notification.classList.remove('hidden');
+            }
+        });
+    </script>
 </body>

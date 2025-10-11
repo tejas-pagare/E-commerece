@@ -1,5 +1,5 @@
-<% if(!(title==="login" || title==="signup" || title==="Home")) { %>
-    <footer class="bg-green-50 border-t border-green-100 mt-12">
+<% if (!(title && (title.toLowerCase() === "login" || title.toLowerCase() === "signup"))) { %>
+    <footer id="site-footer" class="bg-green-50 border-t border-green-100 mt-12">
       <div class="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
         <!-- Brand & Mission -->
         <div>
@@ -50,5 +50,22 @@
         &copy; 2025 SwiftMart. All Rights Reserved.
       </div>
     </footer>
-    <% } %>
-    
+
+    <script>
+      // Hide footer on root portal path(s) to avoid mixed UI when landing at "/"
+      document.addEventListener('DOMContentLoaded', function () {
+        try {
+          var footer = document.getElementById('site-footer');
+          if (!footer) return;
+          var p = window.location.pathname.replace(/\/+$/, '') || '/';
+          // Add any additional root paths you want to treat as portal roots
+          var portalPaths = ['/', '/index', '/home', '/api/v1/']; 
+          if (portalPaths.indexOf(p) !== -1 || p === '/') {
+            footer.style.display = 'none';
+          }
+        } catch (e) {
+          // silent fail
+        }
+      });
+    </script>
+<% } %>

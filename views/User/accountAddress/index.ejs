@@ -9,36 +9,19 @@
 
           <div class="address-section">
             <h2 class="text-xl font-semibold mb-4">Address</h2>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Billing Address -->
               <div class="bg-white p-6 border border-gray-300 rounded-lg shadow-sm">
                 <div class="flex justify-between items-center font-semibold mb-2">
                   <strong>Billing Address</strong>
-                  <span class="text-green-600 cursor-pointer hover:underline" onclick="redirectToUpdate()">✎ Edit</span>
+                  <a href="/api/v1/user/account/update/address" class="text-green-600 cursor-pointer hover:underline">✎ Edit</a>
                 </div>
-                <p class="mb-2"><span class="font-bold">PlotNo: </span>
-                  <%= user.Address.plotno %>
-                </p>
-                <p class="mb-2"><span class="font-bold">Street: </span>
-                  <%= user.Address.street %>
-                </p>
-                <p class="mb-2"><span class="font-bold">City: </span>
-                  <%= user.Address.city %>
-                </p>
-                <p class="mb-2"><span class="font-bold">State: </span>
-                  <%= user.Address.state %>
-                </p>
-                <p class="mb-2"><span class="font-bold">Pincode: </span>
-                  <%= user.Address.pincode %>
-                </p>
-                <p class="mb-2"><span class="font-bold">Phone: </span>
-                  <%= user.Address.phone %>
-                </p>
+                <p class="mb-2"><span class="font-bold">PlotNo: </span> <span id="plotno">Loading...</span></p>
+                <p class="mb-2"><span class="font-bold">Street: </span> <span id="street"></span></p>
+                <p class="mb-2"><span class="font-bold">City: </span> <span id="city"></span></p>
+                <p class="mb-2"><span class="font-bold">State: </span> <span id="state"></span></p>
+                <p class="mb-2"><span class="font-bold">Pincode: </span> <span id="pincode"></span></p>
+                <p class="mb-2"><span class="font-bold">Phone: </span> <span id="phone"></span></p>
               </div>
-
-              <!-- Shipping Address -->
-
             </div>
           </div>
         </section>
@@ -46,8 +29,25 @@
   </div>
 
   <script>
-    function redirectToUpdate() {
-      window.location.href = "/api/v1/user/account/update/address";
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '/api/v1/user/account/address/details', true);
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const data = JSON.parse(xhr.responseText);
+                if (data.success) {
+                    const address = data.address;
+                    document.getElementById('plotno').textContent = address.plotno || 'N/A';
+                    document.getElementById('street').textContent = address.street || 'N/A';
+                    document.getElementById('city').textContent = address.city || 'N/A';
+                    document.getElementById('state').textContent = address.state || 'N/A';
+                    document.getElementById('pincode').textContent = address.pincode || 'N/A';
+                    document.getElementById('phone').textContent = address.phone || 'N/A';
+                }
+            }
+        };
+        xhr.send();
+    });
   </script>
 </body>
