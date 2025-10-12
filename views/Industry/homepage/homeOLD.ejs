@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoWear Collective</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-green-100 to-emerald-200 min-h-screen font-sans">
+
+  <!-- ========= HEADER (DO NOT CHANGE) ========= -->
+  <header class="bg-white shadow-sm sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <!-- Logo -->
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-8 h-8 bg-emerald-500 rounded-full"></span>
+        <span class="text-2xl font-bold text-emerald-700 tracking-wide">Swift Mart</span>
+      </div>
+      <!-- Navigation -->
+      <nav class="hidden md:flex gap-8">
+        <a href="home" class="text-gray-700 hover:text-emerald-600">Home</a>
+        <a href="about" class="text-gray-700 hover:text-emerald-600">About</a>
+        <a href="blog" class="text-gray-700 hover:text-emerald-600">Blogs</a>
+        <a href="dashboard" class="text-gray-700 hover:text-emerald-600">Dashboard</a>
+      </nav>
+      <!-- Button group for icons -->
+      <div class="flex items-center space-x-2">
+        <!-- Cart Icon Button -->
+        <a href="cart" aria-label="Cart" class="bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-lg transition inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m13-9v9m-6 0a2 2 0 104 0 2 2 0 00-4 0z" />
+          </svg>
+        </a>
+      
+        <!-- Profile Icon Button -->
+        <a href="profile" aria-label="Profile" class="bg-emerald-700 hover:bg-emerald-800 text-white p-2 rounded-lg transition inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A8.966 8.966 0 0112 15c1.657 0 3.21.402 4.879 1.117M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </a>
+      
+        <!-- Logout Icon Button -->
+        <a href="logout" aria-label="Logout" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5" />
+          </svg>
+        </a>
+      </div>
+      
+    </div>
+  </header>
+  <!-- ========= /HEADER ========= -->
+
+  <!-- Hero Section -->
+  <section class="relative flex flex-col md:flex-row items-center max-w-7xl mx-auto px-6 py-12 mb-10">
+    <div class="md:w-1/2 mb-10 md:mb-0">
+      <h1 class="text-5xl font-extrabold text-gray-800 mb-4 leading-tight">
+        Sustainable Looks, <span class="text-emerald-600">Conscious Choices</span>
+      </h1>
+      <p class="text-lg text-gray-600 mb-6">
+        Curated eco-friendly fabrics and responsibly crafted fashion.<br>
+        Shop stylishly, live sustainably.
+      </p>
+      <a href="#order" class="inline-block bg-emerald-600 text-white px-7 py-3 rounded-full font-semibold hover:bg-emerald-700 shadow-lg transition">
+        Browse Collection
+      </a>
+    </div>
+    <div class="md:w-1/2 flex justify-center relative">
+      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80"
+        alt="Eco Fashion"
+        class="rounded-2xl shadow-2xl w-80 h-80 object-cover border-4 border-emerald-100 animate-fade-in"
+      >
+      <!-- Decorative Leaf SVG -->
+      <svg class="absolute -bottom-6 -right-6 w-16 h-16 text-green-200 opacity-60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 21c0-4.418 3.582-8 8-8s8 3.582 8 8M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"></path>
+      </svg>
+    </div>
+    <div class="absolute top-0 left-0 w-32 h-32 bg-emerald-100 rounded-full -z-10 blur-2xl"></div>
+    <div class="absolute bottom-0 right-0 w-48 h-48 bg-emerald-200 rounded-full -z-10 blur-2xl"></div>
+  </section>
+
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-10 px-6">
+
+    <!-- Sidebar Fabric Selector -->
+    <aside class="md:w-1/4 mb-10 md:mb-0">
+      <h2 class="text-xl font-bold text-emerald-800 mb-6 flex items-center gap-2">
+        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 21c0-4.418 3.582-8 8-8s8 3.582 8 8M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"></path>
+        </svg>
+        Filter by Fabric
+      </h2>
+      <ul class="space-y-4">
+        <% const fabrics = [
+          { name: 'Cotton', img: 'https://img.freepik.com/free-photo/top-view-cloths-made-with-different-natural-pigments-composition_23-2148734249.jpg' },
+          { name: 'Silk', img: 'https://plus.unsplash.com/premium_photo-1672681446484-827767f95dab?q=80&w=686&auto=format&fit=crop' },
+          { name: 'Leather', img: 'https://media.istockphoto.com/id/453550893/photo/sample-a-good-quality-leather-in-various-colors.jpg?s=612x612&w=is&k=20&c=gQUo-0fsKkEScdIMfPq48qFJT5dzih6XrttNGYP0SkE=' },
+          { name: 'Wool', img: 'https://images.unsplash.com/photo-1636716018019-569382b46111?q=80&w=1170&auto=format&fit=crop' },
+          { name: 'Linen', img: 'https://plus.unsplash.com/premium_photo-1674575954775-b5ef5af6fd17?w=1000&auto=format&fit=crop&q=60' },
+          { name: 'Cashmere', img: 'https://img.freepik.com/free-photo/close-up-flannel-shirt-detail_23-2149575336.jpg?ga=GA1.1.1660626605.1746341889&semt=ais_hybrid&w=740' },
+          { name: 'Denim', img: 'https://plus.unsplash.com/premium_photo-1675877946243-bc3f83e65afe?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8ZGVuaW0lMjBmYWJyaWN8ZW58MHx8MHx8fDA%3D' },
+          { name: 'Polyester', img: 'https://plus.unsplash.com/premium_photo-1672680445357-4dc4d3b2756e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cG9seWVzdGVyfGVufDB8fDB8fHww' },
+          { name: 'Synthetic', img: 'https://media.istockphoto.com/id/1186706715/photo/close-up-fabric-fiber-in-underwater.jpg?s=612x612&w=0&k=20&c=OQ-gl9rSaTyAFd49-H5cib_tJEHzXENBLGUSoM8R7aw=' }
+        ]; %>
+        <% fabrics.forEach(fab => { %>
+        <li>
+          <button class="flex items-center w-full gap-3 p-3 rounded-lg bg-white shadow hover:bg-emerald-50 transition group">
+            <img src="<%= fab.img %>" class="w-10 h-10 rounded-full object-cover border-2 border-emerald-100 group-hover:scale-105 transition" alt="<%= fab.name %>">
+            <span class="font-medium text-gray-700 group-hover:text-emerald-700"><%= fab.name %></span>
+          </button>
+        </li>
+        <% }) %>
+      </ul>
+    </aside>
+
+    <!-- Order Table Section -->
+    <main class="md:w-3/4" id="order">
+      <h2 class="text-2xl font-bold text-emerald-800 mb-6 flex items-center gap-2">
+        <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 014-4h4M9 17H5a2 2 0 01-2-2v-1a2 2 0 012-2h4M9 17l-2 4m2-4l2 4"></path>
+        </svg>
+        Order Your Sustainable Wear
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-xl shadow text-gray-700">
+          <thead>
+            <tr class="bg-emerald-100 text-emerald-800 text-center">
+              <th class="py-3 px-4">Material</th>
+              <th class="py-3 px-4">Cloth Duration</th>
+              <th class="py-3 px-4">Size</th>
+              <th class="py-3 px-4">Available Stock</th>
+              <th class="py-3 px-4">Price per Item</th>
+              <th class="py-3 px-4">Quantity to Buy</th>
+              <th class="py-3 px-4">Add to Cart</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% combinations.forEach(function(comb) { %>
+              <tr class="border-b hover:bg-green-50 text-center transition">
+                <form action="/api/v1/industry/cart" method="POST" class="contents">
+                  <input type="hidden" name="_id" value="<%= comb._id %>">
+                  <input type="hidden" name="fabric" value="<%= comb.fabric %>">
+                  <input type="hidden" name="size" value="<%= comb.size %>">
+                  <input type="hidden" name="usageDuration" value="<%= comb.usageDuration %>">
+                  <input type="hidden" name="estimated_value" value="<%= comb.estimated_value %>">
+                  <td class="py-3 px-4">
+                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-50 rounded text-emerald-700 font-semibold">
+                      <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      <%= comb.fabric %>
+                    </span>
+                  </td>
+                  <td class="py-3 px-4">
+                    <% if (comb.usageDuration == 1) { %>
+                      More than 1 year
+                    <% } else if (comb.usageDuration == 6) { %>
+                      More than 6 months and less than 1 year
+                    <% } else { %>
+                      <%= comb.usageDuration %> months
+                    <% } %>
+                  </td>
+                  <td class="py-3 px-4"><%= comb.size %></td>
+                  <td class="py-3 px-4">
+                    <span class="inline-block px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold"><%= comb.quantity %></span>
+                  </td>
+                  <td class="py-3 px-4 font-semibold text-emerald-700">₹<%= comb.estimated_value %></td>
+                  <td class="py-3 px-4">
+                    <input 
+                      type="number" 
+                      name="new_quantity" 
+                      min="1" 
+                      max="<%= comb.quantity %>" 
+                      value="1"
+                      class="w-20 border border-emerald-300 rounded-lg px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-emerald-300"
+                    />
+                  </td>
+                  <td class="py-3 px-4">
+                    <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 shadow transition font-semibold flex items-center gap-2">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m13-9v9m-6 0a2 2 0 104 0 2 2 0 00-4 0z" />
+                      </svg>
+                      Add to Cart
+                    </button>
+                  </td>
+                </form>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t py-6 mt-16">
+    <div class="max-w-7xl mx-auto text-center text-gray-500 text-sm">
+      &copy; 2025 Swift Mart. Crafted for a greener tomorrow.
+    </div>
+  </footer>
+</body>
+<script>
+  // Quantity input validation
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('input[name="bulkQuantity"]').forEach(input => {
+      input.addEventListener("input", () => {
+        const max = parseInt(input.max);
+        if (parseInt(input.value) > max) {
+          input.value = max;
+        } else if (parseInt(input.value) < 1) {
+          input.value = 1;
+        }
+      });
+    });
+  });
+</script>
+</html>

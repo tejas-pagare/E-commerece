@@ -152,8 +152,7 @@ function loadOrders() {
         const data = JSON.parse(xhr.responseText);
         if (Array.isArray(data)) {
           allOrders = data; // ✅ store all data globally
-          renderOrders(data); // render all initially
-          attachCartEvents();
+          renderOrders(data); // render all initially (this calls attachCartEvents internally)
           attachFilterEvents(); // ✅ enable filters
         } else {
           tbody.innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">No data found</td></tr>`;
@@ -169,11 +168,13 @@ function loadOrders() {
   };
 
   xhr.onerror = function () {
-    document.getElementById("orderBody").innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">Network Error</td></tr>`;
+    document.getElementById("orderBody").innerHTML =
+      `<tr><td colspan="7" class="text-red-600 py-4">Network Error</td></tr>`;
   };
 
   xhr.send();
 }
+
 
 // ✅ Function to render rows dynamically
 function renderOrders(data) {
