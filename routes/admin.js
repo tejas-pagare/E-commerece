@@ -180,18 +180,34 @@ router.delete("/product/:id", async (req, res) => {
   }
 })
 
+router.get("/api/products", async (req, res) => {
+  try {
+    const products = await Product.find({}).populate("sellerId");
+    return res.json({
+      success: true,
+      products
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server Error",
+      success: false
+    });
+  }
+});
+
+// Backward compatibility: keep old route pointing to same handler
 router.get("/products/details", async (req, res) => {
   try {
     const products = await Product.find({}).populate("sellerId");
-    console.log(products);
     return res.json({
+      success: true,
       products
-    })
+    });
   } catch (error) {
-    res.json({
+    return res.status(500).json({
       message: "Server Error",
       success: false
-    })
+    });
   }
 });
 
