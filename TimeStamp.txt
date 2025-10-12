@@ -1,0 +1,9 @@
+Video URL: https://youtu.be/f1ZvXh32WC4
+
+0:27 - Introduction to Swiftmart project
+1:11 - Problem statement of fashion industry
+1:42 - Revenue streams for Swiftmart
+2:02  Form Validation demo + show code
+3:00  Async Data Handling demos (three flows) + network tab shown
+5:20  Per-member contribution (10–20s each)
+6:48 - Wrap-up and where artifacts/evidence are located
