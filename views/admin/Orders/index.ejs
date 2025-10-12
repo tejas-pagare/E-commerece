@@ -116,42 +116,39 @@
       }
     }
 
-    async function fetchOrders() {
+    function fetchOrders() {
       setPageLoading(true);
       emptyState.classList.add('hidden');
       tableBody.innerHTML = '';
-      try {
-        const response = await fetch('/api/v1/admin/orders', {
-          method: 'GET',
-          headers: { 'Accept': 'application/json' },
-          credentials: 'include'
-        });
-
-        if (!response.ok) {
-          const text = await response.text().catch(() => '');
-          throw new Error(`HTTP ${response.status}: ${text || 'Failed to fetch'}`);
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+          setPageLoading(false);
+          if (this.status == 200) {
+            try {
+              var data = JSON.parse(this.responseText);
+              var ordersPayload = (data && data.success && data.orders) ? data.orders : data;
+              if (!ordersPayload || typeof ordersPayload !== 'object') {
+                showNotification('Invalid data format received', 'error');
+                return null;
+              }
+              renderOrders(ordersPayload);
+              return ordersPayload;
+            } catch (error) {
+              showNotification('Failed to fetch orders', 'error');
+              emptyState.classList.remove('hidden');
+              return null;
+            }
+          } else {
+            showNotification('Failed to fetch orders', 'error');
+            emptyState.classList.remove('hidden');
+            return null;
+          }
         }
-
-        const data = await response.json();
-
-        // Support both shapes: direct map or { success, orders }
-        const ordersPayload = (data && data.success && data.orders) ? data.orders : data;
-
-        if (!ordersPayload || typeof ordersPayload !== 'object') {
-          showNotification('Invalid data format received', 'error');
-          return null;
-        }
-
-        renderOrders(ordersPayload);
-        return ordersPayload;
-      } catch (error) {
-        console.error('Fetch error:', error);
-        showNotification('Failed to fetch orders', 'error');
-        emptyState.classList.remove('hidden');
-        return null;
-      } finally {
-        setPageLoading(false);
-      }
+      };
+      xhttp.open('GET', '/api/v1/admin/orders', true);
+      xhttp.setRequestHeader('Accept', 'application/json');
+      xhttp.send();
     }
 
     function renderOrders(ordersData) {
@@ -193,44 +190,45 @@
       });
     }
 
-    async function updateOrderStatus(orderId, newStatus) {
+    function updateOrderStatus(orderId, newStatus) {
       const container = document.querySelector(`[data-order-id="${orderId}"]`);
       const statusSelect = container ? container.querySelector('select') : null;
       const spinner = container ? container.querySelector('.inline-spinner') : null;
-      try {
-        if (statusSelect) statusSelect.disabled = true;
-        if (spinner) spinner.classList.remove('hidden');
-
-        const response = await fetch(`/api/v1/admin/orders/${orderId}/status`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ orderStatus: newStatus })
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          const statusSpan = container ? container.querySelector('.status-indicator') : null;
-          if (statusSpan) {
-            statusSpan.className = `status-indicator px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(newStatus)}`;
-            statusSpan.textContent = newStatus;
+      if (statusSelect) statusSelect.disabled = true;
+      if (spinner) spinner.classList.remove('hidden');
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+          if (statusSelect) statusSelect.disabled = false;
+          if (spinner) spinner.classList.add('hidden');
+          if (this.status == 200) {
+            try {
+              var data = JSON.parse(this.responseText);
+              if (data.success) {
+                const statusSpan = container ? container.querySelector('.status-indicator') : null;
+                if (statusSpan) {
+                  statusSpan.className = `status-indicator px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(newStatus)}`;
+                  statusSpan.textContent = newStatus;
+                }
+                if (statusSelect) statusSelect.value = newStatus;
+                showNotification('Order status updated successfully', 'success');
+                showStatusUpdatePopup(newStatus);
+                fetchOrders();
+              } else {
+                showNotification((data && data.message) || 'Failed to update status', 'error');
+              }
+            } catch (error) {
+              showNotification('Failed to update order status', 'error');
+            }
+          } else {
+            showNotification('Failed to update order status', 'error');
           }
-          if (statusSelect) statusSelect.value = newStatus;
-
-          showNotification('Order status updated successfully', 'success');
-          showStatusUpdatePopup(newStatus);
-          // Refresh in background
-          fetchOrders();
-        } else {
-          showNotification((data && data.message) || 'Failed to update status', 'error');
         }
-      } catch (error) {
-        console.error('Error updating status:', error);
-        showNotification('Failed to update order status', 'error');
-      } finally {
-        if (statusSelect) statusSelect.disabled = false;
-        if (spinner) spinner.classList.add('hidden');
-      }
+      };
+      xhttp.open('PUT', `/api/v1/admin/orders/${orderId}/status`, true);
+      xhttp.setRequestHeader('Content-Type', 'application/json');
+      xhttp.withCredentials = true;
+      xhttp.send(JSON.stringify({ orderStatus: newStatus }));
     }
 
     function showOrderDetails(userId, userData) {
@@ -364,14 +362,27 @@
       }, 1600);
     }
 
-    async function getUserData(orderId) {
-      try {
-        const response = await fetch(`/api/v1/admin/orders/user/${orderId}`, { method: 'GET', credentials: 'include' });
-        return await response.json();
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-        return null;
-      }
+    function getUserData(orderId, callback) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+          if (this.status == 200) {
+            try {
+              var data = JSON.parse(this.responseText);
+              if (typeof callback === 'function') callback(data);
+            } catch (error) {
+              console.error('Error parsing user data:', error);
+              if (typeof callback === 'function') callback(null);
+            }
+          } else {
+            console.error('Error fetching user data:', this.status);
+            if (typeof callback === 'function') callback(null);
+          }
+        }
+      };
+      xhttp.open('GET', `/api/v1/admin/orders/user/${orderId}`, true);
+      xhttp.withCredentials = true;
+      xhttp.send();
     }
 
     function closeOrderPopup() {
