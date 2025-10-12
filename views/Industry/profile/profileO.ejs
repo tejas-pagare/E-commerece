@@ -1,8 +1,29 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title || 'Industry Profile' %></title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -21,10 +42,10 @@
     }
   </script>
 </head>
-
 <body class="bg-gradient-to-r from-green-100 to-teal-100 text-gray-700 min-h-screen">
-  <!-- Header -->
-   <header class="bg-white shadow-sm sticky top-0 z-20">
+
+
+  <header class="bg-white shadow-sm sticky top-0 z-20">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
       <!-- Logo -->
       <div class="flex items-center gap-2">
@@ -61,37 +82,46 @@
       </div>
     </div>
   </header>
+  
 
-  <!-- Profile Container -->
+
   <div class="container mx-auto px-4 py-8 max-w-4xl">
+    
+    <!-- Header -->
     <div class="border-b border-gray-200 pb-4 mb-6">
       <h1 class="text-4xl font-semibold text-green-700">Profile Info</h1>
       <p class="text-gray-500 mt-2">Manage your company information</p>
     </div>
+    
+    <!-- Profile Content -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div class="space-y-0">
+        <!-- Company Name -->
+        <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-200 py-4">
+          <div class="text-gray-700 font-medium">Company Name</div>
+          <div class="md:col-span-2 px-3 py-2">
+            <%= industryName || 'Not Provided' %>
+          </div>
+        </div>
 
-    <!-- Profile Details -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6 space-y-0">
-      <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-200 py-4">
-        <div class="text-gray-700 font-medium">Company Name</div>
-        <div class="md:col-span-2 px-3 py-2" id="companyName">Loading...</div>
-      </div>
+        <!-- Email -->
+        <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-200 py-4">
+          <div class="text-gray-700 font-medium">E-mail</div>
+          <div class="md:col-span-2 px-3 py-2">
+            <%= email || 'Not Provided' %>
+          </div>
+        </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-200 py-4">
-        <div class="text-gray-700 font-medium">E-mail</div>
-        <div class="md:col-span-2 px-3 py-2" id="email">Loading...</div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-200 py-4">
-        <div class="text-gray-700 font-medium">Address</div>
-        <div class="md:col-span-2 px-3 py-2" id="address">Loading...</div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-200 py-4">
-        <div class="text-gray-700 font-medium">Joined On</div>
-        <div class="md:col-span-2 px-3 py-2" id="date">Loading...</div>
+        <!-- Address -->
+        <div class="grid grid-cols-1 md:grid-cols-3 border-b border-gray-200 py-4">
+          <div class="text-gray-700 font-medium">Address</div>
+          <div class="md:col-span-2 px-3 py-2">
+            <%= address || 'Not Provided' %>
+          </div>
+        </div>
       </div>
     </div>
-
+    
     <!-- Buttons -->
     <div class="flex justify-center md:justify-end gap-4 mt-8">
       <a href="logout" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-8 rounded border border-gray-300 transition duration-300">
@@ -102,53 +132,5 @@
       </a>
     </div>
   </div>
-
-
-
-
-
-
-
-  <!-- ✅ XML-based JS to fetch and render profile -->
-  <script>
-    function fetchProfileXML() {
-      const xhr = new XMLHttpRequest();
-      xhr.open("GET", "fetchprofile", true);
-      xhr.withCredentials = true; // include cookies
-
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            try {
-              const data = JSON.parse(xhr.responseText);
-              document.getElementById("companyName").textContent = data.industryName || "Not Provided";
-              document.getElementById("email").textContent = data.email || "Not Provided";
-              document.getElementById("address").textContent = data.address || "Not Provided";
-
-              const formattedDate = new Date(data.date || Date.now()).toLocaleDateString();
-              document.getElementById("date").textContent = formattedDate;
-            } catch (err) {
-              console.error("Error parsing response:", err);
-            }
-          } else if (xhr.status === 401) {
-            alert("⚠️ Access Denied! Please log in again.");
-            window.location.href = "/industry/login";
-          } else {
-            console.error("Failed to fetch profile. Status:", xhr.status);
-          }
-        }
-      };
-
-      xhr.send();
-    }
-
-    // Call function on load
-    fetchProfileXML();
-  </script>
-
-
-
-
-
 </body>
 </html>

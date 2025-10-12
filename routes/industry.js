@@ -102,7 +102,40 @@ router.get("/blog", industryAuth, (req,res)=>{
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////done////////////
+
+
+
 router.get("/profile", industryAuth, async (req, res) => {
+    try {
+    //     const id = req.industry;
+    //     console.log(id);
+    //   const industry = await Industry.findById(id)
+    //  console.log(industry);
+    //   if (!industry) {
+    //     return res.status(404).render("error", {
+    //       message: "Industry profile not found",
+    //       error: { status: 404 },
+    //     })
+    //   }
+  
+      res.render("Industry/Profile/profile", {
+        title: "Profile",
+        role: "Industry"})
+    } catch (error) {
+      console.error("Error fetching industry:", error)
+      res.status(500).render("error", {
+        message: "Error fetching profile",
+        error: { status: 500 },
+      })
+    }
+  })
+
+
+
+
+
+
+  router.get("/fetchprofile", industryAuth, async (req, res) => {
     try {
         const id = req.industry;
         console.log(id);
@@ -115,12 +148,11 @@ router.get("/profile", industryAuth, async (req, res) => {
         })
       }
   
-      res.render("Industry/Profile/profile", {
-        title: "Profile",
-        role: "Industry",
+      res.json( {
         industryName: industry.companyName,
         email: industry.email,
         address: industry.Address || "No address provided",
+        date: industry.createdAt || new Date(),
       })
     } catch (error) {
       console.error("Error fetching industry:", error)
