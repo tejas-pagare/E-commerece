@@ -8,8 +8,13 @@ import SellProduct from "../models/SellProduct.js"
 const router = express.Router();
 
 router.get("/login", (req, res) => {
-  return res.render('admin/login/index.ejs', { title: 'login', role: "admin" })
-})
+  const { error } = req.query; // Get error from query
+  return res.render('admin/login/index.ejs', { 
+    title: 'login', 
+    role: "admin",
+    error: error // Pass error to the template
+  });
+});
 
 router.get("/secondHand", (req, res) => {
   return res.render("admin/secondhandProducts/index.ejs", { title: "secondHandProduct", role: "admin" });
@@ -68,9 +73,12 @@ router.get("/dashboard", async (req, res) => {
 router.post("/dashboard", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (email !== "adminLogin@gmail.com" && password !== "swiftmart") {
-      res.redirect("/api/v1/user/login");
+    // Corrected condition: if email OR password doesn't match
+    if (email !== "adminLogin@gmail.com" || password !== "swiftmart") {
+      // Redirect back to admin login with an error
+      return res.redirect("/api/v1/admin/login?error=Invalid credentials.");
     }
+    // On success, redirect to the dashboard
     res.redirect("/api/v1/admin/dashboard");
   } catch (error) {
     console.error(error);

@@ -8,12 +8,16 @@ const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
     const industryCheck = await Industry.findOne({ email });
+
     if (!industryCheck) {
-      return res.redirect("/api/v1/industry/login");
+      // Pass an error message for invalid credentials
+      return res.redirect("/api/v1/industry/login?error=Invalid email or password");
     }
+
     const isMatch = await bcrypt.compare(password, industryCheck.password);
     if (!isMatch) {
-      return res.redirect("/api/v1/industry/login");
+      // Pass an error message for invalid credentials
+      return res.redirect("/api/v1/industry/login?error=Invalid email or password");
     }
 
     const token = jwt.sign({ industry_id: industryCheck._id, role: "industry" }, "JWT_SECRET", { expiresIn: "5h" });
@@ -26,10 +30,10 @@ const loginController = async (req, res) => {
 
     res.redirect("/api/v1/industry/home");
 
-
   } catch (error) {
-    console.log(error)
-    res.redirect("/api/v1/industry/login")
+    console.log(error);
+    // Pass a generic error message for other failures
+    res.redirect("/api/v1/industry/login?error=An error occurred. Please try again.");
   }
 }
 
