@@ -1,83 +1,275 @@
 <body>
-    <div class="bg-gray-100 p-6">
-        <form onsubmit="event.preventDefault(); update('<%= product._id %>');"
-            class="product-form bg-white p-8 rounded-lg shadow-md space-y-8">
-            <!-- Product Information Section -->
-            <section>
-                <h2 class="text-xl font-semibold mb-4">Product Information</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <input value="<%= product.title %>" name="title" type="text" placeholder="Title (Product Name)"
-                        class="p-3 border rounded-lg w-full" required>
+    <div class="bg-gray-50 p-6">
+        <!-- Header Card -->
+        <header class="mb-6">
+            <div class="mx-auto max-w-4xl rounded-lg border border-gray-200 bg-white px-4 py-4 md:px-6 md:py-5 shadow-sm">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-md bg-gray-900 text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h18M7 7h10v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V7z"/></svg>
+                        </div>
+                        <div>
+                            <h1 class="text-base md:text-lg font-semibold text-gray-900">Update Product</h1>
+                            <p class="text-sm text-gray-500">Edit details and save your changes</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex h-6 items-center rounded-full border border-gray-200 bg-white px-2 text-xs font-medium text-gray-600">Seller</span>
                 </div>
-                <input value="<%= product.image %>" name="image" type="text" placeholder="Photo Link"
-                    class="p-3 mt-4 border rounded-lg w-full" required>
+            </div>
+        </header>
+
+        <form class="product-form mx-auto max-w-4xl bg-white border border-gray-200 p-6 md:p-8 rounded-lg shadow-sm space-y-8"
+              onsubmit="return handleUpdate(event, '<%= product._id %>')">
+            <!-- Product Information Section -->
+            <section class="space-y-4">
+                <h2 class="text-lg font-medium text-gray-900">Product Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="title" class="text-sm font-medium text-gray-900">Title</label>
+                        <input id="title" name="title" type="text" placeholder="Product name"
+                               value="<%= product.title %>"
+                               class="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                               required />
+                    </div>
+                    <div class="space-y-2">
+                        <label for="imgUrl" class="text-sm font-medium text-gray-900">Product Image URL</label>
+                        <input id="imgUrl" name="image" type="url" placeholder="https://example.com/image.jpg"
+                               value="<%= product.image %>"
+                               class="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                               required />
+                        <!-- Inline Preview Card -->
+                        <div id="imagePreviewCard" class="mt-3 hidden items-center gap-4 rounded-md border border-gray-200 bg-white p-3">
+                            <img id="imageInlinePreview" src="" alt="Selected image preview" class="h-16 w-16 rounded-md object-cover border border-gray-200" />
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm text-gray-900 truncate" id="imageUrlText"></p>
+                                <p class="text-xs text-gray-500">Live preview of the image URL</p>
+                            </div>
+                            <button type="button" id="clearImageBtn" class="text-sm text-red-600 hover:text-red-700">Clear</button>
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <input value="<%= product.quantity %>" name="quantity" type="number" placeholder="Quantity"
-                class="p-3 border rounded-lg w-full" required>
+            <!-- Inventory Section -->
+            <section class="space-y-4">
+                <h2 class="text-lg font-medium text-gray-900">Inventory</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="quantity" class="text-sm font-medium text-gray-900">Quantity</label>
+                        <input id="quantity" name="quantity" type="number" min="0" step="1" placeholder="e.g., 10"
+                               value="<%= product.quantity %>"
+                               class="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                               required />
+                    </div>
+                    <div class="space-y-2">
+                        <label for="stock" class="text-sm font-medium text-gray-900">Stock Status</label>
+                        <select id="stock" name="stock"
+                                class="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300" required>
+                            <option value="true" <%= product.stock===true ? 'selected' : '' %>>In Stock</option>
+                            <option value="false" <%= product.stock===false ? 'selected' : '' %>>Not In Stock</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
 
-            <!-- Product Description Section -->
-            <section>
-                <h2 class="text-xl font-semibold mb-4">Product Description</h2>
-                <textarea name="description" placeholder="Enter product description"
-                    class="p-3 border rounded-lg w-full h-32" required><%= product.description %></textarea>
+            <!-- Description Section -->
+            <section class="space-y-2">
+                <h2 class="text-lg font-medium text-gray-900">Description</h2>
+                <label for="description" class="sr-only">Description</label>
+                <textarea id="description" name="description" placeholder="Enter a clear description of your product"
+                          class="w-full min-h-32 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                          required><%= product.description %></textarea>
             </section>
 
             <!-- Pricing Section -->
-            <section>
-                <h2 class="text-xl font-semibold mb-4">Pricing</h2>
-                <div class="grid grid-cols-1">
-                    <input value="<%= product.price %>" name="price" type="number" placeholder="Sale Price"
-                        class="p-3 border rounded-lg w-full" required>
+            <section class="space-y-2">
+                <h2 class="text-lg font-medium text-gray-900">Pricing</h2>
+                <label for="price" class="sr-only">Sale Price</label>
+                <div class="relative">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">₹</span>
+                    <input id="price" name="price" type="number" min="0" step="0.01" placeholder="0.00"
+                           value="<%= product.price %>"
+                           class="w-full h-10 rounded-md border border-gray-300 bg-white pl-8 pr-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                           required />
                 </div>
             </section>
 
-            <!-- Stock and Status Section -->
-            <section>
-                <h2 class="text-xl font-semibold mb-4">Stock and Status</h2>
-                <select name="stock" class="p-3 border rounded-lg w-full" required>
-                    <option value="true" <%=product.stock===true ? 'selected' : '' %>>In Stock</option>
-                    <option value="false" <%=product.stock===false ? 'selected' : '' %>>Not In Stock</option>
-                </select>
+            <!-- Live Preview Section -->
+            <section id="previewSection" class="border border-gray-200 rounded-lg p-4 bg-white">
+                <h2 class="text-xl font-semibold mb-4">Preview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-1 flex items-start justify-center">
+                        <img id="imagePreview" src="" alt="Preview Image" class="w-48 h-48 object-cover rounded-md border border-gray-200" />
+                    </div>
+                    <div class="md:col-span-2 space-y-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">Title:</span>
+                            <span id="previewTitle" class="text-sm font-medium text-gray-900">—</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">Price:</span>
+                            <span id="previewPrice" class="text-sm font-medium text-gray-900">—</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">Quantity:</span>
+                            <span id="previewQuantity" class="text-sm font-medium text-gray-900">—</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm text-gray-500">Stock:</span>
+                            <span id="previewStock" class="text-sm font-medium text-gray-900">—</span>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">Description:</span>
+                            <p id="previewDescription" class="text-sm text-gray-900 mt-1">—</p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- Footer Section -->
             <footer class="flex justify-between mt-8">
-                <button type="button" class="text-gray-600 hover:underline">Back to Product</button>
-                <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700">
-                    Update Details
+                <button type="button" class="text-gray-600 hover:underline" onclick="history.back()">Back to Product</button>
+                <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 update-btn flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed" aria-busy="false">
+                    <svg class="spinner hidden shadcn-animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                    <span class="btn-text">Update Details</span>
                 </button>
             </footer>
         </form>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
     <script>
-        async function update(id) {
-            console.log("Updating product:", id);
+        // minimal spinner animation if Tailwind isn't present
+        (function(){
+            const style = document.createElement('style');
+            style.innerHTML = `@keyframes shadcn-spin { to { transform: rotate(360deg); } } .shadcn-animate-spin { animation: shadcn-spin 1s linear infinite; }`;
+            document.head && document.head.appendChild(style);
+        })();
 
-            const form = document.querySelector(".product-form");
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
+        // Toast helpers
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const colors = { success: 'bg-green-600', error: 'bg-red-600', info: 'bg-gray-800', warning: 'bg-yellow-600' };
+            const toast = document.createElement('div');
+            toast.className = `${colors[type] || colors.info} text-white px-4 py-3 rounded shadow flex items-start gap-3`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button aria-label="Close" class="ml-2 text-white/80 hover:text-white" onclick="this.parentElement.remove()">✕</button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => { if (toast && toast.parentElement) toast.remove(); }, 3000);
+        }
 
-            try {
-                const response = await fetch(`/api/v1/seller/update/${id}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    credentials: "include",
-                    body: JSON.stringify(data)
-                });
+        // Preview helpers
+        function updatePreview() {
+            const title = document.getElementById('title').value || '';
+            const price = document.getElementById('price').value || '';
+            const qty = document.getElementById('quantity').value || '';
+            const stock = document.getElementById('stock').value === 'true' ? 'In Stock' : 'Not In Stock';
+            const desc = document.getElementById('description').value || '';
+            const imgUrl = document.getElementById('imgUrl').value || '';
 
-                if (response.ok) {
-                    window.location.href = "/api/v1/seller/";
-                } else {
-                    alert("Failed to update product.");
-                }
-            } catch (error) {
-                console.error("Error submitting form:", error);
-                alert("Failed to submit form");
+            document.getElementById('previewTitle').textContent = title || '—';
+            document.getElementById('previewPrice').textContent = price ? `₹${price}` : '—';
+            document.getElementById('previewQuantity').textContent = qty || '—';
+            document.getElementById('previewStock').textContent = stock || '—';
+            document.getElementById('previewDescription').textContent = desc || '—';
+
+            const img = document.getElementById('imagePreview');
+            const inline = document.getElementById('imageInlinePreview');
+            const card = document.getElementById('imagePreviewCard');
+            const urlText = document.getElementById('imageUrlText');
+
+            if (imgUrl) {
+                img.src = imgUrl;
+                inline.src = imgUrl;
+                urlText.textContent = imgUrl;
+                card.classList.remove('hidden');
+                // hide preview image if it fails to load
+                img.onerror = () => { img.removeAttribute('src'); };
+                inline.onerror = () => { inline.removeAttribute('src'); card.classList.add('hidden'); };
+            } else {
+                img.removeAttribute('src');
+                inline.removeAttribute('src');
+                urlText.textContent = '';
+                card.classList.add('hidden');
             }
         }
+
+        function bindFields() {
+            ['title','price','quantity','stock','description','imgUrl'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const evs = id === 'stock' ? ['change','blur'] : ['input','blur'];
+                evs.forEach(ev => el.addEventListener(ev, updatePreview));
+            });
+
+            const clearBtn = document.getElementById('clearImageBtn');
+            if (clearBtn) clearBtn.addEventListener('click', () => {
+                const imgInput = document.getElementById('imgUrl');
+                imgInput.value = '';
+                updatePreview();
+            });
+        }
+
+        // Submit handler with loader
+        async function handleUpdate(event, id) {
+            event.preventDefault();
+            const form = document.querySelector('.product-form');
+            const fd = new FormData(form);
+            const submitBtn = document.querySelector('.update-btn');
+            const spinner = submitBtn?.querySelector('.spinner');
+            const btnText = submitBtn?.querySelector('.btn-text');
+
+            const payload = Object.fromEntries(fd.entries());
+            // normalize types
+            if (payload.stock === 'true' || payload.stock === true) payload.stock = true; else if (payload.stock === 'false' || payload.stock === false) payload.stock = false;
+            if (payload.quantity !== undefined) payload.quantity = Number(payload.quantity);
+            if (payload.price !== undefined) payload.price = Number(payload.price);
+
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.setAttribute('aria-busy','true'); }
+            if (spinner) spinner.classList.remove('hidden');
+            if (btnText) btnText.textContent = 'Updating...';
+
+            try {
+                const res = await fetch(`/api/v1/seller/update/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    showToast('Product updated successfully', 'success');
+                    setTimeout(() => { window.location.href = '/api/v1/seller/'; }, 600);
+                } else {
+                    const data = await res.json().catch(() => ({}));
+                    console.error('Update failed', data);
+                    showToast(data?.message || 'Failed to update product', 'error');
+                }
+            } catch (err) {
+                console.error('Network error submitting form', err);
+                showToast('Network error submitting form', 'error');
+            } finally {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.setAttribute('aria-busy','false'); }
+                if (spinner) spinner.classList.add('hidden');
+                if (btnText) btnText.textContent = 'Update Details';
+            }
+
+            return false;
+        }
+
+        // initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            bindFields();
+            // seed preview with existing values
+            // set initial preview image from server value if present
+            updatePreview();
+        });
     </script>
 </body>
