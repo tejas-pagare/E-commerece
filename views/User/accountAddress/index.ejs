@@ -1,53 +1,85 @@
-<body>
-  <div class="bg-gray-100 text-gray-800 flex items-center justify-center w-screen">
-    <main class="flex w-full h-full">
-      <%- include('../../partials/profileSidebar.ejs') %>
+<body class="bg-gray-100 text-gray-800">
+  <div class="flex min-h-screen">
+    <aside class="w-64 bg-green-200 p-6 shadow-md text-center">
+      <div class="profile mb-6">
+        <img src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+          alt="Profile Picture" class="w-20 h-20 rounded-full object-cover mx-auto" />
+        <h3 class="text-lg font-semibold mt-2">
+          <span id="user-name">Loading...</span>
+        </h3>
+      </div>
+      <nav class="space-y-2">
+        <a href="/api/v1/user/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
+        <a href="/api/v1/user/account/address"
+          class="block py-2 font-medium text-black hover:text-green-700">Address</a>
+        <a href="/api/v1/user/dashboard" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
+        <a href="/api/v1/user/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
+        <a href="/api/v1/user/logout" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
+      </nav>
+    </aside>
 
-        <section class="flex-1 w-screen h-screen p-6 bg-white rounded-lg shadow-md">
-          <h1 class="text-2xl font-bold mb-6">My Account</h1>
-          <hr class="mb-6">
+    <main class="flex-1 p-8 bg-white">
+      <section>
+        <h1 class="text-3xl font-bold mb-6 tracking-tight">My Account</h1>
+        <hr class="mb-8">
 
-          <div class="address-section">
-            <h2 class="text-xl font-semibold mb-4">Address</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="bg-white p-6 border border-gray-300 rounded-lg shadow-sm">
-                <div class="flex justify-between items-center font-semibold mb-2">
-                  <strong>Billing Address</strong>
-                  <a href="/api/v1/user/account/update/address" class="text-green-600 cursor-pointer hover:underline">✎ Edit</a>
-                </div>
-                <p class="mb-2"><span class="font-bold">PlotNo: </span> <span id="plotno">Loading...</span></p>
-                <p class="mb-2"><span class="font-bold">Street: </span> <span id="street"></span></p>
-                <p class="mb-2"><span class="font-bold">City: </span> <span id="city"></span></p>
-                <p class="mb-2"><span class="font-bold">State: </span> <span id="state"></span></p>
-                <p class="mb-2"><span class="font-bold">Pincode: </span> <span id="pincode"></span></p>
-                <p class="mb-2"><span class="font-bold">Phone: </span> <span id="phone"></span></p>
+        <div class="address-section">
+          <h2 class="text-2xl font-semibold mb-4 tracking-tight">Address</h2>
+          <div class="max-w-2xl">
+            <div class="bg-gray-50 p-6 border border-gray-200 rounded-lg shadow-sm">
+              <div class="flex justify-between items-center mb-4">
+                <strong class="text-lg font-semibold">Billing Address</strong>
+                <a href="/api/v1/user/account/update/address"
+                  class="text-sm font-medium text-green-600 hover:underline">✎ Edit</a>
+              </div>
+              <div class="space-y-3 text-gray-700">
+                <p><span class="font-bold w-24 inline-block">Plot No:</span> <span id="plotno">Loading...</span></p>
+                <p><span class="font-bold w-24 inline-block">Street:</span> <span id="street"></span></p>
+                <p><span class="font-bold w-24 inline-block">City:</span> <span id="city"></span></p>
+                <p><span class="font-bold w-24 inline-block">State:</span> <span id="state"></span></p>
+                <p><span class="font-bold w-24 inline-block">Pincode:</span> <span id="pincode"></span></p>
+                <p><span class="font-bold w-24 inline-block">Phone:</span> <span id="phone"></span></p>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
     </main>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', '/api/v1/user/account/address/details', true);
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', '/api/v1/user/account/address/details', true);
 
-        xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
-                const data = JSON.parse(xhr.responseText);
-                if (data.success) {
-                    const address = data.address;
-                    document.getElementById('plotno').textContent = address.plotno || 'N/A';
-                    document.getElementById('street').textContent = address.street || 'N/A';
-                    document.getElementById('city').textContent = address.city || 'N/A';
-                    document.getElementById('state').textContent = address.state || 'N/A';
-                    document.getElementById('pincode').textContent = address.pincode || 'N/A';
-                    document.getElementById('phone').textContent = address.phone || 'N/A';
-                }
-            }
-        };
-        xhr.send();
+      xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const data = JSON.parse(xhr.responseText);
+          if (data.success) {
+            const address = data.address;
+            document.getElementById('plotno').textContent = address.plotno || 'N/A';
+            document.getElementById('street').textContent = address.street || 'N/A';
+            document.getElementById('city').textContent = address.city || 'N/A';
+            document.getElementById('state').textContent = address.state || 'N/A';
+            document.getElementById('pincode').textContent = address.pincode || 'N/A';
+            document.getElementById('phone').textContent = address.phone || 'N/A';
+          }
+        }
+      };
+      xhr.send();
+
+      // Fetch user name for the sidebar
+      const userXhr = new XMLHttpRequest();
+      userXhr.open('GET', '/api/v1/user/account/details', true);
+      userXhr.onload = function() {
+        if (userXhr.status >= 200 && userXhr.status < 300) {
+          const data = JSON.parse(userXhr.responseText);
+          if (data.success) {
+            document.getElementById('user-name').textContent = data.user.firstname + ' ' + data.user.lastname;
+          }
+        }
+      };
+      userXhr.send();
     });
   </script>
 </body>

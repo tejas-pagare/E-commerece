@@ -1,21 +1,13 @@
-<body >
+<body>
   <div class="min-h-screen flex items-center justify-center bg-gray-50">
-
     <div class="w-full mx-auto p-6 lg:flex lg:items-center lg:justify-between">
-  
-      <!-- Illustration Section -->
-      <!-- <div class="hidden lg:block w-1/2">
-        <img src="https://freshcart-next-js.vercel.app/images/svg-graphics/signup-g.svg" alt="Sign Up Illustration" class="max-w-full h-auto">
-      </div> -->
-
       <div class="w-full md:w-1/2 lg:w-1/3 hidden md:flex items-center justify-center mx-auto">
         <img src="https://freshcart-next-js.vercel.app/images/svg-graphics/signup-g.svg" alt="Sign in" class="w-full h-[50%] md:h-auto mx-auto">
       </div>
   
-      <!-- Form Section -->
       <div class="w-full lg:w-1/2 max-w-3xl mx-auto">
-        <h1 class="text-3xl font-bold mb-4">Get Start Shopping</h1>
-        <p class="text-gray-600 mb-8">Welcome to SwiftMart! Enter your email to get started.</p>
+        <h1 class="text-3xl font-bold mb-4">Get Started Shopping</h1>
+        <p class="text-gray-600 mb-8">Welcome to SwiftMart! Enter your details to get started.</p>
   
         <form class="space-y-4" action="/api/v1/user/signup" method="POST" id="signupForm">
           <div>
@@ -46,7 +38,6 @@
             </div>
             <p class="text-red-500 text-sm mt-1 hidden" id="passwordError"></p>
           </div>
-          
   
           <button type="submit" class="w-full bg-green-600 text-white p-2 rounded-lg hover:bg-green-700">Register</button>
         </form>
@@ -58,64 +49,66 @@
   </div>
 
   <script>
-    const passwordInput = document.getElementById('password');
-    const togglePassword = document.getElementById('togglePassword');
+    document.addEventListener('DOMContentLoaded', function () {
+        const signupForm = document.getElementById('signupForm');
 
-    togglePassword.addEventListener('click', () => {
-      passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-    });
+        signupForm.addEventListener('submit', function (event) {
+            let isValid = true;
 
-    document.getElementById('signupForm').addEventListener('submit', (event) => {
-      let isValid = true;
+            const firstName = document.getElementById('firstName');
+            const lastName = document.getElementById('lastName');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
 
-      const firstName = document.getElementById('firstName');
-      const lastName = document.getElementById('lastName');
-      const email = document.getElementById('email');
-      const password = document.getElementById('password');
+            const firstNameError = document.getElementById('firstNameError');
+            const lastNameError = document.getElementById('lastNameError');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
 
-      const firstNameError = document.getElementById('firstNameError');
-      const lastNameError = document.getElementById('lastNameError');
-      const emailError = document.getElementById('emailError');
-      const passwordError = document.getElementById('passwordError');
+            // Clear previous errors
+            firstNameError.classList.add('hidden');
+            lastNameError.classList.add('hidden');
+            emailError.classList.add('hidden');
+            passwordError.classList.add('hidden');
 
-      // Clear previous errors
-      firstNameError.classList.add('hidden');
-      lastNameError.classList.add('hidden');
-      emailError.classList.add('hidden');
-      passwordError.classList.add('hidden');
+            // Validation patterns
+            const namePattern = /^[a-z]+$/i;
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      // Validation patterns
-      const namePattern = /^[a-z]+$/i;
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!namePattern.test(firstName.value.trim())) {
+                firstNameError.textContent = "First Name should contain only letters.";
+                firstNameError.classList.remove('hidden');
+                isValid = false;
+            }
 
-      if (!namePattern.test(firstName.value.trim())) {
-        firstNameError.textContent = "First Name should contain only letters.";
-        firstNameError.classList.remove('hidden');
-        isValid = false;
-      }
+            if (!namePattern.test(lastName.value.trim())) {
+                lastNameError.textContent = "Last Name should contain only letters.";
+                lastNameError.classList.remove('hidden');
+                isValid = false;
+            }
 
-      if (!namePattern.test(lastName.value.trim())) {
-        lastNameError.textContent = "Last Name should contain only letters.";
-        lastNameError.classList.remove('hidden');
-        isValid = false;
-      }
+            if (!emailPattern.test(email.value.trim())) {
+                emailError.textContent = "Invalid email address.";
+                emailError.classList.remove('hidden');
+                isValid = false;
+            }
 
-      if (!emailPattern.test(email.value.trim())) {
-        emailError.textContent = "Invalid email address.";
-        emailError.classList.remove('hidden');
-        isValid = false;
-      }
+            if (password.value.length < 8) {
+                passwordError.textContent = "Password must be at least 8 characters long.";
+                passwordError.classList.remove('hidden');
+                isValid = false;
+            }
 
-      if (password.value.length < 8) {
-        passwordError.textContent = "Password must be at least 8 characters long.";
-        passwordError.classList.remove('hidden');
-        isValid = false;
-      }
+            if (!isValid) {
+                event.preventDefault(); // Prevent form submission if validation fails
+            }
+        });
 
-      // Prevent form submission if validation fails
-      if (!isValid) {
-        event.preventDefault();
-      }
+        const passwordInput = document.getElementById('password');
+        const togglePassword = document.getElementById('togglePassword');
+        togglePassword.addEventListener('click', () => {
+            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+        });
     });
   </script>
 </body>

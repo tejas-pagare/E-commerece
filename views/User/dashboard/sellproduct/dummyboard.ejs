@@ -1,28 +1,31 @@
-<body>
-    <main class="flex-1 p-10 bg-gradient-to-b from-green-50 to-green-100">
-      <h1 class="text-3xl font-bold text-green-800 mb-6">Welcome, <%= username %>!</h1>
+<body class="bg-gray-50 font-sans">
+    <main class="p-8">
+      <h1 class="text-3xl font-bold text-green-800 mb-6">Welcome, <span id="username-display">...</span>!</h1>
       
-      <div class="bg-white rounded-lg shadow-lg p-6">
-        <h2 class="text-xl font-semibold text-green-800 mb-4">Your Donated Clothes</h2>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold text-green-800 mb-4 tracking-tight">Your Donated Clothes</h2>
             
         <div class="overflow-x-auto">
-          <table class="w-full table-auto text-left border-collapse">
+          <table class="w-full text-left">
             <thead>
-              <tr class="bg-green-300 text-green-900">
-                <th class="px-4 py-2 font-semibold">Image</th>
-                <th class="px-4 py-2 font-semibold">Item</th>
-                <th class="px-4 py-2 font-semibold">Fabric</th>
-                <th class="px-4 py-2 font-semibold">Size</th>
-                <th class="px-4 py-2 font-semibold">Gender</th>
-                <th class="px-4 py-2 font-semibold">Usage</th>
-                <th class="px-4 py-2 font-semibold">Date</th>
-                <th class="px-4 py-2 font-semibold">Slot</th>
-                <th class="px-4 py-2 font-semibold">Status</th>
-                <th class="px-4 py-2 font-semibold">Value</th>
+              <tr class="bg-gray-100 text-sm font-semibold text-gray-600">
+                <th class="px-4 py-3">Image</th>
+                <th class="px-4 py-3">Item</th>
+                <th class="px-4 py-3">Fabric</th>
+                <th class="px-4 py-3">Size</th>
+                <th class="px-4 py-3">Gender</th>
+                <th class="px-4 py-3">Usage</th>
+                <th class="px-4 py-3">Date</th>
+                <th class="px-4 py-3">Slot</th>
+                <th class="px-4 py-3">Status</th>
+                <th class="px-4 py-3">Value</th>
               </tr>
             </thead>
-            <tbody id="donations-table-body" class="bg-white text-sm">
-              </tbody>
+            <tbody id="donations-table-body" class="text-sm">
+                <tr>
+                    <td colspan="10" class="text-center p-6 text-gray-500">Loading your donation history...</td>
+                </tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -31,13 +34,24 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const tableBody = document.getElementById('donations-table-body');
-            tableBody.innerHTML = '<tr><td colspan="10" class="text-center p-4">Loading your donation history...</td></tr>';
+            const usernameDisplay = document.getElementById('username-display');
 
-           
+            // Fetch user name
+            const userXhr = new XMLHttpRequest();
+            userXhr.open('GET', '/api/v1/user/account/details', true);
+            userXhr.onload = function() {
+                if (userXhr.status >= 200 && userXhr.status < 300) {
+                    const data = JSON.parse(userXhr.responseText);
+                    if (data.success) {
+                        usernameDisplay.textContent = data.user.firstname;
+                    }
+                }
+            };
+            userXhr.send();
+
+            // Fetch donated products
             const xhr = new XMLHttpRequest();
             xhr.open('GET', '/api/v1/user/donated-products', true);
-
-           
             xhr.onload = function() {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     const data = JSON.parse(xhr.responseText);
@@ -46,40 +60,38 @@
                     tableBody.innerHTML = ''; 
 
                     if (products.length === 0) {
-                        tableBody.innerHTML = '<tr><td colspan="10" class="text-center p-4">You have not donated any clothes yet.</td></tr>';
+                        tableBody.innerHTML = '<tr><td colspan="10" class="text-center p-6 text-gray-500">You have not donated any clothes yet.</td></tr>';
                         return;
                     }
-
                    
                     products.forEach(p => {
                         const row = `
-                            <tr class="border-t">
-                                <td class="px-4 py-2">
-                                    ${p.imageSrc ? `<img src="${p.imageSrc}" alt="img" class="w-12 h-12 object-cover rounded" />` : '<span class="text-gray-400">N/A</span>'}
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-4 py-3">
+                                    ${p.imageSrc ? `<img src="${p.imageSrc}" alt="img" class="w-12 h-12 object-cover rounded-md" />` : '<span class="text-gray-400">N/A</span>'}
                                 </td>
-                                <td class="px-4 py-2">${p.items}</td>
-                                <td class="px-4 py-2">${p.fabric}</td>
-                                <td class="px-4 py-2">${p.size || 'N/A'}</td>
-                                <td class="px-4 py-2 capitalize">${p.gender}</td>
-                                <td class="px-4 py-2">${p.readableUsage}</td>
-                                <td class="px-4 py-2">${new Date(p.clothesDate).toISOString().split('T')[0]}</td>
-                                <td class="px-4 py-2 capitalize">${p.timeSlot}</td>
-                                <td class="px-4 py-2">${p.userStatus}</td>
-                                <td class="px-4 py-2">${p.estimated_value || 'N/A'}</td>
+                                <td class="px-4 py-3 font-medium">${p.items}</td>
+                                <td class="px-4 py-3">${p.fabric}</td>
+                                <td class="px-4 py-3">${p.size || 'N/A'}</td>
+                                <td class="px-4 py-3 capitalize">${p.gender}</td>
+                                <td class="px-4 py-3">${p.readableUsage}</td>
+                                <td class="px-4 py-3">${new Date(p.clothesDate).toLocaleDateString()}</td>
+                                <td class="px-4 py-3 capitalize">${p.timeSlot}</td>
+                                <td class="px-4 py-3">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${p.userStatus}</span>
+                                </td>
+                                <td class="px-4 py-3 font-semibold">${p.estimated_value ? `Rs. ${p.estimated_value}` : 'N/A'}</td>
                             </tr>
                         `;
                         tableBody.innerHTML += row;
                     });
                 } else {
-                    tableBody.innerHTML = '<tr><td colspan="10" class="text-center p-4 text-red-500">Could not load your donation history.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="10" class="text-center p-6 text-red-500">Could not load your donation history.</td></tr>';
                 }
             };
-
-            
             xhr.onerror = function() {
-                tableBody.innerHTML = '<tr><td colspan="10" class="text-center p-4 text-red-500">A network error occurred.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="10" class="text-center p-6 text-red-500">A network error occurred.</td></tr>';
             };
-
            
             xhr.send();
         });

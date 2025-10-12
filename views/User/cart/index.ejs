@@ -1,23 +1,39 @@
-<body>
-  <div class="bg-gray-100 flex items-center justify-center min-h-screen w-full">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-full min-h-screen">
-      <h2 class="text-2xl font-bold mb-4">Shop Cart</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl mx-auto">
+      <h2 class="text-3xl font-bold mb-6 tracking-tight">Shopping Cart</h2>
 
       <div id="notification-container" class="fixed top-5 right-5 z-50 space-y-2"></div>
 
-      <div class="bg-red-100 text-red-700 p-3 rounded-md mb-8 w-[40%]">
-        You've got FREE delivery.
-        Start <span class="font-bold">checkout now!</span>
+      <div class="bg-green-100 text-green-800 p-4 rounded-md mb-8 border border-green-200">
+        <p>You've got FREE delivery. <span class="font-bold">Start checkout now!</span></p>
       </div>
 
-      <div id="cart-items" class="space-y-4">
+      <div id="cart-items" class="space-y-6">
         </div>
 
-      <div class="flex justify-between mt-6">
-        <a href="/api/v1/user/store">
-          <button class="bg-green-600 text-white px-4 py-2 rounded">Continue Shopping</button>
+      <div class="flex flex-col sm:flex-row justify-between items-center mt-8 pt-6 border-t">
+        <a href="/api/v1/user/store" class="text-green-600 font-semibold hover:underline mb-4 sm:mb-0">
+          <i class="fas fa-arrow-left mr-2"></i>Continue Shopping
         </a>
-        <a href="/api/v1/user/checkout" class="bg-black text-white px-4 py-2 rounded">Proceed To Checkout</a>
+        <a href="/api/v1/user/checkout" class="bg-green-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-green-700 transition-colors w-full sm:w-auto text-center">
+          Proceed To Checkout
+        </a>
       </div>
     </div>
   </div>
@@ -26,7 +42,7 @@
     function showNotification(message, type) {
       const notificationContainer = document.querySelector("#notification-container");
       const notification = document.createElement("div");
-      notification.className = `px-4 py-2 rounded-md shadow-md text-white transition-transform transform translate-x-full opacity-0 ${type === "success" ? "bg-green-500" : "bg-red-500"}`;
+      notification.className = `px-4 py-3 rounded-md shadow-lg text-white transition-all duration-300 transform translate-x-full opacity-0 ${type === "success" ? "bg-green-500" : "bg-red-500"}`;
       notification.textContent = message;
       notificationContainer.appendChild(notification);
       setTimeout(() => {
@@ -35,18 +51,14 @@
       }, 10);
       setTimeout(() => {
         notification.classList.add("opacity-0", "translate-x-full");
-        setTimeout(() => {
-          notification.remove();
-        }, 200);
-      }, 2000);
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
     }
 
     function fetchCart() {
       const xhr = new XMLHttpRequest();
       xhr.open("POST", "/api/v1/user/cart", true);
-      // Since this is a POST route on the backend expecting credentials
-      xhr.withCredentials = true; 
-
+      xhr.withCredentials = true;
       xhr.onload = function() {
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
@@ -56,11 +68,15 @@
             }
           } catch (e) {
             console.error("Error parsing cart JSON:", e);
+            document.getElementById("cart-items").innerHTML = '<p class="text-center text-red-500">Error loading cart items.</p>';
           }
+        } else {
+            document.getElementById("cart-items").innerHTML = '<p class="text-center text-red-500">Could not fetch cart.</p>';
         }
       };
       xhr.onerror = function() {
         console.error("Network error fetching cart.");
+        document.getElementById("cart-items").innerHTML = '<p class="text-center text-red-500">Network error. Please try again.</p>';
       };
       xhr.send();
     }
@@ -68,32 +84,32 @@
     function renderCart(cart) {
       const cartContainer = document.getElementById("cart-items");
       cartContainer.innerHTML = "";
-
       if (cart.length === 0) {
         cartContainer.innerHTML = `
-          <div class="text-center">
-            <img class="w-[200px] h-[200px] mx-auto" src="https://media.istockphoto.com/id/898475764/vector/shopping-trolley-cart-icon-in-green-circle-vector.jpg?s=612x612&w=0&k=20&c=W_b90qFRpj_FyLyI19xWqB6EoNSuJYwMSN9nnKkE9Hk=" />
-            <div class="font-bold text-xl mt-4">Your Cart is Empty</div>
+          <div class="text-center py-16">
+            <img class="w-48 h-48 mx-auto" src="https://media.istockphoto.com/id/898475764/vector/shopping-trolley-cart-icon-in-green-circle-vector.jpg?s=612x612&w=0&k=20&c=W_b90qFRpj_FyLyI19xWqB6EoNSuJYwMSN9nnKkE9Hk=" alt="Empty Cart" />
+            <div class="font-bold text-2xl mt-6 text-gray-800">Your Cart is Empty</div>
+            <p class="text-gray-600 mt-2">Looks like you haven't added anything to your cart yet.</p>
           </div>
         `;
       } else {
         cart.forEach((item) => {
-          if (!item.productId) return; // Skip if a product was removed from the DB but is still in cart
+          if (!item.productId) return;
           cartContainer.innerHTML += `
-            <div class="grid grid-cols-4 items-center gap-4 border-b pb-4">
-              <div class="w-[100px] h-[100px] overflow-hidden">
-                <img class="h-full w-full object-cover object-top rounded" src="${item.productId.image}" alt="${item.productId.title}">
+            <div class="flex flex-col sm:flex-row items-center gap-6 border-b pb-6">
+              <img class="h-24 w-24 object-cover rounded-md border" src="${item.productId.image}" alt="${item.productId.title}">
+              <div class="flex-grow text-center sm:text-left">
+                <p class="font-semibold tracking-tight">${item.productId.title}</p>
+                <button class="text-red-600 text-sm mt-1 hover:underline" onclick="removeFromCartPermanent('${item.productId._id}')">
+                  <i class="fas fa-trash-alt mr-1"></i>Remove
+                </button>
               </div>
-              <div>
-                <p class="font-semibold tracking-tighter text-sm">${item.productId.title}</p>
-                <button class="text-red-600 text-sm" onclick="removeFromCartPermanent('${item.productId._id}')">🗑 Remove</button>
+              <div class="flex items-center space-x-3">
+                <button class="px-3 py-1 bg-gray-200 rounded-md font-bold hover:bg-gray-300 transition" onclick="removeFromCart('${item.productId._id}')">-</button>
+                <span id="qty-${item.productId._id}" class="px-4 font-semibold w-12 text-center">${item.quantity}</span>
+                <button class="px-3 py-1 bg-gray-200 rounded-md font-bold hover:bg-gray-300 transition" onclick="AddToCart('${item.productId._id}')">+</button>
               </div>
-              <div class="flex items-center space-x-2">
-                <button class="px-2 py-1 bg-gray-200 rounded" onclick="removeFromCart('${item.productId._id}')">-</button>
-                <span id="qty-${item.productId._id}" class="px-4">${item.quantity}</span>
-                <button class="px-2 py-1 bg-gray-200 rounded" onclick="AddToCart('${item.productId._id}')">+</button>
-              </div>
-              <p class="font-semibold text-lg">Rs. ${item.productId.price * item.quantity}</p>
+              <p class="font-semibold text-lg w-28 text-center sm:text-right">Rs. ${item.productId.price * item.quantity}</p>
             </div>
           `;
         });
@@ -110,10 +126,10 @@
         if (xhr.status >= 200 && xhr.status < 300) {
           const data = JSON.parse(xhr.responseText);
           if (data.success) {
-            showNotification("Item added to cart!", "success");
+            showNotification("Item quantity updated!", "success");
             fetchCart();
           } else {
-            showNotification("Failed to add item!", "error");
+            showNotification(data.message || "Failed to add item!", "error");
           }
         }
       };
@@ -133,10 +149,10 @@
         if (xhr.status >= 200 && xhr.status < 300) {
           const data = JSON.parse(xhr.responseText);
           if (data.success) {
-            showNotification("Item removed from cart!", "success");
+            showNotification("Item quantity updated!", "success");
             fetchCart();
           } else {
-            showNotification("Failed to remove item!", "error");
+            showNotification(data.message || "Failed to remove item!", "error");
           }
         }
       };
@@ -156,10 +172,10 @@
         if (xhr.status >= 200 && xhr.status < 300) {
           const data = JSON.parse(xhr.responseText);
           if (data.success) {
-            showNotification("Item permanently removed!", "success");
+            showNotification("Item removed from cart!", "success");
             fetchCart();
           } else {
-            showNotification("Failed to remove item!", "error");
+            showNotification(data.message || "Failed to remove item!", "error");
           }
         }
       };
@@ -172,3 +188,4 @@
     window.onload = fetchCart;
   </script>
 </body>
+</html>
