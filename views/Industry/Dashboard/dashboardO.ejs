@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Industry Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+  <header class="bg-white shadow-sm sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+      <!-- Logo -->
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-8 h-8 bg-emerald-500 rounded-full"></span>
+        <span class="text-2xl font-bold text-emerald-700 tracking-wide">Swift Mart</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="hidden md:flex gap-8">
+        <a href="home" class="text-gray-700 hover:text-emerald-600">Home</a>
+        <a href="about" class="text-gray-700 hover:text-emerald-600">About</a>
+        <a href="blog" class="text-gray-700 hover:text-emerald-600">Blogs</a>
+        <a href="dashboard" class="text-gray-700 hover:text-emerald-600">Dashboard</a>
+      </nav>
+
+      <!-- Icon Buttons -->
+      <div class="flex items-center space-x-2">
+        <a href="cart" class="bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-lg transition inline-block"
+          aria-label="Cart">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m13-9v9m-6 0a2 2 0 104 0 2 2 0 00-4 0z" />
+          </svg>
+        </a>
+        <a href="profile" class="bg-emerald-700 hover:bg-emerald-800 text-white p-2 rounded-lg transition inline-block"
+          aria-label="Profile">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5.121 17.804A8.966 8.966 0 0112 15c1.657 0 3.21.402 4.879 1.117M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </a>
+        <a href="logout" aria-label="Logout" class="bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition inline-block">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V5" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-5xl mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white shadow rounded-lg p-6 flex flex-col items-center">
+        <span class="text-xl font-semibold text-gray-700">Total Orders</span>
+        <span class="text-4xl font-bold text-emerald-600 mt-2">
+          <%= (orders && orders.length) || 0 %>
+        </span>
+      </div>
+      <div class="bg-white shadow rounded-lg p-6 flex flex-col items-center">
+        <span class="text-xl font-semibold text-gray-700">Total Amount</span>
+        <span class="text-4xl font-bold text-emerald-600 mt-2">₹<%= totalAmount || 0 %></span>
+      </div>
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-6">
+      <h2 class="text-2xl font-semibold mb-4">Order History</h2>
+      <% if (orders && orders.length > 0) { %>
+        <table class="w-full text-left">
+          <thead>
+            <tr>
+              <th class="py-2">Order ID</th>
+              <th class="py-2">Date</th>
+              <th class="py-2">Items</th>
+              <th class="py-2">Amount</th>
+              <th class="py-2">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orders.forEach(order=> { %>
+              <tr class="border-t">
+                <td class="py-2">
+                  <%= order.combination_id %>
+                </td>
+                <td class="py-2">7/5/2025</td>
+                <td class="py-2">
+                  <%= order.quantity || 0 %>
+                </td>
+
+                <td class="py-2">₹<%= order.amount || 0 %>
+                </td>
+                <td class="py-2">
+                  <span
+                    class="px-2 py-1 rounded-full text-xs 
+                    <%= order.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700' %>">
+                    <%= order.status || 'Completed' %>
+                  </span>
+                </td>
+              </tr>
+              <% }) %>
+          </tbody>
+        </table>
+        <% } else { %>
+          <p class="text-gray-500">No orders found.</p>
+          <% } %>
+    </div>
+  </div>
+</body>
+
+</html>

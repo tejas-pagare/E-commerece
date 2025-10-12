@@ -83,6 +83,7 @@ const industrySchema = new mongoose.Schema(
         amount: { type: Number, required: true, default: 0 },
         combination_id: { type: String, required: true },
         id: { type: String, required: true },
+        date: { type: Date, default: Date.now }, // ✅ Add this line
       },
     ],
     createdAt: {
