@@ -1,82 +1,137 @@
 
-<body class="bg-gray-100">
-    <div class="min-h-screen container mx-auto px-4 py-8">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Manager Management</h1>
-            <button onclick="toggleCreateModal()" 
-                class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-150 ease-in-out">
-                Create Manager
-            </button>
-        </div>
+<body class="bg-gray-50 text-gray-900">
+    <div class="min-h-screen">
+        <div class="container mx-auto px-4 py-8">
+            <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-6 border-b border-gray-100">
+                    <h1 class="text-2xl font-semibold tracking-tight">Manager Management</h1>
+                    <button onclick="toggleCreateModal()" type="button" class="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-offset-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m8-8H4"/></svg>
+                        Create Manager
+                    </button>
+                </div>
 
-        <!-- Manager List Table -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <table class="w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">ID</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Created At</th>
-                        <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="manager-table"></tbody>
-            </table>
-        </div>
+                <!-- Table -->
+                <div class="p-6">
+                    <div class="overflow-x-auto rounded-lg border border-gray-100">
+                        <table class="w-full bg-white text-left text-sm">
+                            <thead class="bg-gray-50 text-gray-700">
+                                <tr class="border-b border-gray-100">
+                                    <th class="px-4 py-3 font-medium">ID</th>
+                                    <th class="px-4 py-3 font-medium">Email</th>
+                                    <th class="px-4 py-3 font-medium">Created At</th>
+                                    <th class="px-4 py-3 font-medium">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="manager-skeleton" class="divide-y divide-gray-100 hidden"></tbody>
+                            <tbody id="manager-table" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
 
-        <!-- Create Manager Modal -->
-        <div id="createManagerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg p-6 w-[400px]">
-                <h2 class="text-xl font-bold mb-4">Create New Manager</h2>
-                <form id="createManagerForm" onsubmit="createManager(event)">
+                    <!-- Empty state -->
+                    <div id="empty-state" class="hidden mt-10 flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-white p-10 text-center">
+                        <div class="rounded-full bg-gray-100 p-3 mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18"/><path d="M3 12h18"/><path d="M3 17h18"/></svg>
+                        </div>
+                        <h3 class="text-sm font-semibold">No managers</h3>
+                        <p class="mt-1 text-sm text-gray-500">When managers are created, they will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page loader overlay -->
+    <div id="page-loader" class="hidden fixed inset-0 z-40 grid place-items-center bg-white/60 backdrop-blur-[1px]">
+        <div class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-md">
+            <svg class="h-5 w-5 animate-spin text-gray-700" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+            </svg>
+            <span class="text-sm font-medium text-gray-700">Loading managers…</span>
+        </div>
+    </div>
+
+    <!-- Dialog (Create Manager) -->
+    <div id="createManagerModal" class="hidden fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+        <div id="modal-overlay" class="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="w-full max-w-sm origin-center rounded-xl border border-gray-200 bg-white shadow-xl outline-none transition-all" id="modal-card" style="transform: scale(0.98); opacity: 0;">
+                <div class="flex items-start justify-between border-b border-gray-100 p-5">
+                    <div>
+                        <h2 id="dialog-title" class="text-lg font-semibold tracking-tight">Create New Manager</h2>
+                        <p class="text-sm text-gray-500">Fill in the details to add a new manager.</p>
+                    </div>
+                    <button type="button" aria-label="Close" onclick="toggleCreateModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <form id="createManagerForm" onsubmit="createManager(event)" class="p-5">
                     <div class="mb-4">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
-                            Email
-                        </label>
-                        <input type="email" id="email" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="email">Email</label>
+                        <input type="email" id="email" required class="w-full rounded-md border border-gray-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-700">
                     </div>
                     <div class="mb-6">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
-                            Password
-                        </label>
-                        <input type="password" id="password" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <label class="block text-gray-700 text-sm font-medium mb-2" for="password">Password</label>
+                        <input type="password" id="password" required class="w-full rounded-md border border-gray-200 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-700">
                     </div>
-                    <div class="flex justify-end space-x-4">
-                        <button type="button" onclick="toggleCreateModal()"
-                            class="px-4 py-2 text-gray-600 hover:text-gray-800">
-                            Cancel
-                        </button>
-                        <button type="submit"
-                            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                            Create
-                        </button>
+                    <div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
+                        <button type="button" onclick="toggleCreateModal()" class="inline-flex items-center rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Cancel</button>
+                        <button type="submit" class="inline-flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-offset-2">Create</button>
                     </div>
                 </form>
             </div>
         </div>
-
-        <!-- Notification -->
-        <div id="notification" class="hidden"></div>
     </div>
 
+    <!-- Toast notification -->
+    <div id="notification" class="pointer-events-none fixed bottom-6 right-6 z-[60] hidden w-auto min-w-[260px] max-w-sm translate-y-2 opacity-0 transition-all"></div>
+
     <script>
-        // Function to fetch managers from backend
+        const pageLoaderEl = document.getElementById('page-loader');
+        const skeletonBody = document.getElementById('manager-skeleton');
+        const tableBody = document.getElementById('manager-table');
+        const emptyState = document.getElementById('empty-state');
+
+        function setPageLoading(loading) {
+            if (loading) {
+                pageLoaderEl.classList.remove('hidden');
+                renderSkeletonRows(5);
+            } else {
+                pageLoaderEl.classList.add('hidden');
+                skeletonBody.classList.add('hidden');
+                skeletonBody.innerHTML = '';
+            }
+        }
+
+        function renderSkeletonRows(count) {
+            skeletonBody.innerHTML = '';
+            skeletonBody.classList.remove('hidden');
+            for (let i = 0; i < count; i++) {
+                const tr = document.createElement('tr');
+                tr.className = 'animate-pulse';
+                tr.innerHTML = `
+                    <td class="px-4 py-3"><div class="h-4 w-40 rounded bg-gray-200"></div></td>
+                    <td class="px-4 py-3"><div class="h-4 w-64 rounded bg-gray-200"></div></td>
+                    <td class="px-4 py-3"><div class="h-4 w-24 rounded bg-gray-200"></div></td>
+                    <td class="px-4 py-3"><div class="h-8 w-24 rounded-md bg-gray-200"></div></td>
+                `;
+                skeletonBody.appendChild(tr);
+            }
+        }
+
         async function fetchManagers() {
+            setPageLoading(true);
+            emptyState.classList.add('hidden');
+            tableBody.innerHTML = '';
             try {
                 const response = await fetch('/api/v1/admin/managers', {
                     method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
-                
                 const data = await response.json();
-                console.log(data)
                 if (data.success) {
-                    
                     renderManagerList(data.managers);
                 } else {
                     showNotification(data.message || 'Failed to fetch managers', 'error');
@@ -84,67 +139,56 @@
             } catch (error) {
                 console.error('Error fetching managers:', error);
                 showNotification('Failed to fetch managers', 'error');
+                emptyState.classList.remove('hidden');
+            } finally {
+                setPageLoading(false);
             }
         }
 
-        // Function to render manager list
         function renderManagerList(managers) {
-            const tableBody = document.getElementById('manager-table');
             tableBody.innerHTML = '';
-            
+            if (!managers || !managers.length) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
             managers.forEach(manager => {
                 const row = document.createElement('tr');
-                row.className = 'hover:bg-gray-100 border-b border-gray-200';
-                
+                row.className = 'hover:bg-gray-50';
                 row.innerHTML = `
-                    <td class="px-4 py-2">${manager._id}</td>
-                    <td class="px-4 py-2">${manager.email}</td>
-                    <td class="px-4 py-2">${new Date(manager.createdAt).toLocaleDateString()}</td>
-                    <td class="px-4 py-2">
-                        <button onclick="deleteManager('${manager._id}')" 
-                            class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                    <td class="px-4 py-3 font-mono text-xs text-gray-500">${manager._id}</td>
+                    <td class="px-4 py-3 text-gray-700">${manager.email}</td>
+                    <td class="px-4 py-3 text-gray-700">${new Date(manager.createdAt).toLocaleDateString()}</td>
+                    <td class="px-4 py-3">
+                        <button onclick="deleteManager('${manager._id}')" type="button" class="inline-flex items-center gap-2 rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6v12a2 2 0 002 2h4a2 2 0 002-2V6"/><path d="M19 6l-1.5 14a2 2 0 01-2 2H8.5a2 2 0 01-2-2L5 6"/></svg>
                             Delete
                         </button>
                     </td>
                 `;
-                
                 tableBody.appendChild(row);
             });
         }
 
-        // Function to handle manager creation
         async function createManager(event) {
             event.preventDefault();
-            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
             if (!email || !password) {
                 showNotification('Please fill in all fields', 'error');
                 return;
             }
-            
             try {
                 const response = await fetch('/api/v1/admin/create/manager', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-        
                 const data = await response.json();
                 if (data.success) {
-                    // Reset form
                     document.getElementById('createManagerForm').reset();
-                    
-                    // Show success notification
                     showNotification('Manager created successfully', 'success');
-                    
-                    // Close modal
                     toggleCreateModal();
-                    
-                    // Refresh manager list
                     await fetchManagers();
                 } else {
                     showNotification(data.message || 'Failed to create manager', 'error');
@@ -155,16 +199,12 @@
             }
         }
 
-        // Function to delete manager
         async function deleteManager(managerId) {
             try {
                 const response = await fetch(`/api/v1/admin/managers/${managerId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
-
                 const data = await response.json();
                 if (data.success) {
                     showNotification('Manager deleted successfully', 'success');
@@ -178,29 +218,62 @@
             }
         }
 
-        // Function to show notification
         function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            } text-white`;
-            
-            notification.classList.remove('hidden');
+            const container = document.getElementById('notification');
+            const variant = type === 'success' ? 'border-green-200 bg-white text-green-700' : 'border-red-200 bg-white text-red-700';
+            const icon = type === 'success'
+                ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
+
+            container.innerHTML = `
+                <div class="pointer-events-auto flex w-full items-start gap-3 rounded-lg border ${variant} p-3 shadow-lg ring-1 ring-black/5">
+                    <div class="mt-0.5">${icon}</div>
+                    <div class="text-sm">${message}</div>
+                </div>
+            `;
+            container.classList.remove('hidden');
+            // animate in
+            requestAnimationFrame(() => {
+                container.classList.remove('translate-y-2', 'opacity-0');
+                container.classList.add('translate-y-0', 'opacity-100');
+            });
             setTimeout(() => {
-                notification.classList.add('hidden');
-            }, 3000);
+                container.classList.remove('opacity-100');
+                container.classList.add('opacity-0');
+                setTimeout(() => container.classList.add('hidden'), 250);
+            }, 2200);
         }
 
-        // Function to toggle create manager modal
         function toggleCreateModal() {
-            const modal = document.getElementById('createManagerModal');
-            modal.classList.toggle('hidden');
+            const dialog = document.getElementById('createManagerModal');
+            const card = document.getElementById('modal-card');
+            if (dialog.classList.contains('hidden')) {
+                dialog.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+                requestAnimationFrame(() => {
+                    card.style.transform = 'scale(1)';
+                    card.style.opacity = '1';
+                });
+                // close on overlay click
+                const overlay = document.getElementById('modal-overlay');
+                overlay.addEventListener('click', toggleCreateModal, { once: true });
+                // close on Esc
+                window.addEventListener('keydown', handleEscToClose);
+            } else {
+                card.style.transform = 'scale(0.98)';
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    dialog.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                }, 120);
+                window.removeEventListener('keydown', handleEscToClose);
+            }
         }
 
-        // Initialize the page
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchManagers();
-        });
+        function handleEscToClose(e) {
+            if (e.key === 'Escape') toggleCreateModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchManagers);
     </script>
 </body>

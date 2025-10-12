@@ -1,42 +1,125 @@
-<body class="bg-gray-100">
-  <div class="w-full min-h-screen mx-auto bg-white shadow-md rounded-lg p-6 relative">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="text-xl font-bold">Orders Management</h1>
-    </div>
+<body class="bg-gray-50 text-gray-900">
+  <div class="min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+      <div class="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-100">
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight">Orders</h1>
+            <p class="text-sm text-gray-500 mt-1">Manage customer orders, track status, and view details.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="refresh-btn" type="button" class="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/><path d="M21 3v7h-7"/></svg>
+              Refresh
+            </button>
+          </div>
+        </div>
 
-    <!-- Table -->
-    <div class="overflow-x-auto">
-      <table class="w-full border-collapse bg-white text-left text-sm text-gray-700">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="px-4 py-2">Customer Name</th>
-            <th class="px-4 py-2">Email</th>
-            <th class="px-4 py-2">Total Orders</th>
-            <th class="px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="orders-table"></tbody>
-      </table>
-    </div>
+        <!-- Table -->
+        <div class="p-6">
+          <div class="overflow-x-auto rounded-lg border border-gray-100">
+            <table class="w-full bg-white text-left text-sm">
+              <thead class="bg-gray-50 text-gray-700">
+                <tr class="border-b border-gray-100">
+                  <th class="px-4 py-3 font-medium">Customer</th>
+                  <th class="px-4 py-3 font-medium">Email</th>
+                  <th class="px-4 py-3 font-medium">Total Orders</th>
+                  <th class="px-4 py-3 font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orders-skeleton" class="divide-y divide-gray-100 hidden"></tbody>
+              <tbody id="orders-table" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
 
-    <!-- Order Details Popup -->
-    <div id="order-popup" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div class="bg-white rounded-lg p-6 w-[800px] max-h-[80vh] overflow-y-auto relative">
-        <button onclick="closeOrderPopup()" class="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
-          <i class="fas fa-times"></i>
-        </button>
-        <h2 class="text-xl font-bold mb-4">Order Details</h2>
-        <div id="order-details-content"></div>
+          <!-- Empty state -->
+          <div id="empty-state" class="hidden mt-10 flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-200 bg-white p-10 text-center">
+            <div class="rounded-full bg-gray-100 p-3 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18"/><path d="M3 12h18"/><path d="M3 17h18"/></svg>
+            </div>
+            <h3 class="text-sm font-semibold">No orders</h3>
+            <p class="mt-1 text-sm text-gray-500">When customers place orders, they will appear here.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Add notification element -->
-  <div id="notification" class="hidden fixed top-4 right-4 px-4 py-2 rounded-lg"></div>
+  <!-- Page loader overlay -->
+  <div id="page-loader" class="hidden fixed inset-0 z-40 grid place-items-center bg-white/60 backdrop-blur-[1px]">
+    <div class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-md">
+      <svg class="h-5 w-5 animate-spin text-gray-700" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+      </svg>
+      <span class="text-sm font-medium text-gray-700">Loading orders…</span>
+    </div>
+  </div>
+
+  <!-- Dialog (Order Details) -->
+  <div id="order-popup" class="hidden fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <div id="order-popup-overlay" class="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+      <div class="w-full max-w-3xl origin-center rounded-xl border border-gray-200 bg-white shadow-xl outline-none transition-all" id="order-popup-content" style="transform: scale(0.98); opacity: 0;">
+        <div class="flex items-start justify-between border-b border-gray-100 p-5">
+          <div>
+            <h2 id="dialog-title" class="text-lg font-semibold tracking-tight">Order details</h2>
+            <p class="text-sm text-gray-500">Review products, shipping, and update status.</p>
+          </div>
+          <button type="button" aria-label="Close" onclick="closeOrderPopup()" class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-200 bg-white text-gray-600 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div id="order-details-content" class="p-5 max-h-[70vh] overflow-y-auto"></div>
+        <div class="flex justify-end gap-2 border-t border-gray-100 p-4">
+          <button type="button" onclick="closeOrderPopup()" class="inline-flex items-center rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div id="notification" class="pointer-events-none fixed bottom-6 right-6 z-[60] hidden w-auto min-w-[260px] max-w-sm translate-y-2 opacity-0 transition-all"></div>
 
   <script>
+    const pageLoaderEl = document.getElementById('page-loader');
+    const skeletonBody = document.getElementById('orders-skeleton');
+    const tableBody = document.getElementById('orders-table');
+    const emptyState = document.getElementById('empty-state');
+    const refreshBtn = document.getElementById('refresh-btn');
+
+    function setPageLoading(loading) {
+      if (loading) {
+        pageLoaderEl.classList.remove('hidden');
+        renderSkeletonRows(5);
+      } else {
+        pageLoaderEl.classList.add('hidden');
+        skeletonBody.classList.add('hidden');
+        skeletonBody.innerHTML = '';
+      }
+    }
+
+    function renderSkeletonRows(count) {
+      skeletonBody.innerHTML = '';
+      skeletonBody.classList.remove('hidden');
+      for (let i = 0; i < count; i++) {
+        const tr = document.createElement('tr');
+        tr.className = 'animate-pulse';
+        tr.innerHTML = `
+          <td class="px-4 py-3"><div class="h-4 w-40 rounded bg-gray-200"></div></td>
+          <td class="px-4 py-3"><div class="h-4 w-64 rounded bg-gray-200"></div></td>
+          <td class="px-4 py-3"><div class="h-4 w-16 rounded bg-gray-200"></div></td>
+          <td class="px-4 py-3"><div class="h-8 w-24 rounded-md bg-gray-200"></div></td>
+        `;
+        skeletonBody.appendChild(tr);
+      }
+    }
+
     async function fetchOrders() {
+      setPageLoading(true);
+      emptyState.classList.add('hidden');
+      tableBody.innerHTML = '';
       try {
         const response = await fetch('/api/v1/admin/orders', {
           method: 'GET',
@@ -64,98 +147,122 @@
       } catch (error) {
         console.error('Fetch error:', error);
         showNotification('Failed to fetch orders', 'error');
+        emptyState.classList.remove('hidden');
         return null;
+      } finally {
+        setPageLoading(false);
       }
     }
 
     function renderOrders(ordersData) {
-      const tableBody = document.getElementById('orders-table');
       tableBody.innerHTML = '';
-      
-      Object.entries(ordersData).forEach(([userId, userData]) => {
+      const entries = Object.entries(ordersData || {});
+      if (!entries.length) {
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      entries.forEach(([userId, userData]) => {
         const row = document.createElement('tr');
-        row.className = 'hover:bg-gray-100 border-b border-gray-200';
-        
+        row.className = 'hover:bg-gray-50';
+
         row.innerHTML = `
-          <td class="px-4 py-2">${userData.name}</td>
-          <td class="px-4 py-2">${userData.email}</td>
-          <td class="px-4 py-2">${userData.orders.length}</td>
-          <td class="px-4 py-2">
-            <button onclick="showOrderDetails('${userId}', ${JSON.stringify(userData).replace(/"/g, '&quot;')})" 
-              class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-              View Orders
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-3">
+              <div class="h-9 w-9 shrink-0 rounded-full bg-gray-100 grid place-items-center text-xs font-medium text-gray-600">
+                ${userData.name ? userData.name.charAt(0).toUpperCase() : 'U'}
+              </div>
+              <div>
+                <div class="font-medium">${userData.name || 'Unknown'}</div>
+                <div class="text-xs text-gray-500">ID: ${userId}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3 text-gray-700">${userData.email || '-'}</td>
+          <td class="px-4 py-3"><span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">${(userData.orders || []).length}</span></td>
+          <td class="px-4 py-3">
+            <button onclick="showOrderDetails('${userId}', ${JSON.stringify(userData).replace(/"/g, '&quot;')})" type="button" class="inline-flex items-center gap-2 rounded-md bg-green-700 px-3 py-2 text-xs font-medium text-white shadow-sm transition-colors hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-offset-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              View orders
             </button>
           </td>
         `;
-        
+
         tableBody.appendChild(row);
       });
     }
 
     async function updateOrderStatus(orderId, newStatus) {
+      const container = document.querySelector(`[data-order-id="${orderId}"]`);
+      const statusSelect = container ? container.querySelector('select') : null;
+      const spinner = container ? container.querySelector('.inline-spinner') : null;
       try {
+        if (statusSelect) statusSelect.disabled = true;
+        if (spinner) spinner.classList.remove('hidden');
+
         const response = await fetch(`/api/v1/admin/orders/${orderId}/status`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ orderStatus: newStatus }) // Changed from status to orderStatus
+          body: JSON.stringify({ orderStatus: newStatus })
         });
-        
+
         const data = await response.json();
         if (data.success) {
-          // Update the status display immediately
-          const statusSpan = document.querySelector(`[data-order-id="${orderId}"] .status-indicator`);
-          const statusSelect = document.querySelector(`[data-order-id="${orderId}"] select`);
-          
+          const statusSpan = container ? container.querySelector('.status-indicator') : null;
           if (statusSpan) {
             statusSpan.className = `status-indicator px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(newStatus)}`;
             statusSpan.textContent = newStatus;
           }
-          
-          if (statusSelect) {
-            statusSelect.value = newStatus;
-          }
-          
-          // Show success notification
+          if (statusSelect) statusSelect.value = newStatus;
+
           showNotification('Order status updated successfully', 'success');
-          
-          // Show status update popup
           showStatusUpdatePopup(newStatus);
-          
-          // Refresh the orders list in the background
-          await fetchOrders();
+          // Refresh in background
+          fetchOrders();
         } else {
-          showNotification(data.message || 'Failed to update status', 'error');
+          showNotification((data && data.message) || 'Failed to update status', 'error');
         }
       } catch (error) {
         console.error('Error updating status:', error);
         showNotification('Failed to update order status', 'error');
+      } finally {
+        if (statusSelect) statusSelect.disabled = false;
+        if (spinner) spinner.classList.add('hidden');
       }
     }
 
     function showOrderDetails(userId, userData) {
       const content = document.getElementById('order-details-content');
-      const orders = userData.orders;
-      
+      const dialog = document.getElementById('order-popup');
+      const card = document.getElementById('order-popup-content');
+      const orders = userData.orders || [];
+
       let html = `
-        <div class="space-y-4">
-          <div class="font-semibold">Customer: ${userData.name}</div>
-          <div class="font-semibold">Email: ${userData.email}</div>
-          <div class="divide-y">
+        <div class="mb-4 grid gap-1">
+          <div class="text-sm text-gray-500">Customer</div>
+          <div class="text-sm font-medium">${userData.name || 'Unknown'} <span class="text-gray-400">•</span> <span class="text-gray-600">${userData.email || '-'}</span></div>
+        </div>
+        <div class="divide-y divide-gray-100">
       `;
-      
+
+      if (!orders.length) {
+        html += `
+          <div class="py-10 text-center text-sm text-gray-500">This customer has no orders.</div>
+        `;
+      }
+
       orders.forEach(order => {
         html += `
-          <div class="py-4" data-order-id="${order._id}">
-            <div class="flex justify-between items-center mb-2">
-              <span class="font-semibold">Order ID: ${order._id}</span>
-              <div class="flex items-center space-x-2">
-                <select 
-                  onchange="updateOrderStatus('${order._id}', this.value)"
-                  class="px-2 py-1 rounded border text-xs font-semibold"
-                >
+          <div class="py-5" data-order-id="${order._id}">
+            <div class="mb-3 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-medium text-gray-500">Order ID</span>
+                <span class="rounded border border-gray-200 bg-gray-50 px-2 py-1 text-xs font-mono text-gray-700">${order._id}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <select onchange="updateOrderStatus('${order._id}', this.value)" class="h-8 rounded-md border border-gray-200 bg-white px-2 text-xs font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2">
                   <option value="Pending" ${order.orderStatus === 'Pending' ? 'selected' : ''}>Pending</option>
                   <option value="Processing" ${order.orderStatus === 'Processing' ? 'selected' : ''}>Processing</option>
                   <option value="Shipped" ${order.orderStatus === 'Shipped' ? 'selected' : ''}>Shipped</option>
@@ -163,83 +270,103 @@
                   <option value="Cancelled" ${order.orderStatus === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
                   <option value="Returned" ${order.orderStatus === 'Returned' ? 'selected' : ''}>Returned</option>
                 </select>
-                <span class="status-indicator px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(order.orderStatus)}">
-                  ${order.orderStatus}
+                <span class="status-indicator px-2 py-1 rounded-full text-[10px] font-semibold ${getStatusColor(order.orderStatus)}">${order.orderStatus}</span>
+                <span class="inline-spinner hidden">
+                  <svg class="h-4 w-4 animate-spin text-gray-700" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                  </svg>
                 </span>
               </div>
             </div>
-            <div class="grid grid-cols-2 gap-4 mb-2">
-              <div>
-                <div class="font-medium mb-2">Products:</div>
-                ${order.products.map(p => `
-                  <div class="flex items-center space-x-3 mb-2">
-                    <img src="${p.productId.image}" alt="${p.productId.title}" class="w-16 h-16 object-cover rounded">
-                    <div>
-                      <div class="font-medium">${p.productId.title}</div>
-                      <div class="text-sm text-gray-600">Quantity: ${p.quantity} x ₹${p.price}</div>
+
+            <div class="grid gap-4 md:grid-cols-2">
+              <div class="rounded-lg border border-gray-100">
+                <div class="border-b border-gray-100 px-4 py-2 text-sm font-medium">Products</div>
+                <div class="p-4">
+                  ${order.products.map(p => `
+                    <div class="mb-3 flex items-center gap-3 last:mb-0">
+                      <img src="${p.productId.image}" alt="${p.productId.title}" class="h-14 w-14 rounded-md object-cover ring-1 ring-gray-200" onerror="this.src='https://via.placeholder.com/56'">
+                      <div class="min-w-0">
+                        <div class="truncate text-sm font-medium text-gray-800">${p.productId.title}</div>
+                        <div class="text-xs text-gray-500">Qty: ${p.quantity} × ₹${p.price}</div>
+                      </div>
                     </div>
-                  </div>
-                `).join('')}
+                  `).join('')}
+                </div>
               </div>
-              <div>
-                <div class="font-medium">Shipping Address:</div>
-                <div class="ml-4">
-                  ${order.shippingAddress.fullname}<br>
-                  ${order.shippingAddress.street}<br>
-                  ${order.shippingAddress.city}, ${order.shippingAddress.state}<br>
-                  PIN: ${order.shippingAddress.pincode}<br>
-                  Phone: ${order.shippingAddress.phone}
+
+              <div class="rounded-lg border border-gray-100">
+                <div class="border-b border-gray-100 px-4 py-2 text-sm font-medium">Shipping</div>
+                <div class="p-4 text-sm text-gray-700">
+                  ${(order.shippingAddress && order.shippingAddress.fullname) ? `
+                    <div class="font-medium">${order.shippingAddress.fullname}</div>
+                    <div>${order.shippingAddress.street || ''}</div>
+                    <div>${order.shippingAddress.city || ''}${(order.shippingAddress.city && order.shippingAddress.state) ? ', ' : ''}${order.shippingAddress.state || ''}</div>
+                    <div>PIN: ${order.shippingAddress.pincode || '-'}</div>
+                    <div>Phone: ${order.shippingAddress.phone || '-'}</div>
+                  ` : '<div class="text-gray-500">No shipping address</div>'}
                 </div>
               </div>
             </div>
-            <div class="flex justify-between items-center mt-2">
-              <div class="font-semibold">Total Amount: ₹${order.totalAmount}</div>
-              <div>Payment: ${order.paymentMethod} (${order.paymentStatus})</div>
+
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
+              <div class="text-sm font-medium">Total: <span class="text-gray-900">₹${order.totalAmount}</span></div>
+              <div class="text-xs text-gray-600">Payment: ${order.paymentMethod} <span class="text-gray-400">•</span> ${order.paymentStatus}</div>
             </div>
           </div>
         `;
       });
-      
-      html += `
-          </div>
-        </div>
-      `;
-      
+
+      html += `</div>`;
+
       content.innerHTML = html;
-      document.getElementById('order-popup').classList.remove('hidden');
+      openOrderPopup(card);
+    }
+
+    function openOrderPopup(card) {
+      const dialog = document.getElementById('order-popup');
+      dialog.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      // small enter animation
+      requestAnimationFrame(() => {
+        card.style.transform = 'scale(1)';
+        card.style.opacity = '1';
+      });
+
+      // close on overlay click
+      const overlay = document.getElementById('order-popup-overlay');
+      overlay.addEventListener('click', closeOrderPopup, { once: true });
+
+      // close on Esc
+      window.addEventListener('keydown', handleEscToClose);
+    }
+
+    function handleEscToClose(e) {
+      if (e.key === 'Escape') closeOrderPopup();
     }
 
     function showStatusUpdatePopup(newStatus) {
-      // Create popup element
       const popup = document.createElement('div');
-      popup.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 text-center';
+      popup.className = 'fixed left-1/2 top-1/2 z-[70] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-gray-200 bg-white px-6 py-5 text-center shadow-2xl ring-1 ring-black/5';
       popup.innerHTML = `
-        <div class="text-3xl mb-4">✅</div>
-        <div class="text-xl font-semibold mb-2">Status Updated</div>
-        <div class="text-gray-600">Order status has been changed to:</div>
-        <div class="text-lg font-bold mt-2 ${getStatusColor(newStatus)} inline-block px-3 py-1 rounded">
-          ${newStatus}
+        <div class="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-green-50 text-green-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
         </div>
+        <div class="text-sm font-semibold">Status updated</div>
+        <div class="mt-1 text-xs text-gray-600">Order status changed to</div>
+        <div class="mt-2 inline-block rounded-md px-2 py-1 text-xs font-semibold ${getStatusColor(newStatus)}">${newStatus}</div>
       `;
-      
-      // Add to body
       document.body.appendChild(popup);
-      
-      // Remove after animation
       setTimeout(() => {
         popup.classList.add('opacity-0', 'transition-opacity');
-        setTimeout(() => {
-          popup.remove();
-        }, 300);
-      }, 2000);
+        setTimeout(() => popup.remove(), 250);
+      }, 1600);
     }
 
     async function getUserData(orderId) {
       try {
-        const response = await fetch(`/api/v1/admin/orders/user/${orderId}`, {
-          method: 'GET',
-          credentials: 'include'
-        });
+        const response = await fetch(`/api/v1/admin/orders/user/${orderId}`, { method: 'GET', credentials: 'include' });
         return await response.json();
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -248,15 +375,23 @@
     }
 
     function closeOrderPopup() {
-      document.getElementById('order-popup').classList.add('hidden');
+      const dialog = document.getElementById('order-popup');
+      const card = document.getElementById('order-popup-content');
+      card.style.transform = 'scale(0.98)';
+      card.style.opacity = '0';
+      setTimeout(() => {
+        dialog.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }, 120);
+      window.removeEventListener('keydown', handleEscToClose);
     }
 
     function getStatusColor(status) {
       const colors = {
-        'Pending': 'bg-yellow-100 text-yellow-800',
+        'Pending': 'bg-amber-100 text-amber-800',
         'Processing': 'bg-blue-100 text-blue-800',
-        'Shipped': 'bg-green-100 text-green-800',
-        'Delivered': 'bg-green-500 text-white',
+        'Shipped': 'bg-sky-100 text-sky-800',
+        'Delivered': 'bg-emerald-500 text-white',
         'Cancelled': 'bg-red-100 text-red-800',
         'Returned': 'bg-orange-100 text-orange-800'
       };
@@ -264,19 +399,34 @@
     }
 
     function showNotification(message, type) {
-      const notification = document.getElementById('notification');
-      notification.textContent = message;
-      notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg ${
-        type === 'success' ? 'bg-green-500' : 'bg-red-500'
-      } text-white`;
-      
-      notification.classList.remove('hidden');
+      const container = document.getElementById('notification');
+      const variant = type === 'success' ? 'border-green-200 bg-white text-green-700' : 'border-red-200 bg-white text-red-700';
+      const icon = type === 'success'
+        ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
+
+      container.innerHTML = `
+        <div class="pointer-events-auto flex w-full items-start gap-3 rounded-lg border ${variant} p-3 shadow-lg ring-1 ring-black/5">
+          <div class="mt-0.5">${icon}</div>
+          <div class="text-sm">${message}</div>
+        </div>
+      `;
+      container.classList.remove('hidden');
+      // animate in
+      requestAnimationFrame(() => {
+        container.classList.remove('translate-y-2', 'opacity-0');
+        container.classList.add('translate-y-0', 'opacity-100');
+      });
       setTimeout(() => {
-        notification.classList.add('hidden');
-      }, 3000);
+        container.classList.remove('opacity-100');
+        container.classList.add('opacity-0');
+        setTimeout(() => container.classList.add('hidden'), 250);
+      }, 2200);
     }
 
-    // Initial load
-    document.addEventListener('DOMContentLoaded', fetchOrders);
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchOrders();
+      if (refreshBtn) refreshBtn.addEventListener('click', fetchOrders);
+    });
   </script>
 </body>
