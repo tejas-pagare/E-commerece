@@ -287,21 +287,21 @@
       xhttp.send();
     }
 
-    // Delete seller by id
+    // Delete seller by id (returns a Promise for dialog logic)
     function deleteCustomer(id) {
-      const xhttp = new XMLHttpRequest();
-      xhttp.onload = function () {
-        let data = {};
-        try { data = JSON.parse(this.responseText || "{}"); } catch (e) {}
-        if (data.success) {
-          showNotification(data.message || "Deleted", "success");
-          RenderSellers();
-        } else {
-          showNotification(data.message || "Failed to delete", "error");
-        }
-      };
-      xhttp.open("DELETE", `/api/v1/admin/seller/${id}`, true);
-      xhttp.send();
+      return new Promise((resolve) => {
+        const xhttp = new XMLHttpRequest();
+        xhttp.onload = function () {
+          let data = {};
+          try { data = JSON.parse(this.responseText || "{}"); } catch (e) {}
+          resolve({ ok: !!data.success, data });
+        };
+        xhttp.onerror = function () {
+          resolve({ ok: false, data: { message: "Network error" } });
+        };
+        xhttp.open("DELETE", `/api/v1/admin/seller/${id}`, true);
+        xhttp.send();
+      });
     }
 
     // View dialog
@@ -413,7 +413,7 @@
       if (type === 'approve') {
         result = await approveSeller(id);
       } else if (type === 'delete') {
-        result = await deleteSeller(id);
+        result = await deleteCustomer(id); // <-- use deleteCustomer here
       }
 
       setButtonLoading(confirmBtn, false);
