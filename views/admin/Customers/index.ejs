@@ -261,60 +261,75 @@
       `;
     }
 
-    async function fetchCustomers(opts = {}) {
+    function fetchCustomers(opts = {}) {
       const { fromRefresh = false } = opts;
-      try {
-        isLoading = true;
-        lastError = "";
-        showSkeleton();
-        if (fromRefresh) startRefreshLoading();
-        const res = await fetch("/api/v1/admin/api/customers", { headers: { "Accept": "application/json" } });
-        if (!res.ok) throw new Error("Network error");
-        const data = await res.json();
-        if (!data?.success) throw new Error(data?.message || "Failed to fetch customers");
-        customersData = Array.isArray(data.customers) ? data.customers : [];
-        applyFilter();
-      } catch (err) {
-        lastError = err?.message || "Unexpected error";
-        renderCustomers([]);
-      } finally {
-        isLoading = false;
-        if (fromRefresh) stopRefreshLoading();
-      }
+      isLoading = true;
+      lastError = "";
+      showSkeleton();
+      if (fromRefresh) startRefreshLoading();
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+          isLoading = false;
+          if (fromRefresh) stopRefreshLoading();
+          if (this.status == 200) {
+            try {
+              var data = JSON.parse(this.responseText);
+              if (!data?.success) throw new Error(data?.message || "Failed to fetch customers");
+              customersData = Array.isArray(data.customers) ? data.customers : [];
+              applyFilter();
+            } catch (err) {
+              lastError = err?.message || "Unexpected error";
+              renderCustomers([]);
+            }
+          } else {
+            lastError = "Network error";
+            renderCustomers([]);
+          }
+        }
+      };
+      xhttp.open("GET", "/api/v1/admin/api/customers", true);
+      xhttp.setRequestHeader("Accept", "application/json");
+      xhttp.send();
     }
 
-    async function deleteCustomer(id, btnEl) {
+    function deleteCustomer(id, btnEl) {
       if (!id) return;
-      try {
-        // button loading state
-        if (btnEl) {
-          btnEl.disabled = true;
-          btnEl.dataset.original = btnEl.innerHTML;
-          btnEl.innerHTML = `${spinnerIcon}<span class="ml-2">Deleting...</span>`;
-          btnEl.classList.remove('hover:bg-red-100');
-        }
-        const res = await fetch(`/api/v1/admin/customer/${id}`, { method: "DELETE", headers: { "Accept": "application/json" } });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data?.success) throw new Error(data?.message || "Delete failed");
-        // lightweight toast
-        showToast("Customer deleted");
-        await fetchCustomers();
-      } catch (err) {
-        showToast(err?.message || "Delete failed", true);
-        if (btnEl) {
-          btnEl.disabled = false;
-          btnEl.innerHTML = btnEl.dataset.original || 'Delete';
-        }
-        return;
-      } finally {
-        // In success path, table re-renders; if not, restore button
-        if (btnEl && !btnEl.isConnected) {
-          // no-op; row removed/re-rendered
-        } else if (btnEl) {
-          btnEl.disabled = false;
-          btnEl.innerHTML = btnEl.dataset.original || 'Delete';
-        }
+      // button loading state
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.dataset.original = btnEl.innerHTML;
+        btnEl.innerHTML = `${spinnerIcon}<span class="ml-2">Deleting...</span>`;
+        btnEl.classList.remove('hover:bg-red-100');
       }
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+          if (this.status == 200) {
+            try {
+              var data = JSON.parse(this.responseText);
+              if (!data?.success) throw new Error(data?.message || "Delete failed");
+              showToast("Customer deleted");
+              fetchCustomers();
+            } catch (err) {
+              showToast(err?.message || "Delete failed", true);
+              if (btnEl) {
+                btnEl.disabled = false;
+                btnEl.innerHTML = btnEl.dataset.original || 'Delete';
+              }
+            }
+          } else {
+            showToast("Delete failed", true);
+            if (btnEl) {
+              btnEl.disabled = false;
+              btnEl.innerHTML = btnEl.dataset.original || 'Delete';
+            }
+          }
+        }
+      };
+      xhttp.open("DELETE", `/api/v1/admin/customer/${id}`, true);
+      xhttp.setRequestHeader("Accept", "application/json");
+      xhttp.send();
     }
 
     // Delete confirm dialog logic

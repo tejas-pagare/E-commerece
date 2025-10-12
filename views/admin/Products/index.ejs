@@ -290,55 +290,86 @@
     }
 
     // API calls
-    async function getProducts() {
+    function getProducts() {
       renderSkeletonRows(6);
-      try {
-        const res = await fetch("http://localhost:8000/api/v1/admin/products/details", { credentials: "same-origin" });
-        if (!res.ok) throw new Error("Failed to load products");
-        const data = await res.json();
-        renderProducts(data.products || []);
-      } catch (err) {
-        document.getElementById("product-table").innerHTML = "";
-        showNotification("Failed to load products", "error");
-      }
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+          if (this.status == 200) {
+            try {
+              var data = JSON.parse(this.responseText);
+              renderProducts(data.products || []);
+            } catch (err) {
+              document.getElementById("product-table").innerHTML = "";
+              showNotification("Failed to load products", "error");
+            }
+          } else {
+            document.getElementById("product-table").innerHTML = "";
+            showNotification("Failed to load products", "error");
+          }
+        }
+      };
+      xhttp.open("GET", "http://localhost:8000/api/v1/admin/products/details", true);
+      xhttp.withCredentials = true;
+      xhttp.send();
     }
 
-    async function approveProduct(id) {
+    function approveProduct(id) {
       const btn = document.getElementById(`approve-btn-${id}`);
       setButtonLoading(btn, true, "Approving...");
-      try {
-        const res = await fetch(`/api/v1/admin/product/approve/${id}`, { method: "GET", credentials: "same-origin" });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data.success) throw new Error(data?.message || "Failed to approve product");
-        showNotification(data.message || "Product approved", "success");
-        await getProducts();
-      } catch (err) {
-        showNotification(err.message || "Failed to approve product", "error");
-      } finally {
-        setButtonLoading(btn, false);
-      }
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4) {
+          setButtonLoading(btn, false);
+          if (this.status == 200) {
+            try {
+              var data = JSON.parse(this.responseText);
+              if (!data.success) throw new Error(data?.message || "Failed to approve product");
+              showNotification(data.message || "Product approved", "success");
+              getProducts();
+            } catch (err) {
+              showNotification(err.message || "Failed to approve product", "error");
+            }
+          } else {
+            showNotification("Failed to approve product", "error");
+          }
+        }
+      };
+      xhttp.open("GET", `/api/v1/admin/product/approve/${id}`, true);
+      xhttp.withCredentials = true;
+      xhttp.send();
     }
 
     function confirmDisapprove(id, title) {
       setConfirmDialog({
         title: "Unverify product?",
-        description: `This will mark "${title}" as unverified.`,
+        description: `This will mark \"${title}\" as unverified.`,
         actionText: "Unverify",
         variant: "default",
-        onConfirm: async (actionBtn) => {
+        onConfirm: function(actionBtn) {
           setButtonLoading(actionBtn, true, "Unverifying...");
-          try {
-            const res = await fetch(`/api/v1/admin/product/disapprove/${id}`, { method: "GET", credentials: "same-origin" });
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok || !data.success) throw new Error(data?.message || "Failed to unverify product");
-            showNotification(data.message || "Product unverified", "success");
-            closeDialog("dialog-confirm");
-            await getProducts();
-          } catch (err) {
-            showNotification(err.message || "Failed to unverify product", "error");
-          } finally {
-            setButtonLoading(actionBtn, false);
-          }
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+              setButtonLoading(actionBtn, false);
+              if (this.status == 200) {
+                try {
+                  var data = JSON.parse(this.responseText);
+                  if (!data.success) throw new Error(data && data.message ? data.message : "Failed to unverify product");
+                  showNotification(data.message || "Product unverified", "success");
+                  closeDialog("dialog-confirm");
+                  getProducts();
+                } catch (err) {
+                  showNotification(err.message || "Failed to unverify product", "error");
+                }
+              } else {
+                showNotification("Failed to unverify product", "error");
+              }
+            }
+          };
+          xhttp.open("GET", `/api/v1/admin/product/disapprove/${id}` , true);
+          xhttp.withCredentials = true;
+          xhttp.send();
         }
       });
     }
@@ -346,22 +377,27 @@
     function confirmDelete(id, title) {
       setConfirmDialog({
         title: "Delete product?",
-        description: `This will permanently delete "${title}".`,
+        description: `This will permanently delete \"${title}\".`,
         actionText: "Delete",
         variant: "destructive",
-        onConfirm: async (actionBtn) => {
+        onConfirm: function(actionBtn) {
           setButtonLoading(actionBtn, true, "Deleting...");
-          try {
-            const res = await fetch(`http://localhost:8000/api/v1/admin/product/${id}`, { method: "DELETE", credentials: "same-origin" });
-            if (!res.ok) throw new Error("Failed to delete product");
-            showNotification("Product deleted", "success");
-            closeDialog("dialog-confirm");
-            await getProducts();
-          } catch (err) {
-            showNotification(err.message || "Failed to delete product", "error");
-          } finally {
-            setButtonLoading(actionBtn, false);
-          }
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+              setButtonLoading(actionBtn, false);
+              if (this.status == 200) {
+                showNotification("Product deleted", "success");
+                closeDialog("dialog-confirm");
+                getProducts();
+              } else {
+                showNotification("Failed to delete product", "error");
+              }
+            }
+          };
+          xhttp.open("DELETE", `http://localhost:8000/api/v1/admin/product/${id}` , true);
+          xhttp.withCredentials = true;
+          xhttp.send();
         }
       });
     }
