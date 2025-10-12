@@ -1,115 +1,531 @@
 <body>
-    <div class="bg-gray-100 p-6">
+    <div class="bg-gray-50 p-6">
         <!-- Header Section -->
-        <header class="mb-8">
-            <nav class="text-sm text-gray-500 mb-4">Dashboard &gt; Products &gt; Add Product</nav>
-            <h1 class="text-3xl font-bold text-gray-800">Add New Product</h1>
+        <header class="mb-6">
+            <!-- Breadcrumb -->
+            <nav aria-label="Breadcrumb" class="mb-3">
+                <ol class="flex items-center gap-1 text-sm text-gray-500">
+                    <li>
+                        <a href="/api/v1/seller" class="inline-flex items-center gap-1 rounded-md px-2 py-1 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-4 w-4 text-gray-400">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10.5l9-7 9 7V20a1 1 0 01-1 1h-5.5a1 1 0 01-1-1v-4.5H9.5V20a1 1 0 01-1 1H3.5a1 1 0 01-1-1v-9.5z" />
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li aria-hidden="true" class="px-1 text-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </li>
+                    <li>
+                        <a href="/api/v1/seller" class="inline-flex items-center rounded-md px-2 py-1 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-200">Products</a>
+                    </li>
+                    <li aria-hidden="true" class="px-1 text-gray-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </li>
+                    <li aria-current="page" class="inline-flex items-center rounded-md px-2 py-1 text-gray-900 bg-gray-50">
+                        Add Product
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- Card-like header -->
+            <div class="mx-auto max-w-4xl rounded-lg border border-gray-200 bg-white px-4 py-4 md:px-6 md:py-5 shadow-sm">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="flex items-start gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-md bg-gray-900 text-white">
+                            <!-- icon: package -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.25 7.5l-8.25-4.5-8.25 4.5m16.5 0L12 12m8.25-4.5v9l-8.25 4.5m0-9l-8.25-4.5m8.25 4.5v9m-8.25-13.5v9l8.25 4.5" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-xl md:text-2xl font-semibold text-gray-900">Add New Product</h1>
+                            <p class="mt-1 text-sm text-gray-500">Create a new product and manage it in your seller dashboard.</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex h-6 items-center rounded-full border border-gray-200 bg-white px-2 text-xs font-medium text-gray-600">Seller</span>
+                </div>
+            </div>
         </header>
 
-        <form class="product-form bg-white p-8 rounded-lg shadow-md space-y-8"
+        <form class="product-form mx-auto max-w-4xl bg-white border border-gray-200 p-6 md:p-8 rounded-lg shadow-sm space-y-8"
             onsubmit="return handleFormSubmit(event)">
             <!-- Product Information Section -->
-            <section>
-                <h2 class="text-xl font-semibold mb-4">Product Information</h2>
+            <section class="space-y-4">
+                <h2 class="text-lg font-medium text-gray-900">Product Information</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <input name="title" type="text" placeholder="Title (Product Name)"
-                        class="p-3 border rounded-lg w-full" required>
-                    <select name="category" class="p-3 border rounded-lg w-full" required>
-                        <option value="">Select Category</option>
-                        <option value="silk">Silk</option>
-                        <option value="fabric">Fabric</option>
-                        <option vaue="cotton">Cotton</option>
-                        <option value="wool">Wool</option>
-                        <option value="linen">Linen</option>
-                        <option value="cashmere">Cashmere</option>
+                    <div class="space-y-2">
+                        <label for="title" class="text-sm font-medium text-gray-900">Title</label>
+                        <input id="title" name="title" type="text" placeholder="Product name"
+                            class="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                            required aria-describedby="error-title">
+                        <p id="error-title" class="mt-1 text-sm text-red-600 hidden"></p>
+                    </div>
 
-                    </select>
+                    <div class="space-y-2">
+                        <label for="category" class="text-sm font-medium text-gray-900">Category</label>
+                        <select id="category" name="category"
+                            class="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                            required aria-describedby="error-category">
+                            <option value="">Select Category</option>
+                            <option value="silk">Silk</option>
+                            <option value="fabric">Fabric</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="wool">Wool</option>
+                            <option value="linen">Linen</option>
+                            <option value="cashmere">Cashmere</option>
+                        </select>
+                        <p id="error-category" class="mt-1 text-sm text-red-600 hidden"></p>
+                    </div>
                 </div>
 
-                <input name="img" type="file" placeholder="Photo Link" class="p-3 mt-4 border rounded-lg w-full"
-                    required>
+                <div class="space-y-2">
+                    <label for="imgInput" class="text-sm font-medium text-gray-900">Product Image</label>
+                    <!-- Dropzone -->
+                    <div id="dropZone" role="button" tabindex="0"
+                        class="flex flex-col items-center justify-center gap-2 w-full rounded-md border-2 border-dashed border-gray-300 bg-white px-4 py-8 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-6 w-6 text-gray-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16V4m0 0l-3.5 3.5M12 4l3.5 3.5M6 16v2a2 2 0 002 2h8a2 2 0 002-2v-2"/>
+                        </svg>
+                        <div class="text-sm text-gray-700">
+                            <span class="font-medium text-gray-900">Click to upload</span> or drag and drop
+                        </div>
+                        <div>
+                            <button type="button" id="browseBtn" class="mt-1 inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Browse</button>
+                        </div>
+                        <p class="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                    </div>
+                    <!-- Real input (hidden) -->
+                    <input id="imgInput" name="img" type="file" accept="image/*" class="hidden" required aria-describedby="error-img">
+
+                    <!-- Inline Preview Card -->
+                    <div id="imagePreviewCard" class="hidden mt-3 flex items-center gap-4 rounded-md border border-gray-200 bg-white p-3">
+                        <img id="imageInlinePreview" src="" alt="Selected image preview" class="h-16 w-16 rounded-md object-cover border border-gray-200" />
+                        <div class="flex-1">
+                            <p id="imageFileName" class="text-sm font-medium text-gray-900">—</p>
+                            <p id="imageFileSize" class="text-xs text-gray-500">—</p>
+                        </div>
+                        <button type="button" id="removeImageBtn" class="text-sm text-red-600 hover:text-red-700">Remove</button>
+                    </div>
+
+                    <p id="error-img" class="mt-1 text-sm text-red-600 hidden"></p>
+                </div>
             </section>
 
-            <input name="quantity" type="number" placeholder="Quantity" class="p-3 border rounded-lg w-full" required>
+            <section class="space-y-4">
+                <h2 class="text-lg font-medium text-gray-900">Inventory</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="quantity" class="text-sm font-medium text-gray-900">Quantity</label>
+                        <input id="quantity" name="quantity" type="number" min="1" step="1" placeholder="e.g., 10"
+                            class="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                            required aria-describedby="error-quantity">
+                        <p id="error-quantity" class="mt-1 text-sm text-red-600 hidden"></p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="stock" class="text-sm font-medium text-gray-900">Stock Status</label>
+                        <select id="stock" name="stock"
+                            class="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                            required aria-describedby="error-stock">
+                            <option value="">Select Status</option>
+                            <option value="true">In Stock</option>
+                            <option value="false">Not In Stock</option>
+                        </select>
+                        <p id="error-stock" class="mt-1 text-sm text-red-600 hidden"></p>
+                    </div>
+                </div>
+            </section>
 
             <!-- Product Description Section -->
-            <section>
-                <h2 class="text-xl font-semibold mb-4">Product Description</h2>
-                <textarea name="description" placeholder="Enter product description"
-                    class="p-3 border rounded-lg w-full h-32" required></textarea>
+            <section class="space-y-2">
+                <h2 class="text-lg font-medium text-gray-900">Description</h2>
+                <label for="description" class="sr-only">Description</label>
+                <textarea id="description" name="description" placeholder="Enter a clear description of your product"
+                    class="w-full min-h-32 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                    required aria-describedby="error-description"></textarea>
+                <p id="error-description" class="mt-1 text-sm text-red-600 hidden"></p>
             </section>
 
             <!-- Pricing Section -->
-            <section>
-                <h2 class="text-xl font-semibold mb-4">Pricing</h2>
-                <div class="grid grid-cols-1">
-                    <input name="price" type="number" placeholder="Sale Price" class="p-3 border rounded-lg w-full"
-                        required>
+            <section class="space-y-2">
+                <h2 class="text-lg font-medium text-gray-900">Pricing</h2>
+                <label for="price" class="sr-only">Sale Price</label>
+                <div class="relative">
+                    <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">₹</span>
+                    <input id="price" name="price" type="number" min="0" step="0.01" placeholder="0.00"
+                        class="w-full h-10 rounded-md border border-gray-300 bg-white pl-8 pr-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-300"
+                        required aria-describedby="error-price">
                 </div>
+                <p id="error-price" class="mt-1 text-sm text-red-600 hidden"></p>
             </section>
 
-            <!-- Stock and Status Section -->
-            <section>
-                <h2 class="text-xl font-semibold mb-4">Stock and Status</h2>
-                <select name="stock" class="p-3 border rounded-lg w-full" required>
-                    <option value="">Select Status</option>
-                    <option value="true">In Stock</option>
-                    <option value="false">Not In Stock</option>
-                </select>
+            <!-- Live Preview Section -->
+            <section id="previewSection" class="border border-gray-200 rounded-lg p-4 hidden bg-white">
+                <h2 class="text-xl font-semibold mb-4">Preview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-1 flex items-start justify-center">
+                        <img id="imagePreview" src="" alt="Preview Image" class="w-48 h-48 object-cover rounded-md border border-gray-200 hidden" />
+                    </div>
+                    <div class="md:col-span-2 space-y-2">
+                        <div class="flex items-center">
+                            <span class="text-gray-500 w-28">Title:</span>
+                            <span id="previewTitle" class="font-medium">—</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-500 w-28">Category:</span>
+                            <span id="previewCategory" class="font-medium">—</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-500 w-28">Price:</span>
+                            <span id="previewPrice" class="font-medium">—</span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-500 w-28">Quantity:</span>
+                            <span id="previewQuantity" class="font-medium">—</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-500 block mb-1">Description:</span>
+                            <p id="previewDescription" class="text-gray-700">—</p>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <!-- Footer Section -->
             <footer class="flex justify-between mt-8">
                 <button type="button" class="text-gray-600 hover:underline">Back to Product</button>
-                <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 create-btn">Create
-                    Product</button>
+                <button type="submit" class="bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 create-btn flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed" aria-busy="false">
+                    <svg class="spinner hidden shadcn-animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                    </svg>
+                    <span class="btn-text">Create Product</span>
+                </button>
             </footer>
         </form>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
     <script>
-        async function handleFormSubmit(event) {
-            event.preventDefault(); // Prevent default form submission
+        // minimal spinner animation if Tailwind isn't present
+        (function(){
+            const style = document.createElement('style');
+            style.innerHTML = `@keyframes shadcn-spin { to { transform: rotate(360deg); } } .shadcn-animate-spin { animation: shadcn-spin 1s linear infinite; }`;
+            document.head && document.head.appendChild(style);
+        })();
+        // --- Toast helpers ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                info: 'bg-gray-800',
+                warning: 'bg-yellow-600'
+            };
+            const toast = document.createElement('div');
+            toast.className = `${colors[type] || colors.info} text-white px-4 py-3 rounded shadow flex items-start gap-3 animate-fade-in`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button aria-label="Close" class="ml-2 text-white/80 hover:text-white" onclick="this.parentElement.remove()">✕</button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast && toast.parentElement) toast.remove();
+            }, 4000);
+        }
 
-            const form = document.querySelector(".product-form");
-            const formData = new FormData(form); // Keeps files and text fields
+        // --- Preview handlers ---
+        let currentObjectUrl = null;
+        function updatePreviewVisibility() {
+            const section = document.getElementById('previewSection');
+            if (!section) return;
+            const hasContent = (
+                (document.querySelector('input[name="title"]').value || '').trim() !== '' ||
+                (document.querySelector('select[name="category"]').value || '').trim() !== '' ||
+                (document.querySelector('input[name="price"]').value || '').trim() !== '' ||
+                (document.querySelector('input[name="quantity"]').value || '').trim() !== '' ||
+                (document.querySelector('textarea[name="description"]').value || '').trim() !== '' ||
+                document.getElementById('imagePreview').src
+            );
+            section.classList.toggle('hidden', !hasContent);
+        }
 
-            // Convert FormData to an object (excluding files)
-            const data = {};
-            formData.forEach((value, key) => {
-                if (value instanceof File && value.size > 0) {
-                    data[key] = value; // Keep file objects
-                } else {
-                    data[key] = value.toString(); // Convert other fields to string
+        function bindPreviewFields() {
+            const titleEl = document.querySelector('input[name="title"]');
+            const categoryEl = document.querySelector('select[name="category"]');
+            const priceEl = document.querySelector('input[name="price"]');
+            const qtyEl = document.querySelector('input[name="quantity"]');
+            const descEl = document.querySelector('textarea[name="description"]');
+            const imgEl = document.getElementById('imgInput');
+            const dropZone = document.getElementById('dropZone');
+            const browseBtn = document.getElementById('browseBtn');
+            const imageCard = document.getElementById('imagePreviewCard');
+            const imageInlinePreview = document.getElementById('imageInlinePreview');
+            const imageFileName = document.getElementById('imageFileName');
+            const imageFileSize = document.getElementById('imageFileSize');
+            const removeImageBtn = document.getElementById('removeImageBtn');
+
+            function setText(id, value, prefix = '') {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const v = (value || '').toString().trim();
+                el.textContent = v ? `${prefix}${v}` : '—';
+                updatePreviewVisibility();
+            }
+
+            titleEl.addEventListener('input', () => setText('previewTitle', titleEl.value));
+            categoryEl.addEventListener('change', () => setText('previewCategory', categoryEl.options[categoryEl.selectedIndex]?.textContent || ''));
+            priceEl.addEventListener('input', () => setText('previewPrice', priceEl.value, '₹'));
+            qtyEl.addEventListener('input', () => setText('previewQuantity', qtyEl.value));
+            descEl.addEventListener('input', () => setText('previewDescription', descEl.value));
+
+            function handleFile(file) {
+                const imgPreview = document.getElementById('imagePreview');
+                if (currentObjectUrl) {
+                    URL.revokeObjectURL(currentObjectUrl);
+                    currentObjectUrl = null;
                 }
+                if (file) {
+                    currentObjectUrl = URL.createObjectURL(file);
+                    imgPreview.src = currentObjectUrl;
+                    imgPreview.classList.remove('hidden');
+
+                    // inline card
+                    imageInlinePreview.src = currentObjectUrl;
+                    imageFileName.textContent = file.name;
+                    const sizeKB = Math.round(file.size / 1024);
+                    imageFileSize.textContent = `${sizeKB} KB`;
+                    imageCard.classList.remove('hidden');
+                } else {
+                    imgPreview.src = '';
+                    imgPreview.classList.add('hidden');
+                    imageInlinePreview.src = '';
+                    imageCard.classList.add('hidden');
+                }
+                updatePreviewVisibility();
+            }
+
+            imgEl.addEventListener('change', (e) => {
+                const file = e.target.files && e.target.files[0];
+                handleFile(file);
             });
 
+            if (browseBtn) browseBtn.addEventListener('click', () => imgEl && imgEl.click());
 
-            try {
-                document.querySelector(".create-btn").diabled=true;
-                const response = await fetch("/api/v1/seller/create", {
-                    method: "POST",
-                    credentials: "include",
-                    body: formData, // Send as FormData, not JSON
+            if (dropZone) {
+                ['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    dropZone.classList.add('border-gray-400', 'bg-gray-50');
+                }));
+                ['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, (e) => {
+                    e.preventDefault(); e.stopPropagation();
+                    dropZone.classList.remove('border-gray-400', 'bg-gray-50');
+                }));
+                dropZone.addEventListener('drop', (e) => {
+                    const dt = e.dataTransfer;
+                    if (dt && dt.files && dt.files[0]) {
+                        imgEl.files = dt.files; // assign dropped files to input
+                        handleFile(dt.files[0]);
+                        validateField('img');
+                    }
                 });
+                dropZone.addEventListener('click', () => imgEl && imgEl.click());
+                dropZone.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); imgEl && imgEl.click(); } });
+            }
 
-                console.log(response);
-                if (response.ok) {
-                    document.querySelector(".create-btn").diabled=false;
-                    window.location.href = "/api/v1/seller/"
-                } else {
-                    if (response.ok) {
-                        document.querySelector(".create-btn").diabled=false;
-                        window.location.href = "/api/v1/seller/create"
+            if (removeImageBtn) {
+                removeImageBtn.addEventListener('click', () => {
+                    imgEl.value = '';
+                    handleFile(null);
+                    validateField('img');
+                });
+            }
+
+            // initialize values on load
+            setText('previewTitle', titleEl.value);
+            setText('previewCategory', categoryEl.options[categoryEl.selectedIndex]?.textContent || '');
+            setText('previewPrice', priceEl.value, '₹');
+            setText('previewQuantity', qtyEl.value);
+            setText('previewDescription', descEl.value);
+        }
+
+        // --- Validation helpers ---
+        function setError(el, message, errorId) {
+            if (!el) return;
+            el.classList.add('border-red-500', 'focus:ring-red-200');
+            el.setAttribute('aria-invalid', 'true');
+            const err = document.getElementById(errorId);
+            if (err) { err.textContent = message || ''; err.classList.toggle('hidden', !message); }
+        }
+
+        function clearError(el, errorId) {
+            if (!el) return;
+            el.classList.remove('border-red-500', 'focus:ring-red-200');
+            el.removeAttribute('aria-invalid');
+            const err = document.getElementById(errorId);
+            if (err) { err.textContent = ''; err.classList.add('hidden'); }
+        }
+
+        function validateField(name) {
+            const title = document.getElementById('title');
+            const category = document.getElementById('category');
+            const img = document.getElementById('imgInput');
+            const quantity = document.getElementById('quantity');
+            const description = document.getElementById('description');
+            const price = document.getElementById('price');
+            const stock = document.getElementById('stock');
+            const maxImageSize = 5 * 1024 * 1024; // 5MB
+
+            const validators = {
+                title: () => {
+                    const v = (title.value || '').trim();
+                    if (!v) { setError(title, 'Title is required.', 'error-title'); return false; }
+                    if (v.length < 3) { setError(title, 'Title must be at least 3 characters.', 'error-title'); return false; }
+                    clearError(title, 'error-title'); return true;
+                },
+                category: () => {
+                    const v = (category.value || '').trim();
+                    if (!v) { setError(category, 'Please select a category.', 'error-category'); return false; }
+                    clearError(category, 'error-category'); return true;
+                },
+                img: () => {
+                    const f = img.files && img.files[0];
+                    if (!f) { setError(img, 'Product image is required.', 'error-img'); return false; }
+                    if (!(f.type || '').startsWith('image/')) { setError(img, 'File must be an image.', 'error-img'); return false; }
+                    if (f.size > maxImageSize) { setError(img, 'Image must be less than 5MB.', 'error-img'); return false; }
+                    clearError(img, 'error-img'); return true;
+                },
+                quantity: () => {
+                    const n = Number(quantity.value);
+                    if (!quantity.value) { setError(quantity, 'Quantity is required.', 'error-quantity'); return false; }
+                    if (!Number.isInteger(n) || n < 1) { setError(quantity, 'Quantity must be an integer greater than 0.', 'error-quantity'); return false; }
+                    clearError(quantity, 'error-quantity'); return true;
+                },
+                description: () => {
+                    const v = (description.value || '').trim();
+                    if (!v) { setError(description, 'Description is required.', 'error-description'); return false; }
+                    if (v.length < 10) { setError(description, 'Description must be at least 10 characters.', 'error-description'); return false; }
+                    clearError(description, 'error-description'); return true;
+                },
+                price: () => {
+                    const n = Number(price.value);
+                    if (price.value === '') { setError(price, 'Price is required.', 'error-price'); return false; }
+                    if (isNaN(n) || n < 0) { setError(price, 'Price must be a number greater than or equal to 0.', 'error-price'); return false; }
+                    clearError(price, 'error-price'); return true;
+                },
+                stock: () => {
+                    const v = (stock.value || '').trim();
+                    if (!v) { setError(stock, 'Please select stock status.', 'error-stock'); return false; }
+                    if (!(v === 'true' || v === 'false')) { setError(stock, 'Invalid stock status.', 'error-stock'); return false; }
+                    clearError(stock, 'error-stock'); return true;
+                },
+            };
+
+            if (name && validators[name]) return validators[name]();
+            // validate all
+            let ok = true; let firstInvalid = null;
+            for (const key of Object.keys(validators)) {
+                const res = validators[key]();
+                if (!res && !firstInvalid) firstInvalid = key;
+                ok = ok && res;
+            }
+            if (!ok && firstInvalid) {
+                const el = document.getElementById(firstInvalid === 'img' ? 'imgInput' : firstInvalid);
+                if (el) el.focus();
+            }
+            return ok;
+        }
+
+        // --- Submit handler with loader/toast ---
+        function handleFormSubmit(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = document.querySelector('.product-form');
+            const formData = new FormData(form); // Keeps files and text fields (including files)
+            const submitBtn = document.querySelector('.create-btn');
+            const spinner = submitBtn?.querySelector('.spinner');
+            const btnText = submitBtn?.querySelector('.btn-text');
+            // client-side validation
+            const valid = validateField();
+            if (!valid) {
+                showToast('Please fix the highlighted errors.', 'error');
+                return false;
+            }
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.setAttribute('aria-busy', 'true');
+            }
+            if (spinner) spinner.classList.remove('hidden');
+            if (btnText) btnText.textContent = 'Creating...';
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.responseType = 'json';
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.setAttribute('aria-busy', 'false');
+                    }
+                    if (spinner) spinner.classList.add('hidden');
+                    if (btnText) btnText.textContent = 'Create Product';
+                    if (this.status >= 200 && this.status < 300) {
+                        const ok = this.response && (this.response.success === true || this.response.status === 'ok');
+                        if (ok) {
+                            showToast('Product created successfully.', 'success');
+                            setTimeout(() => { window.location.href = '/api/v1/seller/'; }, 800);
+                        } else {
+                            const msg = (this.response && (this.response.message || this.response.error)) || 'Failed to submit form';
+                            showToast(msg, 'error');
+                        }
+                    } else {
+                        const msg = (this.response && (this.response.message || this.response.error)) || 'Failed to submit form';
+                        showToast(msg, 'error');
                     }
                 }
+            };
+            xhttp.onerror = function () {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.setAttribute('aria-busy', 'false');
+                }
+                if (spinner) spinner.classList.add('hidden');
+                if (btnText) btnText.textContent = 'Create Product';
+                console.error('Network error submitting form');
+                showToast('Network error submitting form', 'error');
+            };
+            xhttp.open('POST', '/api/v1/seller/create', true);
+            xhttp.withCredentials = true; // mirror fetch credentials: 'include'
+            xhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            // Do NOT set Content-Type manually when sending FormData
+            xhttp.send(formData);
 
-            } catch (error) {
-                document.querySelector(".create-btn").diabled=false;
-                console.error("Error submitting form:", error);
-                alert("Failed to submit form");
-                window.location.href = "/api/v1/seller/create"
-            }
+            return false; // ensure inline onsubmit sees false
         }
+
+        // initialize preview binding on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            bindPreviewFields();
+            // attach field-level validation
+            const map = [
+                { el: document.getElementById('title'), key: 'title', events: ['input','blur'] },
+                { el: document.getElementById('category'), key: 'category', events: ['change','blur'] },
+                { el: document.getElementById('imgInput'), key: 'img', events: ['change','blur'] },
+                { el: document.getElementById('quantity'), key: 'quantity', events: ['input','blur'] },
+                { el: document.getElementById('description'), key: 'description', events: ['input','blur'] },
+                { el: document.getElementById('price'), key: 'price', events: ['input','blur'] },
+                { el: document.getElementById('stock'), key: 'stock', events: ['change','blur'] },
+            ];
+            map.forEach(({el, key, events}) => {
+                if (!el) return;
+                events.forEach(ev => el.addEventListener(ev, () => validateField(key)));
+            });
+        });
     </script>
 </body>
