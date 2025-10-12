@@ -1,39 +1,67 @@
-<body>
-    <div class="flex min-h-screen ">
-        <%- include('../../partials/profileSidebar.ejs') %>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <aside class="w-64 h-screen bg-green-200 p-6 shadow-md text-center">
+            <div class="profile mb-6">
+                <img src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                    alt="Profile Picture" class="w-20 h-20 rounded-full object-cover mx-auto" />
+                <h3 class="text-lg font-semibold mt-2">
+                    <span id="user-name">Loading...</span>
+                </h3>
+            </div>
+            <nav class="space-y-2">
+                <a href="/api/v1/user/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
+                <a href="/api/v1/user/account/address"
+                    class="block py-2 font-medium text-black hover:text-green-700">Address</a>
+                <a href="/api/v1/user/dashboard" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
+                <a href="/api/v1/user/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
+                <a href="/api/v1/user/logout" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
+            </nav>
+        </aside>
 
-        <div class="flex justify-center items-center w-full">
+        <div class="flex-1 flex justify-center items-center p-8">
             <div class="w-full max-w-lg">
                 <div id="notification" class="hidden p-4 mb-4 text-sm rounded-lg" role="alert"></div>
-                <form id="addressForm" class="bg-white p-6 rounded-lg shadow-md w-full border-green-600">
-                    <h2 class="text-2xl font-bold text-green-700 text-center mb-4">Update Address</h2>
+                <form id="addressForm" class="bg-white p-8 rounded-lg shadow-md border border-gray-200 space-y-6">
+                    <h2 class="text-2xl font-bold text-green-700 text-center">Update Address</h2>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Plot No:</label>
+                        <input type="text" name="plotno" id="plotno" required
+                            class="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" placeholder="Loading...">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Street:</label>
+                        <input type="text" name="street" id="street" required
+                            class="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" placeholder="Loading...">
+                    </div>
 
-                    <label class="block text-green-700 font-medium">Plot No:</label>
-                    <input type="text" name="plotno" id="plotno" required
-                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">City:</label>
+                        <input type="text" name="city" id="city" required pattern="^[A-Za-z\s]+$" title="City should contain only letters"
+                            class="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" placeholder="Loading...">
+                    </div>
 
-                    <label class="block text-green-700 font-medium">Street:</label>
-                    <input type="text" name="street" id="street" required
-                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">State:</label>
+                        <input type="text" name="state" id="state" required pattern="^[A-Za-z\s]+$" title="State should contain only letters"
+                            class="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" placeholder="Loading...">
+                    </div>
 
-                    <label class="block text-green-700 font-medium">City:</label>
-                    <input type="text" name="city" id="city" required pattern="^[A-Za-z\s]+$" title="City should contain only letters"
-                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Pincode:</label>
+                        <input type="number" name="pincode" id="pincode" required pattern="^[0-9]{6}$" title="Pincode must be a 6-digit number"
+                            class="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" placeholder="Loading...">
+                    </div>
 
-                    <label class="block text-green-700 font-medium">State:</label>
-                    <input type="text" name="state" id="state" required pattern="^[A-Za-z\s]+$" title="State should contain only letters"
-                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
-
-                    <label class="block text-green-700 font-medium">Pincode:</label>
-                    <input type="number" name="pincode" id="pincode" required pattern="^[0-9]{6}$" title="Pincode must be a 6-digit number"
-                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
-
-                    <label class="block text-green-700 font-medium">Phone:</label>
-                    <input type="tel" name="phone" id="phone" required pattern="^[6-9]\d{9}$" title="Phone number must start with 6-9 and be 10 digits long"
-                        class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400 mb-3 bg-gray-100" placeholder="Loading...">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Phone:</label>
+                        <input type="tel" name="phone" id="phone" required pattern="^[6-9]\d{9}$" title="Phone number must start with 6-9 and be 10 digits long"
+                            class="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50" placeholder="Loading...">
+                    </div>
 
                     <button type="submit" id="submit-btn"
-                        class="w-full bg-green-600 text-white font-bold py-2 rounded hover:bg-green-700 transition">
+                        class="w-full bg-green-600 text-white font-bold py-3 rounded-md hover:bg-green-700 transition-colors">
                         Update Address
                     </button>
                 </form>
@@ -46,7 +74,6 @@
             const submitBtn = document.getElementById('submit-btn');
             const notification = document.getElementById('notification');
 
-            
             const xhrFetch = new XMLHttpRequest();
             xhrFetch.open('GET', '/api/v1/user/account/address/details', true);
             xhrFetch.onload = function() {
@@ -60,14 +87,24 @@
                         document.getElementById("state").value = address.state || '';
                         document.getElementById("pincode").value = address.pincode || '';
                         document.getElementById("phone").value = address.phone || '';
-                        // Remove placeholder styles
-                        document.querySelectorAll('input').forEach(el => el.classList.remove('bg-gray-100'));
+                        document.querySelectorAll('input').forEach(el => el.classList.remove('bg-gray-50'));
                     }
                 }
             };
             xhrFetch.send();
 
-            
+            const userXhr = new XMLHttpRequest();
+            userXhr.open('GET', '/api/v1/user/account/details', true);
+            userXhr.onload = function() {
+                if (userXhr.status >= 200 && userXhr.status < 300) {
+                    const data = JSON.parse(userXhr.responseText);
+                    if (data.success) {
+                        document.getElementById('user-name').textContent = data.user.firstname + ' ' + data.user.lastname;
+                    }
+                }
+            };
+            userXhr.send();
+
             form.addEventListener("submit", function (event) {
                 event.preventDefault();
                 submitBtn.disabled = true;
@@ -85,7 +122,7 @@
                 const xhrSubmit = new XMLHttpRequest();
                 xhrSubmit.open('POST', '/api/v1/user/account/update/address', true);
                 xhrSubmit.setRequestHeader('Content-Type', 'application/json');
-                
+            
                 xhrSubmit.onload = function() {
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Update Address';
@@ -98,7 +135,6 @@
                         showNotification(data.message || "Failed to update address.", true);
                     }
                 };
-                
                 xhrSubmit.onerror = function() {
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Update Address';
@@ -107,7 +143,6 @@
 
                 xhrSubmit.send(JSON.stringify(formData));
             });
-
             function showNotification(message, isError = false) {
                 notification.textContent = message;
                 notification.className = isError 

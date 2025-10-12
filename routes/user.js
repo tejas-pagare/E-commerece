@@ -392,7 +392,7 @@ router.get("/order-history", isAuthenticated, async (req, res) => {
       .populate({
         path: "orders.products.productId",
         model: "Product",
-        select: "name description price category image" // Select fields you need
+        select: "title description price category image" // Select fields you need
       });
 
     if (!orderHistory) {
