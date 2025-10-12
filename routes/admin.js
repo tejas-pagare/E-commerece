@@ -329,6 +329,22 @@ router.get("/seller/details", async (req, res) => {
   }
 });
 
+router.get("/api/sellers", async (req, res) => {
+  try {
+    const sellers = await Seller.find({});
+    res.json({
+      success: true,
+      sellers
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Failed to fetch sellers",
+      error: error.message
+    });
+  }
+});
+
 router.get("/manager", (req, res) => {
   return res.render("admin/manager/index.ejs", { title: "Manager", role: "admin" });
 });
@@ -358,7 +374,8 @@ router.get("/order", (req, res) => {
   return res.render("admin/Orders/index.ejs", { title: "Orders", role: "admin" });
 });
 
-router.post("/orders", async (req, res) => {
+// Shared handler: group orders by user (used for both GET and POST)
+async function getOrdersGrouped(req, res) {
   try {
     const orders = await Order.find({})
       .populate({
@@ -371,7 +388,8 @@ router.post("/orders", async (req, res) => {
       });
 
     const userOrders = orders.reduce((acc, order) => {
-      const userId = order.userId._id;
+      const userId = order.userId?._id;
+      if (!userId) return acc;
       if (!acc[userId]) {
         acc[userId] = {
           _id: userId,
@@ -391,50 +409,17 @@ router.post("/orders", async (req, res) => {
       });
       return acc;
     }, {});
-  
-    console.log(userOrders)
-    res.json(userOrders);
+
+    return res.json(userOrders);
   } catch (error) {
     console.error('Error fetching orders:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'Internal server error' });
   }
-});
+}
 
-router.get("/orders", async (req, res) => {
-  try {
-    const users = await User.find({})
-      .populate({
-        path: 'orders',
-        populate: {
-          path: 'products.productId',
-          model: 'Product'
-        }
-      });
-
-    const ordersData = users.reduce((acc, user) => {
-      if (user.orders && user.orders.length > 0) {
-        acc[user._id] = {
-          _id: user._id,
-          name: `${user.firstname} ${user.lastname}`,
-          email: user.email,
-          orders: user.orders
-        };
-      }
-      return acc;
-    }, {});
-
-    res.json({
-      success: true,
-      orders: ordersData
-    });
-  } catch (error) {
-    console.error('Error fetching orders:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching orders'
-    });
-  }
-});
+// Replace the POST and GET routes to use the same handler
+router.post("/orders", getOrdersGrouped);
+router.get("/orders", getOrdersGrouped);
 
 router.get("/orders/:userId", async (req, res) => {
   try {
@@ -554,7 +539,6 @@ router.get('/orders/user/:orderId', async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
-
 
 
 

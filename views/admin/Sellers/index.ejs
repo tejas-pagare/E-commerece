@@ -64,14 +64,16 @@
       }, 2000);
     }
 
-    async function RenderSellers() {
-      try {
-        const response = await fetch("http://localhost:8000/api/v1/admin/seller/details", { method: "GET" });
-        const data = await response.json();
-        let table = document.getElementById("customer-table");
-        table.innerHTML = "";
+    function RenderSellers() {
+      // loadDoc-style XHR
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function () {
+        let data = {};
+        try { data = JSON.parse(this.responseText || "{}"); } catch (e) {}
+        const sellers = data.sellers || [];
+        const table = document.getElementById("customer-table");
         let row = "";
-        data.sellers.map((e) => {
+        sellers.forEach((e) => {
           row += `
             <tr>
               <td class="px-4 py-2"><img src=${e.profileImage} alt="logo" class="h-16 w-16"></td>
@@ -80,34 +82,44 @@
               <td class="px-4 py-2">${e.email}</td>
               <td class="px-4 py-2">${e.gstn}</td>
               <td class="px-4 py-2">
-                <a title="Aadhar proof" href=${e.identityVerification.aadharCard} target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700">Aadhar Proof</a>
+                <a title="Aadhar proof" href=${e.identityVerification?.aadharCard} target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-3 py-1 text-xs font-medium text-white bg-green-600 rounded-full hover:bg-green-700">Aadhar Proof</a>
               </td>
-              <td class="px-4 py-2">${e.bankDetails.bankName}</td>
-              <td class="px-4 py-2">${e.identityVerification.status === "Verified" ? `<span class="badge bg-success disabled">Verified</span>` : `<button class="badge bg-danger" onclick="approveSeller('${e._id}')">Approve</button>`}</td>
+              <td class="px-4 py-2">${e.bankDetails?.bankName || ""}</td>
               <td class="px-4 py-2">
-                <button class="px-2 py-1 bg-blue-500 text-white rounded-md text-xs" onclick="viewProduct('${e._id}', '${e.name}', '${e.storeName}', '${e.email}', '${e.gstn}', '${e.bankDetails.bankName}','${e.profileImage}')">View</button>
+                ${e.identityVerification?.status === "Verified"
+                  ? `<span class="badge bg-success disabled">Verified</span>`
+                  : `<button class="badge bg-danger" onclick="approveSeller('${e._id}')">Approve</button>`}
+              </td>
+              <td class="px-4 py-2">
+                <button class="px-2 py-1 bg-blue-500 text-white rounded-md text-xs" onclick="viewProduct('${e._id}', '${e.name}', '${e.storeName}', '${e.email}', '${e.gstn}', '${e.bankDetails?.bankName || ""}','${e.profileImage}')">View</button>
                 <button class="px-2 py-1 bg-red-500 text-white rounded-md text-xs" onclick="deleteCustomer('${e._id}')">Delete</button>
               </td>
             </tr>`;
         });
         table.innerHTML = row;
-      } catch (error) {
-        console.log(error);
       }
+      xhttp.open("GET", "/api/v1/admin/api/sellers", true);
+      xhttp.send();
     }
 
-    async function approveSeller(id) {
-      const response = await fetch(`/api/v1/admin/seller/approve/${id}`, { method: "GET" });
-      const data = await response.json();
-      if (data.success) {
-        showNotification(data.message, "success");
-        RenderSellers();
-      } else {
-        showNotification(data.message, "error");
+    function approveSeller(id) {
+      // loadDoc-style XHR
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function () {
+        let data = {};
+        try { data = JSON.parse(this.responseText || "{}"); } catch (e) {}
+        if (data.success) {
+          showNotification(data.message || "Approved", "success");
+          RenderSellers();
+        } else {
+          showNotification(data.message || "Failed to approve", "error");
+        }
       }
+      xhttp.open("GET", `/api/v1/admin/seller/approve/${id}`, true);
+      xhttp.send();
     }
 
-    function viewProduct(id, name, storeName, email, gstn, bankName,profileImage) {
+    function viewProduct(id, name, storeName, email, gstn, bankName, profileImage) {
       const popover = document.getElementById("popover");
       const content = document.getElementById("popover-content");
       content.innerHTML = `
