@@ -29,6 +29,11 @@ router.get("/details/:id", async (req, res) => {
 
 
 
+
+
+
+
+
 router.get("/:id", (req, res) => {
   // We no longer fetch data here. We just render the template.
   // The 'role' and 'title' are still needed for the main layout.

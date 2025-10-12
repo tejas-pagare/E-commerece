@@ -1,91 +1,186 @@
 <body>
-    <div class="bg-gray-100">
-        <div class="w-full h-screen mx-auto bg-white p-6 rounded-lg shadow-md">
-            <h1 class="text-2xl font-bold mb-4">Products</h1>
-            <div class="flex justify-between items-center mb-4">
-                <input type="text" placeholder="Search Products" class="p-2 border rounded w-1/3">
-                <a href="/api/v1/seller/create">
-                    <button class="bg-green-500 text-white px-4 py-2 rounded">Add Product</button>
-                </a>
-            </div>
-            <table class="w-full border-collapse bg-white">
-                <thead>
-                    <tr class="bg-gray-200 text-left">
-                        <th class="p-3 border">Image</th>
-                        <th class="p-3 border">Product Name</th>
-                        <th class="p-3 border">Quantity</th>
-                        <th class="p-3 border">Category</th>
-                        <th class="p-3 border">Status</th>
-                        <th class="p-3 border">Price</th>
-                        <th class="p-3 border">Created At</th>
-                        <th class="p-3 border">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% productListed.map(product=> { %>
-                        <tr class="border-t">
-                            <td class="p-3 border"><img src="<%= product.image %>" alt="Product" class="w-16 h-16"></td>
-                            <td class="p-3 border">
-                                <%= product.title %>
-                            </td>
-                            <td class="p-3 border">
-                                <%= product.quantity%>
-                            </td>
-                            <td class="p-3 border">
-                                <%= product.category %>
-                            </td>
-                            <td class="p-3 border">
-                                    <% if( product.stock){%>
-                                        <span class="bg-green-200 text-green-700 px-2 py-1 rounded">   In Stock
-                                        </span>
-                                        <% } else{%>
-                                            <span class="bg-red-200 text-red-700 px-2 py-1 rounded">  Out Of Stock
-                                            </span>
-                                            <% } %>
+    <div class="min-h-screen" style="background-color:#f8fafc;">
+        <div class="max-w-7xl mx-auto p-6">
+            <div class="card">
+                <div class="p-6 border-b" style="border-color:#e5e7eb;">
+                    <div class="flex items-center justify-between gap-3">
+                        <h1 class="text-2xl font-semibold" style="color:#111827;">Products</h1>
+                        <div class="flex items-center gap-3">
+                            <input id="searchInput" type="text" placeholder="Search products..." class="input w-full" style="max-width: 20rem;" />
+                            <a href="/api/v1/seller/create">
+                                <button id="addProductBtn" class="btn btn-primary px-4 py-2 text-sm">
+                                    <span class="btn-label">Add Product</span>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
 
-                                </td>
-                            <td class="p-3 border">
-                                <%= product.price %>
-                            </td>
-                            <td class="p-3 border">
-                                <%= (product.createdAt).toString().split("T")?.[0] %>
-                            </td>
-                            <td class="p-3  flex space-x-2  flex items-center justify-start">
-                                <a href="/api/v1/seller/update/<%= product.id %>">
-                                    <button class="bg-blue-500 text-white px-3 py-1 rounded">Edit</button>
-                                </a>
-                                <button onclick="deleteProduct('<%= product.id %>')"
-                                    class="bg-red-500 text-white px-3 py-1 rounded">Delete</button>
-                            </td>
-                        </tr>
-                        <% }) %>
+                <div class="p-4 overflow-x-auto">
+                    <table class="table bg-white">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Product Name</th>
+                                <th>Quantity</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                                <th>Price</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% productListed.map(product=> { %>
+                                <tr class="product-row">
+                                    <td>
+                                        <img src="<%= product.image %>" alt="Product" class="h-12 w-12 rounded-md object-cover" style="box-shadow: 0 0 0 1px #e5e7eb inset;" />
+                                    </td>
+                                    <td class="text-sm product-title" style="color:#111827; font-weight:500;">
+                                        <%= product.title %>
+                                    </td>
+                                    <td class="text-sm" style="color:#374151;">
+                                        <%= product.quantity%>
+                                    </td>
+                                    <td class="text-sm product-category" style="color:#374151;">
+                                        <%= product.category %>
+                                    </td>
+                                    <td>
+                                        <% if (product.stock) { %>
+                                            <span class="badge badge-green product-status">In Stock</span>
+                                        <% } else { %>
+                                            <span class="badge badge-red product-status">Out Of Stock</span>
+                                        <% } %>
+                                    </td>
+                                    <td class="text-sm" style="color:#111827; font-weight:500;">
+                                        <%= product.price %>
+                                    </td>
+                                    <td class="text-sm" style="color:#374151;">
+                                        <%= (product.createdAt).toString().split("T")?.[0] %>
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <a href="/api/v1/seller/update/<%= product.id %>">
+                                                <button class="btn btn-secondary px-3 py-1.5 text-sm">Edit</button>
+                                            </a>
+                                            <button onclick="deleteProduct('<%= product.id %>', this)" class="btn btn-danger px-3 py-1.5 text-sm">
+                                                <span class="btn-label">Delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }) %>
                             <% if (productListed.length===0) { %>
                                 <tr>
-                                    <td colspan="7" class="p-3 text-center">No Product listed yet</td>
+                                    <td colspan="8" class="p-3 text-center text-sm" style="color:#6b7280;">No Product listed yet</td>
                                 </tr>
-                                <% } %>
-                </tbody>
-            </table>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script>
-        function deleteProduct(productId) {
-            if (confirm("Are you sure you want to delete this product?")) {
-                fetch(`/api/v1/seller/product/${productId}`, {
-                    method: "DELETE",
-                    credentials: "include"
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            location.reload();
+    <style>
+        /* Minimal light-mode utility styles to mimic shadcn/ui look without requiring Tailwind runtime */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .animate-spin { animation: spin 1s linear infinite; }
+        .card { border:1px solid #e5e7eb; border-radius: 0.75rem; background:#ffffff; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+        .input { border:1px solid #d1d5db; border-radius:0.375rem; padding:0.5rem 0.75rem; outline:none; background:#fff; color:#111827; }
+        .input:focus { border-color:#111827; box-shadow:0 0 0 2px rgba(17,24,39,0.15); }
+        .btn { display:inline-flex; align-items:center; gap:0.5rem; border-radius:0.5rem; font-weight:500; }
+        .btn-primary { background:#111827; color:#ffffff; }
+        .btn-primary:hover { background:#0f172a; }
+        .btn-secondary { background:#3b82f6; color:#ffffff; }
+        .btn-secondary:hover { background:#2563eb; }
+        .btn-danger { background:#ef4444; color:#ffffff; }
+        .btn-danger:hover { background:#dc2626; }
+        .btn:disabled { opacity:0.6; cursor:not-allowed; }
+        .table { width:100%; border-collapse:collapse; }
+        .table th { background:#f9fafb; color:#374151; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:0.02em; text-align:left; }
+        .table th, .table td { border:1px solid #e5e7eb; padding:12px; vertical-align:middle; }
+        .table tr:hover { background:#fafafa; }
+        .badge { display:inline-flex; align-items:center; border-radius:9999px; padding:2px 8px; font-size:12px; font-weight:600; border:1px solid; }
+        .badge-green { background:#ecfdf5; color:#065f46; border-color:#a7f3d0; }
+        .badge-red { background:#fee2e2; color:#991b1b; border-color:#fecaca; }
+        .btn .spinner { width:16px; height:16px; border:2px solid currentColor; border-bottom-color:transparent; border-radius:9999px; }
+    </style>
 
-                        } else {
-                            alert("Failed to delete product.");
-                        }
-                    })
-                    .catch(error => console.error("Error:", error));
+    <script>
+        // Client-side search filter by title, category, or status
+        (function(){
+            const input = document.getElementById('searchInput');
+            if (!input) return;
+            const onFilter = () => {
+                const q = (input.value || '').toLowerCase().trim();
+                const rows = document.querySelectorAll('tr.product-row');
+                rows.forEach(row => {
+                    const title = row.querySelector('.product-title')?.textContent?.toLowerCase() || '';
+                    const category = row.querySelector('.product-category')?.textContent?.toLowerCase() || '';
+                    const status = row.querySelector('.product-status')?.textContent?.toLowerCase() || '';
+                    const match = !q || title.includes(q) || category.includes(q) || status.includes(q);
+                    row.style.display = match ? '' : 'none';
+                });
+            };
+            input.addEventListener('input', onFilter);
+        })();
+
+        function setButtonLoading(btnEl, isLoading, loadingText) {
+            if (!btnEl) return;
+            const labelSpan = btnEl.querySelector('.btn-label');
+            if (isLoading) {
+                if (labelSpan) { btnEl.dataset.originalLabel = labelSpan.textContent; }
+                btnEl.disabled = true;
+                btnEl.setAttribute('aria-busy', 'true');
+                const spinner = document.createElement('span');
+                spinner.className = 'spinner animate-spin';
+                const text = document.createElement('span');
+                text.textContent = loadingText || 'Loading...';
+                btnEl.innerHTML = '';
+                btnEl.appendChild(spinner);
+                btnEl.appendChild(text);
+            } else {
+                btnEl.disabled = false;
+                btnEl.removeAttribute('aria-busy');
+                const original = btnEl.dataset.originalLabel || 'Action';
+                btnEl.innerHTML = '<span class="btn-label">' + original + '</span>';
+            }
+        }
+
+        // Add Product button loader (shows briefly before navigation)
+        (function(){
+            const addBtn = document.getElementById('addProductBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', function(){
+                    setButtonLoading(addBtn, true, 'Opening...');
+                });
+            }
+        })();
+
+        function deleteProduct(productId, btnEl) {
+            if (!productId) return;
+            if (confirm('Are you sure you want to delete this product?')) {
+                setButtonLoading(btnEl, true, 'Deleting...');
+                fetch(`/api/v1/seller/product/${productId}`, {
+                    method: 'DELETE',
+                    credentials: 'include'
+                })
+                .then(async (response) => {
+                    const data = await response.json().catch(() => ({}));
+                    if (response.ok && (data.success === undefined || data.success === true)) {
+                        location.reload();
+                    } else {
+                        const msg = (data && (data.message || data.error)) || 'Failed to delete product.';
+                        alert(msg);
+                        setButtonLoading(btnEl, false);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the product.');
+                    setButtonLoading(btnEl, false);
+                });
             }
         }
     </script>

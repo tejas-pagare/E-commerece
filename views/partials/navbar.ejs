@@ -64,22 +64,24 @@
     </div>
 <% } else if(role==="seller" && !(title && (title.toLowerCase() === "login" || title.toLowerCase() === "signup"))) { %>
     <div>
-        <header class="bg-white shadow-md">
-            <div class="container mx-auto px-4 py-4">
+        <header class="bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-gray-100">
+            <div class="container mx-auto px-4">
                 <!-- Top Bar -->
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between py-3">
                     <!-- Logo -->
                     <div class="flex items-center">
-                        <a href="/api/v1/seller">
-                            <span class="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">SwiftMart</span>
+                        <a href="/api/v1/seller" class="focus:outline-none focus:ring-2 focus:ring-green-200 rounded">
+                            <span class="text-2xl font-semibold tracking-tight bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">SwiftMart</span>
                         </a>
                     </div>
 
-                    <!-- Right Icons -->
-                    <div class="flex items-center space-x-6">
-                        <a href="/api/v1/seller/account" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Profile</a>
+                    <!-- Right Actions -->
+                    <div class="flex items-center gap-3">
+                        <a href="/api/v1/seller/account" class="hidden sm:inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
+                            Profile
+                        </a>
                         <form action="/api/v1/seller/logout" method="get">
-                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-150 ease-in-out shadow-sm">
+                            <button type="submit" class="inline-flex items-center rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 transition-colors">
                                 Logout
                             </button>
                         </form>
@@ -87,14 +89,39 @@
                 </div>
 
                 <!-- Navigation -->
-                <nav class="flex items-center space-x-6 mt-4 pt-3 border-t border-gray-100">
-                    <a href="/api/v1/seller/create" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Create Product</a>
-                    <a href="/api/v1/seller" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Listed Products</a>
-                    <a href="/api/v1/seller/sold-products" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Sold Products</a>
-
+                <nav class="flex items-center gap-2 py-2">
+                    <a href="/api/v1/seller/create" data-nav
+                       class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
+                        Create Product
+                    </a>
+                    <a href="/api/v1/seller" data-nav
+                       class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
+                        Listed Products
+                    </a>
+                    <a href="/api/v1/seller/sold-products" data-nav
+                       class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
+                        Sold Products
+                    </a>
                 </nav>
             </div>
         </header>
+        <script>
+            // Active link highlight for seller nav
+            (function() {
+                try {
+                    const path = window.location.pathname;
+                    document.querySelectorAll('header nav a[data-nav]').forEach(a => {
+                        const href = a.getAttribute('href');
+                        if (!href) return;
+                        // consider startsWith for list pages
+                        if (path === href || (href !== '/api/v1/seller' && path.startsWith(href))) {
+                            a.classList.add('bg-green-50','text-green-700','border-green-300');
+                            a.setAttribute('aria-current','page');
+                        }
+                    });
+                } catch (e) { /* no-op */ }
+            })();
+        </script>
     </div>
 <% } else if(role==="admin" && !(title && (title.toLowerCase() === "login" || title.toLowerCase() === "signup"))){ %>
     <nav class="bg-gradient-to-r from-green-500 to-green-600 shadow-lg">

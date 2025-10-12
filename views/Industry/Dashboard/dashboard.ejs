@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <title>Industry Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 </head>
 
 <body class="bg-gray-100 min-h-screen">
+  <!-- Header -->
   <header class="bg-white shadow-sm sticky top-0 z-20">
     <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
       <!-- Logo -->
@@ -48,64 +50,181 @@
     </div>
   </header>
 
-  <div class="max-w-5xl mx-auto py-10">
-    <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+  <!-- Main Content -->
+  <div class="max-w-6xl mx-auto py-10 px-4">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Dashboard</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
       <div class="bg-white shadow rounded-lg p-6 flex flex-col items-center">
         <span class="text-xl font-semibold text-gray-700">Total Orders</span>
-        <span class="text-4xl font-bold text-emerald-600 mt-2">
-          <%= (orders && orders.length) || 0 %>
-        </span>
+        <span id="totalOrders" class="text-4xl font-bold text-emerald-600 mt-2">0</span>
       </div>
+
       <div class="bg-white shadow rounded-lg p-6 flex flex-col items-center">
         <span class="text-xl font-semibold text-gray-700">Total Amount</span>
-        <span class="text-4xl font-bold text-emerald-600 mt-2">₹<%= totalAmount || 0 %></span>
+        <span id="totalAmount" class="text-4xl font-bold text-emerald-600 mt-2">₹0</span>
+      </div>
+
+      <div class="bg-white shadow rounded-lg p-6 flex flex-col items-center">
+        <span class="text-xl font-semibold text-gray-700">Completed Orders</span>
+        <span id="completedOrders" class="text-4xl font-bold text-emerald-600 mt-2">0</span>
       </div>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6">
-      <h2 class="text-2xl font-semibold mb-4">Order History</h2>
-      <% if (orders && orders.length > 0) { %>
-        <table class="w-full text-left">
-          <thead>
-            <tr>
-              <th class="py-2">Order ID</th>
-              <th class="py-2">Date</th>
-              <th class="py-2">Items</th>
-              <th class="py-2">Amount</th>
-              <th class="py-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% orders.forEach(order=> { %>
-              <tr class="border-t">
-                <td class="py-2">
-                  <%= order.combination_id %>
-                </td>
-                <td class="py-2">7/5/2025</td>
-                <td class="py-2">
-                  <%= order.quantity || 0 %>
-                </td>
 
-                <td class="py-2">₹<%= order.amount || 0 %>
-                </td>
-                <td class="py-2">
-                  <span
-                    class="px-2 py-1 rounded-full text-xs 
-                    <%= order.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700' %>">
-                    <%= order.status || 'Completed' %>
-                  </span>
-                </td>
-              </tr>
-              <% }) %>
-          </tbody>
-        </table>
-        <% } else { %>
-          <p class="text-gray-500">No orders found.</p>
-          <% } %>
+
+
+
+
+
+
+
+    <!-- Filter + Refresh -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-3">
+        <button data-filter="all"
+          class="filter-btn bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">All</button>
+        <button data-filter="Completed"
+          class="filter-btn bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">Completed</button>
+        <button data-filter="Pending"
+          class="filter-btn bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">Pending</button>
+      </div>
+      <button id="refreshBtn"
+        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow">⟳ Refresh</button>
+    </div>
+
+    <!-- Order Table -->
+    <div class="bg-white shadow rounded-lg p-6 overflow-x-auto">
+      <h2 class="text-2xl font-semibold mb-4">Order History</h2>
+
+      <div id="loader" class="text-center text-gray-500 py-6 hidden">Loading...</div>
+
+      <table class="w-full text-left" id="ordersTable">
+        <thead>
+          <tr class="border-b bg-gray-50">
+            <th class="py-2 px-3">Order ID</th>
+            <th class="py-2 px-3">Date</th>
+            <th class="py-2 px-3">Quantity</th>
+            <th class="py-2 px-3">Amount</th>
+            <th class="py-2 px-3">Status</th>
+          </tr>
+        </thead>
+        <tbody id="orderBody">
+          <tr><td colspan="5" class="text-center text-gray-500 py-4">No orders found</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
-</body>
 
+
+
+                                                                                                                                        
+  <!-- Script -->
+                                                                                                          
+                                                                                                                       
+
+
+  <script>
+    let allOrders = [];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchDashboard();
+
+      // Refresh button
+      document.getElementById("refreshBtn").addEventListener("click", fetchDashboard);
+
+      // Filter buttons
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const filter = btn.dataset.filter;
+          filterOrders(filter);
+
+          // Highlight selected
+          document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("bg-emerald-600", "text-white"));
+          btn.classList.add("bg-emerald-600", "text-white");
+        });
+      });
+    });
+
+    // Fetch data from backend
+    function fetchDashboard() {
+      const loader = document.getElementById("loader");
+      const tbody = document.getElementById("orderBody");
+      loader.classList.remove("hidden");
+      tbody.innerHTML = "";
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "http://localhost:8000/api/v1/industry/fetchdashboard", true);
+      xhr.withCredentials = true;
+
+      xhr.onload = function () {
+        loader.classList.add("hidden");
+
+        if (xhr.status === 200) {
+          const { orders, totalAmount } = JSON.parse(xhr.responseText);
+          allOrders = orders || [];
+
+          // Update summary
+          document.getElementById("totalOrders").textContent = allOrders.length;
+          document.getElementById("totalAmount").textContent = `₹${totalAmount || 0}`;
+          document.getElementById("completedOrders").textContent =
+            allOrders.filter(o => o.status === "Completed").length;
+
+          renderOrders(allOrders);
+        } else if (xhr.status === 401) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-red-600 text-center py-4">Access Denied — Please Login</td></tr>`;
+        } else {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-red-600 text-center py-4">Server Error (${xhr.status})</td></tr>`;
+        }
+      };
+
+      xhr.onerror = function () {
+        loader.classList.add("hidden");
+        tbody.innerHTML = `<tr><td colspan="5" class="text-red-600 text-center py-4">Network Error</td></tr>`;
+      };
+
+      xhr.send();
+    }
+
+    // Render orders in table
+    function renderOrders(data) {
+      const tbody = document.getElementById("orderBody");
+      tbody.innerHTML = "";
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-gray-500 py-4">No orders found</td></tr>`;
+        return;
+      }
+
+      data.forEach(order => {
+        const row = document.createElement("tr");
+        row.className = "border-t hover:bg-emerald-50 transition";
+        row.innerHTML = `
+          <td class="py-2 px-3 font-medium">${order.combination_id || "—"}</td>
+          <td class="py-2 px-3">${order.date || "—"}</td>
+          <td class="py-2 px-3">${order.quantity || 0}</td>
+          <td class="py-2 px-3 font-semibold text-emerald-700">₹${order.amount || 0}</td>
+          <td class="py-2 px-3">
+            <span class="px-3 py-1 rounded-full text-xs ${
+              order.status === "Completed"
+                ? "bg-emerald-100 text-emerald-700"
+                : "bg-yellow-100 text-yellow-700"
+            }">${order.status || "Pending"}</span>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Filter orders
+    function filterOrders(status) {
+      if (status === "all") {
+        renderOrders(allOrders);
+      } else {
+        renderOrders(allOrders.filter(o => o.status === status));
+      }
+    }
+  </script>
+</body>
 </html>

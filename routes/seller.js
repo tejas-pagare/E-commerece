@@ -73,11 +73,21 @@ router.post("/signup", upload.fields([{ name: "profileImage" }, { name: "aadhaar
       });
     };
 
+
+
+
+
+
+
+
     // Upload images to Cloudinary
     const [result1, result2] = await Promise.all([
       uploadToCloudinary(req.files["profileImage"][0].buffer, "uploads"),
       uploadToCloudinary(req.files["aadhaarImage"][0].buffer, "uploads"),
     ]);
+
+
+    
 
     console.log("Profile Image:", result1.secure_url);
     console.log("Aadhaar Image:", result2.secure_url);

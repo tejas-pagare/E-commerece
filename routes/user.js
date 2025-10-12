@@ -90,7 +90,7 @@ router.get("/store", (req, res) => {
 });
 
 
-
+// IMPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  NEW ROUTE to get the current user's details as JSON
 router.get("/account/details", isAuthenticated, async (req, res) => {
   try {

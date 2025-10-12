@@ -53,28 +53,35 @@
     </div>
 
     <script>
-        document.getElementById('filterForm').addEventListener('submit', async (e) => {
+        document.getElementById('filterForm')?.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(e.target);
-            const params = new URLSearchParams(formData);
-            
-            try {
-                const response = await fetch(`/api/v1/seller/sold-products/filter?${params}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
+            const params = new URLSearchParams(formData).toString();
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                        try {
+                            const data = JSON.parse(this.responseText);
+                            if (data && data.success) {
+                                updateTable(data.soldProducts);
+                            } else {
+                                alert('Error filtering products');
+                            }
+                        } catch (err) {
+                            console.error('Parse error:', err);
+                            alert('Error filtering products');
+                        }
+                    } else {
+                        console.error('Request failed with status:', this.status);
+                        alert('Error filtering products');
                     }
-                });
-                const data = await response.json();
-                
-                if (data.success) {
-                    updateTable(data.soldProducts);
-                } else {
-                    alert('Error filtering products');
                 }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error filtering products');
-            }
+            };
+            xhttp.open('GET', '/api/v1/seller/sold-products/filter?' + params, true);
+            xhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhttp.send();
         });
 
         function updateTable(products) {

@@ -1,41 +1,71 @@
-<body class="bg-gray-100 text-gray-800">
-  <main class="flex">
-      <aside class="w-64 min-h-screen bg-green-200 p-6 rounded-lg text-center shadow-md">
-          <div class="profile mb-4">
-              <img src=<%= seller.profileImage %>
-                  alt="Profile Picture" class="w-20 h-20 rounded-full object-cover mx-auto" />
-              <h2 class="text-lg font-semibold mt-2"><%= seller.name %></h2>
-          </div>
-          <nav class="space-y-2">
-              <a href="/api/v1/seller/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
-              <a href="/api/v1/seller/" class="block py-2 font-medium text-black hover:text-green-700">Listed Product</a>
-             
-              <a href="/api/v1/seller/logout" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
-          </nav>
-      </aside>
+<body class="min-h-screen bg-gray-50 text-gray-900">
+        <main class="p-4 md:p-6">
+            <div class="mx-auto max-w-6xl rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+                <div class="h-1 w-full bg-green-500"></div>
+                <div class="grid grid-cols-1 md:grid-cols-4">
+                    <!-- Sidebar inside the same card -->
+                    <aside class="md:col-span-1 border-b md:border-b-0 md:border-r border-gray-100 p-6">
+                        <div class="text-center">
+                            <img src="<%= seller.profileImage %>" alt="Seller profile picture"
+                                     class="w-20 h-20 rounded-full object-cover mx-auto ring-2 ring-green-100" />
+                            <h2 class="text-base md:text-lg font-semibold mt-3"><%= seller.name %></h2>
+                            <p class="text-xs text-gray-500 mt-1">Seller</p>
+                        </div>
+                        <nav class="space-y-2 text-left mt-6">
+                            <a href="/api/v1/seller/account" data-nav
+                                 class="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700">
+                                <span>Overview</span>
+                            </a>
+                            <a href="/api/v1/seller/account/update" data-nav
+                                 class="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700">
+                                <span>Edit Account</span>
+                            </a>
+                            <a href="/api/v1/seller/" data-nav
+                                 class="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700">
+                                <span>Listed Products</span>
+                            </a>
+                            <a href="/api/v1/seller/logout"
+                                 class="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700">
+                                <span>Log Out</span>
+                            </a>
+                        </nav>
+                    </aside>
 
-      <section class="flex-1  p-6 bg-white rounded-lg shadow-md">
-          <h1 class="text-2xl font-bold mb-6">My Account</h1>
-          <hr class="mb-6">
+                    <!-- Main content in the same card -->
+                    <section class="md:col-span-3 p-6 md:p-8">
+                        <div class="flex items-start justify-between gap-4 mb-6">
+                            <div>
+                                <h1 class="text-xl md:text-2xl font-semibold tracking-tight">My Account</h1>
+                                <p class="text-sm text-gray-500 mt-1">View your account details</p>
+                            </div>
+                            <span class="inline-flex h-6 items-center rounded-full border border-gray-200 bg-white px-2 text-xs font-medium text-gray-600">Seller</span>
+                        </div>
 
-          <form  class="mb-6">
-              <h2 class="text-xl font-semibold mb-4">Account Details</h2>
-              <label class="block font-bold"> Name *</label>
-              <p><%= seller.name %></p>
+                        <h2 class="text-lg font-medium">Account Details</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                            <div class="space-y-1">
+                                <span class="text-sm font-medium text-gray-600">Name</span>
+                                <p class="text-sm text-gray-900 rounded-md border border-gray-100 bg-gray-50 px-3 py-2"><%= seller.name %></p>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="text-sm font-medium text-gray-600">Email</span>
+                                <p class="text-sm text-gray-900 rounded-md border border-gray-100 bg-gray-50 px-3 py-2"><%= seller.email %></p>
+                            </div>
+                            <div class="space-y-1 md:col-span-2">
+                                <span class="text-sm font-medium text-gray-600">GSTN</span>
+                                <p class="text-sm text-gray-900 rounded-md border border-gray-100 bg-gray-50 px-3 py-2"><%= seller.gstn %></p>
+                            </div>
+                        </div>
 
-        
-              <label class="block font-bold mt-4">Email *</label>
-              <p><%= seller.email %></p>
-
-              <label class="block font-bold mt-4">Gstn *</label>
-              <p><%= seller.gstn %></p>
-
-  
-             
-                <a class="mt-12 block w-[180px] px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 " href="/api/v1/seller/account/update">Update Account </a> 
-          </form>
-
-      </section>
-  </main>
+                        <div class="pt-4">
+                            <a class="inline-flex items-center gap-2 rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-200" href="/api/v1/seller/account/update">
+                                Update Account
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </main>
 </body>
 
