@@ -1,100 +1,130 @@
-<body>
-    <div class="bg-green-100 p-4">
-      <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-3xl font-bold text-green-700 mb-6">Checkout</h2>
-  
-        <div class="flex border-b border-green-200 mb-6" role="tablist">
-          <button id="cart-tab" class="tab-button px-4 py-2 text-green-700 font-semibold border-b-2 border-green-500" role="tab">Cart</button>
-          <button id="address-tab" class="tab-button px-4 py-2 text-green-500 font-semibold" role="tab">Address</button>
-          <button id="summary-tab" class="tab-button px-4 py-2 text-green-500 font-semibold" role="tab">Summary</button>
-        </div>
-  
-        <div id="cart-content" class="tab-content">
-          <h3 class="text-lg font-semibold text-green-700 mb-4">Your Cart</h3>
-          <div id="cart-summary-container" class="bg-green-50 p-4 rounded-lg shadow">
-             <p class="text-gray-500">Loading cart...</p>
-          </div>
-          <div class="mt-4 text-right">
-            <button id="to-address" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Proceed to Address</button>
-          </div>
-        </div>
-  
-        <div id="address-content" class="tab-content hidden">
-          <h3 class="text-lg font-semibold text-green-700 mb-4">Billing Address</h3>
-          <div id="address-view">
-            <p class="p-2 border rounded mb-2" id="address-display">Loading...</p>
-            <p class="p-2 border rounded mb-2" id="phone-display">Phone: Loading...</p>
-            <button id="edit-address" class="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">Edit</button>
-          </div>
-          <div id="address-edit" class="hidden">
-            <input id="plotno" class="w-full p-2 mb-2 border rounded" placeholder="Plot/House Number" required />
-            <input id="street" class="w-full p-2 mb-2 border rounded" placeholder="Street Name/Area" required />
-            <input id="city" class="w-full p-2 mb-2 border rounded" placeholder="City" required />
-            <input id="state" class="w-full p-2 mb-2 border rounded" placeholder="State" required />
-            <input id="pincode" class="w-full p-2 mb-2 border rounded" placeholder="PIN Code (6 digits)" required />
-            <input id="phone-input" class="w-full p-2 mb-2 border rounded" placeholder="Phone Number (10 digits)" required />
-            <div id="address-error" class="text-red-500 text-sm mb-2 hidden"></div>
-            <button id="save-address" class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600">Save</button>
-          </div>
-          <div class="mt-4 flex justify-between">
-            <button id="back-to-cart" class="bg-gray-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-gray-600 transition">Back to Cart</button>
-            <button id="to-summary" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Proceed to Summary</button>
-          </div>
-        </div>
-  
-        <div id="summary-content" class="tab-content hidden">
-          <h3 class="text-lg font-semibold text-green-700 mb-4">Order Summary</h3>
-          <div class="grid md:grid-cols-2 gap-6">
-            <div id="final-summary-container" class="bg-green-50 p-4 rounded-lg shadow">
-              <p class="text-gray-500">Loading summary...</p>
-            </div>
-            <div>
-              <h4 class="text-md font-semibold text-green-700 mb-2">User Details</h4>
-              <div id="user-name" class="w-full p-2 mb-2 border rounded">Loading...</div>
-              <div id="user-email" class="w-full p-2 mb-2 border rounded"></div>
-              <div id="user-phone" class="w-full p-2 mb-2 border rounded"></div>
-            </div>
-          </div>
-  
-          <div class="mt-6">
-            <h4 class="text-md font-semibold text-green-700 mb-2">Shipping Address</h4>
-            <p class="p-2 border rounded mb-2" id="summary-address">Loading...</p>
-          </div>
-  
-          <div class="mt-6 flex justify-between">
-            <button id="back-to-address" class="bg-gray-500 text-white py-2 px-6 rounded-lg font-semibold hover:bg-gray-600 transition">Back to Address</button>
-            <button id="place-order" class="bg-green-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Pay</button>
-          </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-green-50 p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-8 rounded-lg shadow-lg">
+      <h2 class="text-3xl font-bold text-green-700 mb-8">Checkout</h2>
+
+      <div class="border-b border-gray-200 mb-8" role="tablist">
+        <div class="flex space-x-4 sm:space-x-8">
+          <button id="cart-tab" class="tab-button pb-3 font-semibold border-b-2 border-green-500 text-green-700" role="tab">1. Cart</button>
+          <button id="address-tab" class="tab-button pb-3 font-semibold border-b-2 border-transparent text-gray-500 hover:text-green-600" role="tab">2. Address</button>
+          <button id="summary-tab" class="tab-button pb-3 font-semibold border-b-2 border-transparent text-gray-500 hover:text-green-600" role="tab">3. Summary</button>
         </div>
       </div>
-  
-      <script>
-       
+
+      <div id="cart-content" class="tab-content">
+        <h3 class="text-xl font-semibold text-green-700 mb-4">Your Cart</h3>
+        <div id="cart-summary-container" class="bg-green-50 p-6 rounded-lg shadow-inner">
+           <p class="text-gray-500">Loading cart...</p>
+        </div>
+        <div class="mt-6 text-right">
+          <button id="to-address" class="bg-green-600 text-white py-2.5 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors">Proceed to Address</button>
+        </div>
+      </div>
+
+      <div id="address-content" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-green-700 mb-4">Billing Address</h3>
+        <div id="address-view" class="bg-gray-50 p-4 rounded-md border">
+          <p class="text-gray-700" id="address-display">Loading...</p>
+          <p class="text-gray-700 mt-2" id="phone-display">Phone: Loading...</p>
+          <button id="edit-address" class="mt-4 text-sm font-semibold text-green-600 hover:underline">Edit Address</button>
+        </div>
+        <div id="address-edit" class="hidden space-y-4">
+          <input id="plotno" class="w-full p-3 border rounded-md" placeholder="Plot/House Number" required />
+          <input id="street" class="w-full p-3 border rounded-md" placeholder="Street Name/Area" required />
+          <input id="city" class="w-full p-3 border rounded-md" placeholder="City" required />
+          <input id="state" class="w-full p-3 border rounded-md" placeholder="State" required />
+          <input id="pincode" class="w-full p-3 border rounded-md" placeholder="PIN Code (6 digits)" required />
+          <input id="phone-input" class="w-full p-3 border rounded-md" placeholder="Phone Number (10 digits)" required />
+          <div id="address-error" class="text-red-500 text-sm hidden"></div>
+          <button id="save-address" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 text-sm font-semibold">Save Address</button>
+        </div>
+        <div class="mt-6 flex justify-between">
+          <button id="back-to-cart" class="bg-gray-500 text-white py-2.5 px-6 rounded-lg font-semibold hover:bg-gray-600 transition">Back to Cart</button>
+          <button id="to-summary" class="bg-green-600 text-white py-2.5 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Proceed to Summary</button>
+        </div>
+      </div>
+
+      <div id="summary-content" class="tab-content hidden">
+        <h3 class="text-xl font-semibold text-green-700 mb-4">Order Summary</h3>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div id="final-summary-container" class="bg-green-50 p-6 rounded-lg shadow-inner">
+            <p class="text-gray-500">Loading summary...</p>
+          </div>
+          <div class="space-y-4">
+            <div>
+                <h4 class="text-md font-semibold text-green-700 mb-2">User Details</h4>
+                <div class="bg-gray-50 p-3 border rounded-md" id="user-name">Loading...</div>
+                <div class="bg-gray-50 p-3 border rounded-md mt-2" id="user-email"></div>
+                <div class="bg-gray-50 p-3 border rounded-md mt-2" id="user-phone"></div>
+            </div>
+            <div>
+                <h4 class="text-md font-semibold text-green-700 mb-2">Shipping Address</h4>
+                <p class="p-3 border rounded-md bg-gray-50" id="summary-address">Loading...</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 flex justify-between border-t pt-6">
+          <button id="back-to-address" class="bg-gray-500 text-white py-2.5 px-6 rounded-lg font-semibold hover:bg-gray-600 transition">Back to Address</button>
+          <button id="place-order" class="bg-green-600 text-white py-2.5 px-6 rounded-lg font-semibold hover:bg-green-700 transition">Pay Now</button>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+        let finalTotal = 0; // Global variable to store the final total
+
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
-  
+
         tabButtons.forEach((btn, i) => {
           btn.addEventListener('click', () => {
-            tabButtons.forEach(b => b.classList.remove('text-green-700', 'border-green-500', 'border-b-2'));
+            tabButtons.forEach(b => {
+                b.classList.remove('text-green-700', 'border-green-500');
+                b.classList.add('text-gray-500', 'border-transparent');
+            });
             tabContents.forEach(tc => tc.classList.add('hidden'));
-            btn.classList.add('text-green-700', 'border-green-500', 'border-b-2');
+            
+            btn.classList.add('text-green-700', 'border-green-500');
+            btn.classList.remove('text-gray-500', 'border-transparent');
             tabContents[i].classList.remove('hidden');
           });
         });
-        
+
         document.getElementById('edit-address').addEventListener('click', () => {
           document.getElementById('address-view').classList.add('hidden');
           document.getElementById('address-edit').classList.remove('hidden');
         });
+
         document.getElementById('to-address').addEventListener('click', () => tabButtons[1].click());
         document.getElementById('back-to-cart').addEventListener('click', () => tabButtons[0].click());
         document.getElementById('to-summary').addEventListener('click', () => tabButtons[2].click());
         document.getElementById('back-to-address').addEventListener('click', () => tabButtons[1].click());
 
-        
         document.addEventListener('DOMContentLoaded', function() {
             const xhr = new XMLHttpRequest();
             xhr.open('GET', '/api/v1/user/checkout-details', true);
+            xhr.withCredentials = true;
 
             xhr.onload = function() {
                 if (xhr.status >= 200 && xhr.status < 300) {
@@ -104,50 +134,50 @@
                     }
                 }
             };
+            
             xhr.send();
         });
 
         function populateCheckoutPage(data) {
             const { user, total, extra } = data;
-            
-            // --- Populate Cart & Summary Sections ---
+            finalTotal = total - (extra || 0); // Calculate and store final total
+
             const cartContainer = document.getElementById('cart-summary-container');
             const summaryContainer = document.getElementById('final-summary-container');
-            let cartHtml = '';
+            let cartHtml = '<div class="space-y-4">';
 
             user.cart.forEach(e => {
                 cartHtml += `
-                    <div class="border-b pb-2 mb-2">
-                        <div class="flex justify-between items-center">
-                            <img src="${e.productId.image}" alt="Product" class="w-12 h-12 rounded" />
-                            <div class="flex-1 ml-3 text-xs">
-                                <p class="font-medium">${e.productId.title}</p>
-                                <p class="text-sm text-gray-500">Rs ${e.productId.price} x ${e.quantity}</p>
-                            </div>
-                            <p class="font-medium">Rs ${e.productId.price * e.quantity}</p>
+                    <div class="flex justify-between items-center">
+                        <img src="${e.productId.image}" alt="Product" class="w-16 h-16 rounded-md object-cover" />
+                        <div class="flex-1 ml-4">
+                            <p class="font-semibold">${e.productId.title}</p>
+                            <p class="text-sm text-gray-600">Rs ${e.productId.price} x ${e.quantity}</p>
                         </div>
+                        <p class="font-semibold text-gray-800">Rs ${e.productId.price * e.quantity}</p>
                     </div>
                 `;
             });
-
-            let totalHtml = `<div class="flex justify-between font-bold text-lg text-green-700"><p>Total:</p><p>Rs ${total}</p></div>`;
+            cartHtml += '</div>';
+            
+            let totalHtml = `<div class="mt-6 pt-4 border-t border-green-200"><div class="flex justify-between font-bold text-lg text-green-700"><p>Total:</p><p>Rs ${total}</p></div>`;
             if (extra) {
                 totalHtml += `
-                    <div class="flex justify-between font-bold text-lg text-green-700 mt-4"><p>Extra (Discount):</p><p>- Rs ${extra}</p></div>
-                    <div class="flex justify-between font-bold text-lg text-green-700 mt-2"><p>Final Total:</p><p>Rs ${total - extra}</p></div>
+                    <div class="flex justify-between font-semibold text-md text-green-600 mt-2"><p>Discount:</p><p>- Rs ${extra}</p></div>
+                    <div class="flex justify-between font-bold text-xl text-green-800 mt-2 border-t pt-2"><p>Final Total:</p><p>Rs ${finalTotal}</p></div>
                 `;
             }
+            totalHtml += `</div>`;
             
             cartContainer.innerHTML = cartHtml + totalHtml;
             summaryContainer.innerHTML = cartHtml + totalHtml;
 
-            // --- Populate Address & User Details ---
             const address = user.Address || {};
-            const addressString = `${address.plotno || ''}, ${address.street || ''}, ${address.city || ''}, ${address.state || ''} - ${address.pincode || ''}`;
+            const addressString = [address.plotno, address.street, address.city, address.state].filter(Boolean).join(', ') + (address.pincode ? ` - ${address.pincode}` : '');
             
-            document.getElementById('address-display').textContent = addressString;
-            document.getElementById('phone-display').textContent = `Phone: ${address.phone || ''}`;
-            document.getElementById('summary-address').textContent = addressString;
+            document.getElementById('address-display').textContent = addressString || 'No address found.';
+            document.getElementById('phone-display').textContent = `Phone: ${address.phone || 'N/A'}`;
+            document.getElementById('summary-address').textContent = addressString || 'No address found.';
 
             document.getElementById('plotno').value = address.plotno || '';
             document.getElementById('street').value = address.street || '';
@@ -158,10 +188,49 @@
 
             document.getElementById('user-name').textContent = `${user.firstname} ${user.lastname}`;
             document.getElementById('user-email').textContent = user.email;
-            document.getElementById('user-phone').textContent = address.phone || '';
+            document.getElementById('user-phone').textContent = address.phone || 'N/A';
         }
         
-        // --- This existing form submission logic is already client-side and is kept as is ---
+        // NEW: Event listener for saving the address
+        document.getElementById('save-address').addEventListener('click', async () => {
+            const addressData = {
+                plotno: document.getElementById('plotno').value.trim(),
+                street: document.getElementById('street').value.trim(),
+                city: document.getElementById('city').value.trim(),
+                state: document.getElementById('state').value.trim(),
+                pincode: document.getElementById('pincode').value.trim(),
+                phone: document.getElementById('phone-input').value.trim()
+            };
+
+            try {
+                const res = await fetch('/api/v1/user/account/update/address', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(addressData)
+                });
+
+                if (res.ok) {
+                    // Update the UI with the new address
+                    const newAddressString = `${addressData.plotno}, ${addressData.street}, ${addressData.city}, ${addressData.state} - ${addressData.pincode}`;
+                    document.getElementById('address-display').textContent = newAddressString;
+                    document.getElementById('phone-display').textContent = `Phone: ${addressData.phone}`;
+                    document.getElementById('summary-address').textContent = newAddressString;
+                    document.getElementById('user-phone').textContent = addressData.phone;
+                    
+                    // Switch back to view mode
+                    document.getElementById('address-view').classList.remove('hidden');
+                    document.getElementById('address-edit').classList.add('hidden');
+                } else {
+                    alert('Failed to save address.');
+                }
+            } catch (error) {
+                console.error('Error saving address:', error);
+                alert('An error occurred while saving the address.');
+            }
+        });
+
+        // MODIFIED: Event listener for placing the order
         document.getElementById('place-order').addEventListener('click', async () => {
           const address = {
               plotno: document.getElementById('plotno').value.trim(),
@@ -175,29 +244,34 @@
           const payButton = document.getElementById('place-order');
           payButton.disabled = true;
           payButton.innerHTML = '<span class="animate-spin inline-block mr-2">⭕</span>Processing...';
+          
           try {
             const res = await fetch('/api/v1/user/payment', {
               method: 'POST',
               credentials: 'include',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paymentMethod: 'COD', address })
+              body: JSON.stringify({ 
+                  paymentMethod: 'COD', 
+                  address: address,
+                  totalEstimatedValue: finalTotal // **FIX**: Sending the final total to the backend
+              })
             });
             if (res.ok) {
               const successOverlay = document.createElement('div');
-              successOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+              successOverlay.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
               const successContent = document.createElement('div');
-              successContent.className = 'bg-white rounded-lg p-8 text-center transform scale-0 transition-transform duration-300';
+              successContent.className = 'bg-white rounded-lg p-8 text-center transform scale-95 transition-transform duration-300';
               successContent.innerHTML = `
-                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                  <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                  <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h3 class="text-xl font-bold text-green-700 mb-2">Payment Successful!</h3>
+                <h3 class="text-2xl font-bold text-green-700 mb-2">Payment Successful!</h3>
                 <p class="text-gray-600 mb-4">Your order has been placed successfully.</p>
-                <div class="animate-pulse text-sm text-gray-500">Redirecting to home page...</div>
+                <div class="text-sm text-gray-500">Redirecting to home page...</div>
               `;
               successOverlay.appendChild(successContent);
               document.body.appendChild(successOverlay);
-              setTimeout(() => { successContent.classList.add('scale-100'); }, 100);
+              setTimeout(() => { successContent.classList.remove('scale-95'); successContent.classList.add('scale-100'); }, 100);
               setTimeout(() => { window.location.href = '/api/v1/user/'; }, 2000);
             } else {
               const err = await res.json();
@@ -210,7 +284,7 @@
             alert('Something went wrong while placing the order: ' + err.message);
           }
         });
-
       </script>
     </div>
   </body>
+</html>

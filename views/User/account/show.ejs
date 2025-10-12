@@ -1,26 +1,45 @@
 <body class="bg-gray-100 text-gray-800">
     <main class="flex">
-        <%- include('../../partials/profileSidebar.ejs') %>
+        <aside class="w-64 h-screen bg-green-200 p-6 rounded-lg text-center shadow-md">
+            <div class="profile mb-4">
+                <img src="https://img.freepik.com/premium-vector/avatar-profile-icon-flat-style-female-user-profile-vector-illustration-isolated-background-women-profile-sign-business-concept_157943-38866.jpg?semt=ais_hybrid"
+                    alt="Profile Picture" class="w-20 h-20 rounded-full object-cover mx-auto" />
+                <h3 class="text-lg font-semibold mt-2" id="user-name-sidebar">Loading...</h3>
+            </div>
+            <nav class="space-y-2">
+                <a href="/api/v1/user/account" class="block py-2 font-medium text-black hover:text-green-700">Account</a>
+                <a href="/api/v1/user/account/address" class="block py-2 font-medium text-black hover:text-green-700">Address</a>
+                <a href="/api/v1/user/dashboard" class="block py-2 font-medium text-black hover:text-green-700">Orders</a>
+                <a href="/api/v1/user/cart" class="block py-2 font-medium text-black hover:text-green-700">Cart</a>
+                <a href="/api/v1/user/logout" class="block py-2 font-medium text-black hover:text-green-700">Log Out</a>
+            </nav>
+        </aside>
 
-        <section class="flex-1 p-6 bg-white rounded-lg shadow-md">
-            <h1 class="text-2xl font-bold mb-6">My Account</h1>
+        <section class="flex-1 p-8 bg-white rounded-lg shadow-md">
+            <h1 class="text-3xl font-bold mb-6 tracking-tight">My Account</h1>
             <hr class="mb-6">
 
-            <div class="mb-6">
-                <h2 class="text-xl font-semibold mb-4">Account Details</h2>
+           <div class="space-y-6">
+                <h2 class="text-2xl font-semibold tracking-tight">Account Details</h2>
 
-                <label class="block font-bold">First Name *</label>
-                <p id="firstname-p">Loading...</p>
+                <div>
+                    <label class="block font-medium text-sm text-gray-700">First Name *</label>
+                    <p id="firstname-p" class="mt-1 p-3 border border-gray-300 rounded-md bg-gray-50">Loading...</p>
+                </div>
 
-                <label class="block font-bold mt-4">Last Name *</label>
-                <p id="lastname-p">Loading...</p>
+                <div>
+                    <label class="block font-medium text-sm text-gray-700">Last Name *</label>
+                    <p id="lastname-p" class="mt-1 p-3 border border-gray-300 rounded-md bg-gray-50">Loading...</p>
+                </div>
 
-                <label class="block font-bold mt-4">Email *</label>
-                <p id="email-p">Loading...</p>
+                <div>
+                    <label class="block font-medium text-sm text-gray-700">Email *</label>
+                    <p id="email-p" class="mt-1 p-3 border border-gray-300 rounded-md bg-gray-50">Loading...</p>
+                </div>
 
-                <a class="mt-12 block w-[180px] px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-center"
+                <a class="inline-block mt-6 px-5 py-2.5 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 transition-colors text-center"
                     href="/api/v1/user/account/update">Update Account</a>
-            </div>
+           </div>
         </section>
     </main>
 
@@ -37,6 +56,7 @@
                         document.getElementById('firstname-p').textContent = user.firstname;
                         document.getElementById('lastname-p').textContent = user.lastname;
                         document.getElementById('email-p').textContent = user.email;
+                        document.getElementById('user-name-sidebar').textContent = user.firstname + ' ' + user.lastname;
                     } else {
                         console.error('Failed to load user details:', data.message);
                     }
@@ -44,7 +64,6 @@
                     console.error('Error fetching user details. Status:', xhr.status);
                 }
             };
-
             xhr.onerror = function() {
                 console.error('Network error occurred.');
             };
