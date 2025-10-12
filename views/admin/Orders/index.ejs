@@ -39,23 +39,32 @@
     async function fetchOrders() {
       try {
         const response = await fetch('/api/v1/admin/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
           credentials: 'include'
         });
-        
-        const data = await response.json();
-        if (data) {
-          console.log(data);
-          renderOrders(data);
-        } else {
-          showNotification('Invalid data format received', 'error');
+
+        if (!response.ok) {
+          const text = await response.text().catch(() => '');
+          throw new Error(`HTTP ${response.status}: ${text || 'Failed to fetch'}`);
         }
+
+        const data = await response.json();
+
+        // Support both shapes: direct map or { success, orders }
+        const ordersPayload = (data && data.success && data.orders) ? data.orders : data;
+
+        if (!ordersPayload || typeof ordersPayload !== 'object') {
+          showNotification('Invalid data format received', 'error');
+          return null;
+        }
+
+        renderOrders(ordersPayload);
+        return ordersPayload;
       } catch (error) {
         console.error('Fetch error:', error);
         showNotification('Failed to fetch orders', 'error');
+        return null;
       }
     }
 
@@ -124,30 +133,6 @@
         console.error('Error updating status:', error);
         showNotification('Failed to update order status', 'error');
       }
-    }
-
-    async function fetchOrders() {
-      try {
-        const response = await fetch('/api/v1/admin/orders', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          credentials: 'include'
-        });
-        
-        const data = await response.json();
-        if (data) {
-          renderOrders(data);
-          return data;
-        } else {
-          showNotification('Invalid data format received', 'error');
-        }
-      } catch (error) {
-        console.error('Fetch error:', error);
-        showNotification('Failed to fetch orders', 'error');
-      }
-      return null;
     }
 
     function showOrderDetails(userId, userData) {
