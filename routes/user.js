@@ -32,33 +32,6 @@ import UserHistory from "../models/userHistory.js";
 import path from 'path';
 const router = express.Router();
 
-// Inject chatbot widget into all user-rendered HTML pages
-const CHATBOT_SNIPPET = '<script src="https://nordan-backend-production.up.railway.app/public/widget.js" defer nordankey="LBK1C5VHQ1ztE"></script>';
-router.use((req, res, next) => {
-  const originalRender = res.render.bind(res);
-
-  res.render = (view, options, callback) => {
-    if (typeof options === 'function') {
-      callback = options;
-      options = {};
-    }
-    const wrap = (err, html) => {
-      if (err) {
-        return callback ? callback(err) : res.status(500).send('Template render error');
-      }
-      if (typeof html === 'string') {
-        html = /<\/body>/i.test(html)
-          ? html.replace(/<\/body>/i, `${CHATBOT_SNIPPET}\n</body>`)
-          : `${html}\n${CHATBOT_SNIPPET}`;
-      }
-      return callback ? callback(null, html) : res.send(html);
-    };
-    return originalRender(view, options || {}, wrap);
-  };
-
-  next();
-});
-
 // New route to get products as JSON
 router.get("/products", isAuthenticated, async (req, res) => {
     try {
@@ -452,6 +425,7 @@ router.get("/dashboard", isAuthenticated, async (req, res) => {
     res.status(500).send("Error loading dashboard");
   }
 });
+
 
 
 router.post("/review/create/:id", isAuthenticated, async (req, res) => {
