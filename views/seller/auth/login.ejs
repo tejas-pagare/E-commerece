@@ -11,29 +11,32 @@
               <h2 class="text-3xl font-bold text-gray-800 mb-4">Sign in to SwiftMart</h2>
               <p class="text-gray-600 mb-8">Welcome back to SwiftMart! Enter your email to get started.</p>
               
-              <form action="/api/v1/seller/login" method="post" id="loginForm">
-                  <div class="mb-4">
-                      <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                      <input name="email" type="email" id="email" placeholder="Enter your email" class="mt-1 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                      <p class="text-red-500 text-sm mt-1 hidden" id="emailError"></p>
-                  </div>
-                  
-                  <div class="mb-4 relative">
-                      <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                      <input name="password" type="password" id="password" placeholder="Enter your password" class="mt-1 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                      <button type="button" id="togglePassword" class="absolute right-3 top-10 text-gray-600 hover:text-gray-800">👁️</button>
-                      <p class="text-red-500 text-sm mt-1 hidden" id="passwordError"></p>
-                  </div>
-                  
-                  <% if (error) { %>
-                      <p style="color: red;"><%= error %></p>
-                  <% } %>
-                  
-                  <button type="submit" id="submit-btn" class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">Sign In</button>
-              </form>
+             <form action="/api/v1/seller/login" method="post" id="loginForm">
+
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+            <span class="block sm:inline"><%= error %></span>
+        </div>
+    <% } %>
+
+    <div class="mb-4">
+        <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+        <input name="email" type="email" id="email" placeholder="Enter your email" class="mt-1 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <p class="text-red-500 text-sm mt-1 hidden" id="emailError"></p>
+    </div>
+
+    <div class="mb-4 relative">
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input name="password" type="password" id="password" placeholder="Enter your password" class="mt-1 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <button type="button" id="togglePassword" class="absolute right-3 top-10 text-gray-600 hover:text-gray-800">👁️</button>
+        <p class="text-red-500 text-sm mt-1 hidden" id="passwordError"></p>
+    </div>
+
+    <button type="submit" id="submit-btn" class="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition">Sign In</button>
+</form>
               
               <p class="mt-6 text-center text-gray-700">Don't have an account? <a href="/api/v1/seller/signup" class="text-green-600 hover:underline">Sign Up</a></p>
-              <p class="mt-6 text-center text-gray-700">Are you admin? <a href="/api/v1/admin/login" class="text-green-600 hover:underline">Admin Sign Up</a></p>
+              <p class="mt-6 text-center text-gray-700">Are you admin? <a href="/api/v1/admin/login" class="text-green-600 hover:underline">Admin Log in</a></p>
           </div>
       </div>
       

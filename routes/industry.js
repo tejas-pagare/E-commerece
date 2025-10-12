@@ -7,9 +7,12 @@ import {v4 as uuidv4} from 'uuid';
 import bcrypt from 'bcryptjs';
 const router = express.Router();
 
-router.get('/login', (req,res)=>{
-    res.render('Industry/Auth/login', {title:'Login', role:'User'})
-} );
+router.get('/login', (req, res) => {
+    // Capture the 'error' query parameter
+    const { error } = req.query;
+    // Pass the error to the template
+    res.render('Industry/Auth/login', { title: 'Login', role: 'User', error: error });
+});
 router.get('/signup', (req, res) => {
     res.render('Industry/Auth/signup', {title:'Signup',role:'User'})
 })
