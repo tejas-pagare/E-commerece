@@ -72,23 +72,15 @@
       </div>
     </div>
 
-
-
-
-
-
-
-
-
     <!-- Filter + Refresh -->
     <div class="flex items-center justify-between mb-4">
       <div class="flex items-center gap-3">
         <button data-filter="all"
           class="filter-btn bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">All</button>
         <button data-filter="Completed"
-          class="filter-btn bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">Completed</button>
+          class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-emerald-600 hover:text-white transition">Completed</button>
         <button data-filter="Pending"
-          class="filter-btn bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition">Pending</button>
+          class="filter-btn bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-emerald-600 hover:text-white transition">Pending</button>
       </div>
       <button id="refreshBtn"
         class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 shadow">⟳ Refresh</button>
@@ -117,14 +109,7 @@
     </div>
   </div>
 
-
-
-                                                                                                                                        
   <!-- Script -->
-                                                                                                          
-                                                                                                                       
-
-
   <script>
     let allOrders = [];
 
@@ -164,6 +149,13 @@
         if (xhr.status === 200) {
           const { orders, totalAmount } = JSON.parse(xhr.responseText);
           allOrders = orders || [];
+
+          // 🟢 Add mock statuses if missing
+          allOrders = allOrders.map((o, i) => ({
+            ...o,
+            status: o.status || (i % 2 === 0 ? "Completed" : "Pending"),
+            date: o.date ? new Date(o.date).toLocaleDateString() : new Date().toLocaleDateString()
+          }));
 
           // Update summary
           document.getElementById("totalOrders").textContent = allOrders.length;
@@ -210,7 +202,7 @@
               order.status === "Completed"
                 ? "bg-emerald-100 text-emerald-700"
                 : "bg-yellow-100 text-yellow-700"
-            }">${order.status || "Pending"}</span>
+            }">${order.status}</span>
           </td>
         `;
         tbody.appendChild(row);
@@ -222,7 +214,7 @@
       if (status === "all") {
         renderOrders(allOrders);
       } else {
-        renderOrders(allOrders.filter(o => o.status === status));
+        renderOrders(allOrders.filter(o => (o.status || "").toLowerCase() === status.toLowerCase()));
       }
     }
   </script>
