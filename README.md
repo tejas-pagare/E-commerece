@@ -1,6 +1,128 @@
+# Group ID: 30
+# Project Title: Swiftmart
+
+**SPOC:** Pagare Tejas Kiran  
+Email: tejaskiran.p23@iiits.in  
+Roll No: S20230010172
+
+---
+
+# Team Contributions
+
+## Tejas Pagare
+
+### Admin Side
+- Developed pages for Secondhand, Manager, and Delivery management.
+- Handled core modules: Seller, Product, Customer, and Order management.
+- Built the Admin Dashboard to monitor platform metrics and operations.
+
+### Seller Side
+- Designed Product Creation, Edit Product, and Product Listing pages.
+- Implemented Seller Profile Edit functionality for account and business updates.
+
+---
+
+## Roshan Bhamare
+
+### Industry Side
+- Updated the Home page and renamed it to CSR (Client Side Rendering).
+- Implemented the Dashboard page.
+- Added the Profile view functionality.
+- Integrated Cart, Profile Updation, About Us, and Blog pages.
+
+### User Side
+- Developed the Sell Product feature.
+- Created the Sustainable Dashboard interface.
+
+---
+
+## Ruchith Bandaru
+
+### User Side
+- Designed the Product Page for user navigation and product display.
+- Implemented Cart, Order Dashboard, and Payment Page for a complete shopping flow.
+- Added Profile update/retrieve features and the Store Page for product listings.
+- Integrated About Us pages for content and platform information.
+
+---
+
+## Yashwardhan Chouhan
+
+### Admin Side
+- Managed Seller Module – Controlled seller registrations, details, and activity.
+- Handled Product Module – Verified and managed products listed on the platform.
+- Managed Customer Module – Maintained customer details and monitored activity.
+- Developed Admin Dashboard – Showed key stats like users, orders, and revenue.
+- Implemented Order Management – Tracked orders and updated their statuses.
+
+---
+
+## Kranthi Banoth
+
+### User Side
+- Implemented User Login and Signup functionalities with proper authentication flow.
+- Added Form Validation for login and registration to ensure data integrity.
+- Developed the User Blog section for creating and viewing blog posts.
+- Designed the User Homepage as the main landing page after login.
+
 # Developer Guide
 
 This document explains the architecture, setup, and development workflow for the EJS + Node.js + MongoDB application in this repository.
+
+## Validation in the Project
+
+### Client-Side Validation
+
+- **User Signup/Login Forms:**  
+  - Validates required fields (name, email, password) for presence and format.
+  - Email format checked with regex.
+  - Password minimum length enforced.
+  - Real-time error messages shown for invalid input.
+  - `views/User/auth/signup.ejs` and `views/User/auth/login.ejs`
+
+- **Seller Signup:**  
+  - Validates GSTN, IFSC, account number, and required file uploads (profile and Aadhaar images).
+  - Pattern attributes and required fields in form inputs.
+  - `views/seller/auth/signup.ejs`
+
+- **Product Creation/Update:**  
+  - Checks for required fields, valid price, quantity, and image file type/size.
+  - Real-time field validation and error highlighting.
+  - `views/seller/Product/index.ejs`
+
+- **User Sell/Donation Form:**  
+  - Validates personal info, address, item selection, material, size, gender, condition, date, and file upload.
+  - Ensures at least one item is selected and terms are agreed.
+  - File type and size checks for images.
+  - `views/User/sell/index.ejs`
+
+### Server-Side Validation
+
+- **User/Seller/Industry Signup & Login:**  
+  - Checks for required fields, unique email, and password hashing.
+  - Validates uploaded files (presence and type) for seller signup.
+  - `routes/user.js`, `routes/seller.js`, `routes/industry.js`
+
+- **Sell/Donation Submission:**  
+  - Validates file presence, combination validity, and field completeness.
+  - Ensures image size limit (5MB) and correct combination for point calculation.
+  - `routes/user.js` (`/sell` route)
+
+- **Product Management:**  
+  - Validates required product fields, image upload, and correct data types.
+  - `routes/seller.js`, `models/product.js`
+
+- **Order and Review Creation:**  
+  - Checks for required fields and valid references.
+  - `routes/user.js` (`/review/create/:id`)
+
+- **Mongoose Schema Validation:**  
+  - Enforces required fields, unique constraints, enums, and data types at the schema/model level.
+  - `models/user.js`, `models/seller.js`, `models/product.js`, `models/orders.js`, `models/Industry.js`, `models/SellProduct.js`
+
+---
+
+Both client-side and server-side validation are implemented to ensure data integrity, user experience, and security.
 
 - Entry point: `index.js`
 - Server framework: Express (SSR with EJS layouts)
