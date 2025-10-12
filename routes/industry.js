@@ -162,8 +162,49 @@ router.get("/profile", industryAuth, async (req, res) => {
       })
     }
   })
+
+
+  
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////done/////////
   router.get("/profile/edit", industryAuth, async (req, res) => {
+    try {
+      // const id = req.industry
+      // const industry = await Industry.findById(id)
+      
+  
+      // if (!industry) {
+      //   return res.status(404).render("error", {
+      //     message: "Industry profile not found",
+      //     error: { status: 404 },
+      //   })
+      // }
+  
+      res.render("Industry/profile/editProfile", {
+        title: "Profile Update",
+        role: "Industry",
+        // companyName: industry.companyName,
+        // email: industry.email,
+        // address: industry.Address || "",
+      })
+    } catch (error) {
+      console.error("Error fetching industry:", error)
+      res.status(500).render("error", {
+        message: "Error fetching profile for editing",
+        error: { status: 500 },
+      })
+    }
+  })
+
+
+
+
+  router.get("/fetchprofileedit", industryAuth, async (req, res) => {
     try {
       const id = req.industry
       const industry = await Industry.findById(id)
@@ -176,9 +217,9 @@ router.get("/profile", industryAuth, async (req, res) => {
         })
       }
   
-      res.render("Industry/profile/editProfile", {
-        title: "Profile Update",
-        role: "Industry",
+      res.json( {
+        // title: "Profile Update",
+        // role: "Industry",
         companyName: industry.companyName,
         email: industry.email,
         address: industry.Address || "",
