@@ -17,16 +17,21 @@ const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
     const userCheck = await User.findOne({ email });
+
     if (!userCheck) {
-      return res.redirect("/api/v1/user/login");
-    }
-    
-    const isMatch = await bcrypt.compare(password, userCheck.password);
-    if (!isMatch) {
-      return res.redirect("/api/v1/user/login");
+      return res.redirect("/api/v1/user/login?error=Invalid email or password");
     }
 
-    const token = jwt.sign({ userId: userCheck._id, role: "user" }, "JWT_SECRET", { expiresIn: "5h" });
+    const isMatch = await bcrypt.compare(password, userCheck.password);
+    if (!isMatch) {
+      return res.redirect("/api/v1/user/login?error=Invalid email or password");
+    }
+
+    const token = jwt.sign(
+      { userId: userCheck._id, role: "user" },
+      "JWT_SECRET",
+      { expiresIn: "5h" }
+    );
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -35,17 +40,17 @@ const loginController = async (req, res) => {
     });
 
     res.redirect("/api/v1/user/");
-
-
   } catch (error) {
-    console.log(error)
-    res.redirect("/api/v1/user/login")
+    console.log(error);
+    res.redirect("/api/v1/user/login?error=Something went wrong");
   }
-}
+};
+
 
 
 const loginPageRenderController = (req, res) => {
-  res.render('User/auth/login.ejs', { title: 'login', error: "", role: "" });
+  const error = req.query.error || "";
+  res.render("User/auth/login", { title: 'login', error, role: "" });
 }
 
 
