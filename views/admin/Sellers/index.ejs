@@ -119,6 +119,23 @@
       xhttp.send();
     }
 
+    // Delete seller by id
+    function deleteCustomer(id) {
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function () {
+        let data = {};
+        try { data = JSON.parse(this.responseText || "{}"); } catch (e) {}
+        if (data.success) {
+          showNotification(data.message || "Deleted", "success");
+          RenderSellers();
+        } else {
+          showNotification(data.message || "Failed to delete", "error");
+        }
+      };
+      xhttp.open("DELETE", `/api/v1/admin/seller/${id}`, true);
+      xhttp.send();
+    }
+
     function viewProduct(id, name, storeName, email, gstn, bankName, profileImage) {
       const popover = document.getElementById("popover");
       const content = document.getElementById("popover-content");

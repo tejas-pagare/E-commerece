@@ -345,6 +345,26 @@ router.get("/api/sellers", async (req, res) => {
   }
 });
 
+// Delete a seller by id (and optionally their products)
+router.delete("/seller/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const seller = await Seller.findById(id);
+    if (!seller) {
+      return res.status(404).json({ success: false, message: "Seller not found" });
+    }
+
+    // Optional: remove products belonging to this seller
+    await Product.deleteMany({ sellerId: id });
+
+    await seller.deleteOne();
+    return res.json({ success: true, message: "Seller deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting seller:", error);
+    return res.status(500).json({ success: false, message: "Failed to delete seller" });
+  }
+});
+
 router.get("/manager", (req, res) => {
   return res.render("admin/manager/index.ejs", { title: "Manager", role: "admin" });
 });
