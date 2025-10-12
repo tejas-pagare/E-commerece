@@ -1,104 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
 <body class="bg-green-50 font-sans">
-  <div class="flex h-screen">
-    <aside class="w-64 bg-green-700 text-white shadow-lg p-6">
-      <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
-      <nav>
-        <ul>
-          <li class="mb-4"><a href="#" class="block p-3 bg-green-600 hover:bg-green-500 rounded transition" onclick="showSection('orders')">Orders</a></li>
-          <li class="mb-4"><a href="#" class="block p-3 hover:bg-green-600 rounded transition" onclick="showSection('profile')">Profile</a></li>
-          <li class="mb-4"><a href="#" class="block p-3 hover:bg-green-600 rounded transition" onclick="showSection('settings')">Settings</a></li>
-        </ul>
-      </nav>
-    </aside>
+  <div class="min-h-screen">
+    <main class="p-8">
+      <header class="mb-8">
+        <h1 class="text-3xl font-bold text-green-800">Welcome, <span id="username-display">...</span>!</h1>
+      </header>
 
-    <main class="flex-1 p-8 overflow-y-auto">
-      <h1 class="text-3xl font-bold mb-6 text-green-800">Welcome, <span id="username-display"><%= username %></span>!</h1>
-
-      <div id="orders" class="content-section bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-semibold mb-4 text-green-700">Recent Orders</h2>
-        <table class="w-full border-collapse border border-green-300 rounded-lg overflow-hidden">
-          <thead>
-            <tr class="bg-green-300 text-green-900">
-              <th class="border p-3">Order ID</th>
-              <th class="border p-3">Date</th>
-              <th class="border p-3">Total</th>
-              <th class="border p-3">Status</th>
-              <th class="border p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="ordersTableBody">
-            <tr>
-                <td colspan="5" class="p-3 text-center text-gray-500">Loading order history...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div id="profile" class="content-section hidden bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-semibold mb-4 text-green-700">Profile</h2>
-        <p>Your profile information will be displayed here.</p>
-      </div>
-
-      <div id="settings" class="content-section hidden bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-semibold mb-4 text-green-700">Settings</h2>
-        <p>Account settings and preferences.</p>
+      <div id="orders" class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4 text-green-700">Your Recent Orders</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="bg-gray-100 text-left text-sm font-semibold text-gray-600">
+                <th class="p-3">Order ID</th>
+                <th class="p-3">Date</th>
+                <th class="p-3">Total</th>
+                <th class="p-3">Status</th>
+                <th class="p-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr>
+                <td colspan="5" class="p-4 text-center text-gray-500">Loading order history...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
   </div>
 
-  <div id="orderPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="relative bg-white p-6 rounded-lg shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto">
-      <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl w-8 h-8 flex items-center justify-center" onclick="closePopup()">✖</button>
-      <h2 class="text-2xl font-semibold text-green-700 mb-4">Order Details</h2>
-      <div id="popupContent"></div>
-      <button class="mt-4 px-5 py-2 bg-green-600 hover:bg-green-500 text-white rounded transition" onclick="closePopup()">Close</button>
+  <div id="orderPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+    <div class="relative bg-white p-8 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <button class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl" onclick="closePopup()">✖</button>
+      <h2 class="text-2xl font-semibold text-green-700 mb-6">Order Details</h2>
+      <div id="popupContent" class="space-y-4"></div>
+      <button class="mt-6 px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded-md transition" onclick="closePopup()">Close</button>
     </div>
   </div>
 
   <script>
-    function showSection(sectionId) {
-      document.querySelectorAll('.content-section').forEach(section => {
-        section.classList.add('hidden');
-      });
-      document.getElementById(sectionId).classList.remove('hidden');
-    }
-
     function viewDetails(productsJson) {
-        // The JSON is passed as a string, so we need to parse it
-        const products = JSON.parse(decodeURIComponent(productsJson));
-        const popupContent = document.getElementById("popupContent");
-        
-        if (!products || products.length === 0) {
-            popupContent.innerHTML = '<p>No product details available for this order.</p>';
-        } else {
-            popupContent.innerHTML = products.map(item => {
-                const product = item.productId || {}; // Handle cases where productId might be null
-                return `
-                <div class="p-3 border-b text-left">
-                  <div class="flex items-center space-x-4">
-                    <img src="${product.image || 'https://via.placeholder.com/80'}" alt="${product.name || 'Product Image'}" class="w-20 h-20 object-cover rounded">
-                    <div>
-                      <p class="font-semibold">${product.name || 'Unknown Product'}</p>
-                      <p><strong>Price:</strong> Rs.${item.price}</p>
-                      <p><strong>Quantity:</strong> ${item.quantity}</p>
-                      <p><strong>Category:</strong> ${product.category || 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
-              `;
-            }).join("");
-        }
-        document.getElementById("orderPopup").classList.remove("hidden");
+      const products = JSON.parse(decodeURIComponent(productsJson));
+      const popupContent = document.getElementById("popupContent");
+      
+      if (!products || products.length === 0) {
+        popupContent.innerHTML = '<p>No product details available for this order.</p>';
+      } else {
+        popupContent.innerHTML = products.map(item => {
+          const product = item.productId || {};
+          return `
+            <div class="p-4 border rounded-md flex items-start space-x-4">
+              <img src="${product.image || 'https://via.placeholder.com/80'}" alt="${product.title || 'Product Image'}" class="w-24 h-24 object-cover rounded-md">
+              <div class="flex-grow">
+                <p class="font-semibold text-lg">${product.title || 'Unknown Product'}</p>
+                <p class="text-gray-600"><strong>Price:</strong> Rs.${item.price}</p>
+                <p class="text-gray-600"><strong>Quantity:</strong> ${item.quantity}</p>
+                <p class="text-gray-600"><strong>Category:</strong> ${product.category || 'N/A'}</p>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+      document.getElementById("orderPopup").classList.remove("hidden");
     }
-
+    
     function closePopup() {
       document.getElementById("orderPopup").classList.add("hidden");
     }
     
-    
     document.addEventListener('DOMContentLoaded', function() {
         const tableBody = document.getElementById('ordersTableBody');
-        
+        const usernameDisplay = document.getElementById('username-display');
+
+        // Fetch user name
+        const userXhr = new XMLHttpRequest();
+        userXhr.open('GET', '/api/v1/user/account/details', true);
+        userXhr.onload = function() {
+            if (userXhr.status >= 200 && userXhr.status < 300) {
+                const data = JSON.parse(userXhr.responseText);
+                if (data.success) {
+                    usernameDisplay.textContent = data.user.firstname;
+                }
+            }
+        };
+        userXhr.send();
+
+        // Fetch order history
         const xhr = new XMLHttpRequest();
         xhr.open('GET', '/api/v1/user/order-history', true);
         
@@ -107,29 +109,26 @@
                 const data = JSON.parse(xhr.responseText);
                 const orders = data.orders || [];
 
-                tableBody.innerHTML = ''; // Clear loading message
+                tableBody.innerHTML = ''; 
 
                 if (orders.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-gray-500">You have no past orders.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">You have no past orders.</td></tr>';
                     return;
                 }
 
                 orders.forEach(order => {
-                    // We need to stringify and encode the products array to pass it safely in an HTML attribute
                     const productsJson = encodeURIComponent(JSON.stringify(order.products));
                     const row = `
-                        <tr class="hover:bg-green-100 transition">
-                            <td class="border p-3 text-center">${order.orderId}</td>
-                            <td class="border p-3 text-center">${new Date(order.purchaseDate).toLocaleDateString()}</td>
-                            <td class="border p-3 text-center">Rs.${order.totalAmount}</td>
-                            <td class="border p-3 text-center">
+                        <tr class="border-b hover:bg-gray-50 transition">
+                            <td class="p-3 font-mono text-sm">${order.orderId}</td>
+                            <td class="p-3">${new Date(order.purchaseDate).toLocaleDateString()}</td>
+                            <td class="p-3 font-semibold">Rs.${order.totalAmount}</td>
+                            <td class="p-3">
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">${order.status}</span>
                             </td>
-                            <td class="border p-3 text-center">
-                                <button 
-                                    class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded transition"
-                                    onclick='viewDetails("${productsJson}")'>
-                                    Details
+                            <td class="p-3 text-right">
+                                <button class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-semibold rounded-md transition" onclick='viewDetails("${productsJson}")'>
+                                    View Details
                                 </button>
                             </td>
                         </tr>
@@ -137,15 +136,16 @@
                     tableBody.innerHTML += row;
                 });
             } else {
-                 tableBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-red-500">Failed to load order history.</td></tr>';
+                 tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Failed to load order history.</td></tr>';
             }
         };
 
         xhr.onerror = function() {
-            tableBody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-red-500">A network error occurred.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">A network error occurred.</td></tr>';
         };
 
         xhr.send();
     });
   </script>
 </body>
+</html>

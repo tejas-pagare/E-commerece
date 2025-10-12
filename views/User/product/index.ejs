@@ -7,7 +7,7 @@
         <span>/</span>
         <span id="breadcrumb-title" class="text-gray-700 font-semibold">Loading...</span>
       </nav>
-  
+
       <div class="md:flex md:space-x-10">
         <div class="md:w-1/2 flex flex-col items-center">
           <div class="w-full flex justify-center">
@@ -17,28 +17,28 @@
           <div id="thumbnail-gallery" class="flex space-x-4 mt-4">
              </div>
         </div>
-  
+
         <div class="md:w-1/2 mt-8 md:mt-0">
           <h1 id="product-title" class="text-3xl font-extrabold text-green-900 mb-2">Loading...</h1>
           <span id="product-category" class="text-sm text-green-600 font-medium uppercase tracking-wide"></span>
-  
+
           <div class="flex items-center mt-4">
             <div class="text-yellow-400 text-lg">
               &#9733;&#9733;&#9733;&#9733;<span class="text-gray-300">&#9733;</span>
             </div>
             <span class="ml-2 text-gray-500 text-sm">(4.0)</span>
           </div>
-  
+
           <div class="mt-5 flex items-center gap-4">
             <span id="product-price" class="text-2xl font-bold text-green-700"></span>
             <span class="text-gray-400 line-through"></span>
           </div>
-  
+
           <button id="add-to-cart-btn"
             class="mt-8 bg-green-600 text-white text-lg px-8 py-3 rounded-full font-semibold shadow hover:bg-green-700 transition opacity-50 cursor-not-allowed" disabled>
             <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
           </button>
-  
+
           <div class="mt-8 text-gray-700 space-y-1 text-sm">
             <p><span class="font-semibold text-green-700">Product Code:</span> <span id="product-code"></span></p>
             <p><span class="font-semibold text-green-700">Availability:</span> <span id="product-availability"></span></p>
@@ -47,7 +47,7 @@
           </div>
         </div>
       </div>
-  
+
       <div class="mt-10 md:flex md:space-x-10">
         <div class="md:w-1/2">
           <h3 id="details-category" class="text-xl font-bold text-green-800 mb-2 capitalize"></h3>
@@ -56,19 +56,19 @@
           <p class="text-gray-600">Store in a cool, dry place.</p>
         </div>
       </div>
-  
+
       <h3 class="text-2xl font-bold mt-12 mb-4 text-green-800">Related Items</h3>
       <div id="related-products-grid" class="grid grid-cols-2 md:grid-cols-4 gap-6">
         </div>
     </div>
-  
+
     <script>
       // Function to change the main image when a thumbnail is clicked
       function changeImage(src) {
         document.getElementById('mainImage').src = src;
       }
       
-      // Notification function (can be moved to a shared JS file later)
+      // Notification function
       function showNotification(message, type = 'success') {
         let container = document.querySelector(".notification-container");
         if (!container) {
@@ -112,9 +112,11 @@
         }
       }
 
-      
       document.addEventListener('DOMContentLoaded', function() {
-        const productId = "<%= productId %>"; // Get productId from the server-rendered variable
+        // Get the product ID from the URL
+        const pathParts = window.location.pathname.split('/');
+        const productId = pathParts[pathParts.length - 1];
+        
         const productContainer = document.getElementById('product-container');
         
         const xhr = new XMLHttpRequest();
@@ -134,8 +136,9 @@
                     document.getElementById('product-category').textContent = product.category;
                     document.getElementById('product-price').textContent = `Rs ${product.price}`;
                     document.getElementById('product-code').textContent = product._id;
-                    document.getElementById('product-availability').textContent = product.stock ? 'In Stock' : 'Not In Stock';
-                    document.getElementById('product-availability').className = product.stock ? 'text-green-600' : 'text-red-500';
+                    const availability = document.getElementById('product-availability');
+                    availability.textContent = product.stock ? 'In Stock' : 'Out of Stock';
+                    availability.className = product.stock ? 'text-green-600' : 'text-red-500';
                     document.getElementById('product-type').textContent = product.category;
                     document.getElementById('details-category').textContent = product.category;
                     document.getElementById('product-description').textContent = product.description;
