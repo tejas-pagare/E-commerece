@@ -1,28 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#008b5e',
-                        secondary: '#e6f9f0',
-                        accent: '#005e3f',
-                        dark: '#ffffff',
-                        darkgray: '#f5f5f5'
-                    }
-                }
-            }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#008b5e',
+            secondary: '#e6f9f0',
+            accent: '#005e3f',
+            dark: '#ffffff',
+            darkgray: '#f5f5f5'
+          }
         }
-    </script>
+      }
+    }
+  </script>
 </head>
+
 <body class="bg-gradient-to-r from-green-100 to-teal-100 text-gray-700 min-h-screen">
-    <header class="bg-white shadow-sm sticky top-0 z-20">
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-20">
         <div class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
           <!-- Logo -->
           <div class="flex items-center gap-2">
@@ -59,105 +61,154 @@
           </div>
         </div>
       </header>
-      
-    <div class="container mx-auto px-4 py-8 max-w-4xl">
-        <!-- Header -->
-        <div class="border-b border-gray-200 pb-4 mb-6">
-            <h1 class="text-4xl font-semibold text-green-700">Edit Profile</h1>
-            <p class="text-gray-500 mt-2">Update your company information</p>
-        </div>
-        
-        <!-- Edit Form -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <form id="profileForm" action="/api/v1/industry/profile/edit" method="POST" class="space-y-6">
-                <!-- Company Name -->
-                <div class="space-y-2">
-                    <label for="companyName" class="text-gray-700 font-medium">Company Name</label>
-                    <input 
-                        type="text" 
-                        id="companyName" 
-                        name="companyName" 
-                        value="<%= companyName %>" 
-                        class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
-                        required
-                    >
-                </div>
-                
-                <!-- Email -->
-                <div class="space-y-2">
-                    <label for="email" class="text-gray-700 font-medium">E-mail</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email" 
-                        value="<%= email %>" 
-                        class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
-                        required
-                    >
-                </div>
-                
-                <!-- Address -->
-                <div class="space-y-2">
-                    <label for="address" class="text-gray-700 font-medium">Address</label>
-                    <textarea 
-                        id="address" 
-                        name="address" 
-                        rows="3" 
-                        class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
-                        required
-                    ><%= address %></textarea>
-                </div>
 
-                <div class="space-y-2" title="this field required">
-                    <label for="password" class="text-gray-700 font-medium">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        value="Enter new password" 
-                        class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
-                        required
-                    >
-                </div>
-                
-                <!-- Buttons -->
-                <div class="flex justify-end gap-4 pt-4">
-                    <a href="profile" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-8 rounded border border-gray-300 transition duration-300">
-                        CANCEL
-                    </a>
-                    <button 
-                        type="submit" 
-                        class="bg-green-700 hover:bg-accent text-white font-medium py-2 px-8 rounded transition duration-300"
-                    >
-                        SAVE CHANGES
-                    </button>
-                </div>
-            </form>
-        </div>
+  <!-- Container -->
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="border-b border-gray-200 pb-4 mb-6">
+      <h1 class="text-4xl font-semibold text-green-700">Edit Profile</h1>
+      <p class="text-gray-500 mt-2">Update your company information</p>
     </div>
-    
-    <script>
-        // Form submission with validation
-        document.getElementById('profileForm').addEventListener('submit', function(event) {
-            const companyName = document.getElementById('companyName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const address = document.getElementById('address').value.trim();
-            const password = document.getElementById('password').value.trim();
-            
-            if (!companyName || !email || !address || !password) {
-                event.preventDefault();
-                alert('Please fill in all required fields');
-                return false;
+
+    <!-- Edit Form -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <form id="profileForm" action="/api/v1/industry/profile/edit" method="POST" class="space-y-6">
+        <!-- Company Name -->
+        <div class="space-y-2">
+          <label for="companyName" class="text-gray-700 font-medium">Company Name</label>
+          <input 
+            type="text" 
+            id="companyName" 
+            name="companyName"
+            placeholder="Enter company name"
+            class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
+            required
+          >
+        </div>
+
+        <!-- Email -->
+        <div class="space-y-2">
+          <label for="email" class="text-gray-700 font-medium">E-mail</label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email"
+            placeholder="Enter email"
+            class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
+            required
+          >
+        </div>
+
+        <!-- Address -->
+        <div class="space-y-2">
+          <label for="address" class="text-gray-700 font-medium">Address</label>
+          <textarea 
+            id="address" 
+            name="address" 
+            rows="3"
+            placeholder="Enter company address"
+            class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
+            required
+          ></textarea>
+        </div>
+
+        <!-- Password with toggle -->
+        <div class="space-y-2 relative" title="This field is required">
+          <label for="password" class="text-gray-700 font-medium">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            name="password" 
+            placeholder="Enter new password"
+            class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary pr-10"
+            required
+          >
+          <button type="button" id="togglePassword" class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
+          <p class="text-sm text-gray-500 mt-1">⚠️ Password must be entered; otherwise, old password will be overwritten with blank.</p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end gap-4 pt-4">
+          <a href="/industry/profile" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-2 px-8 rounded border border-gray-300 transition duration-300">
+            CANCEL
+          </a>
+          <button 
+            type="submit"
+            class="bg-green-700 hover:bg-accent text-white font-medium py-2 px-8 rounded transition duration-300"
+          >
+            SAVE CHANGES
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Fetch profile data via XMLHttpRequest
+    function fetchProfileXML() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", "http://localhost:8000/api/v1/industry/fetchprofileedit", true);
+      xhr.withCredentials = true;
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            try {
+              const data = JSON.parse(xhr.responseText);
+              document.getElementById("companyName").value = data.companyName || "";
+              document.getElementById("email").value = data.email || "";
+              document.getElementById("address").value = data.address || "";
+            } catch (err) {
+              console.error("Error parsing profile data:", err);
             }
-            
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                event.preventDefault();
-                alert('Please enter a valid email address');
-                return false;
-            }
-        });
-    </script>
+          } else if (xhr.status === 401) {
+            alert("⚠️ Access Denied! Please log in again.");
+            window.location.href = "/industry/login";
+          } else {
+            console.error("Failed to fetch profile. Status:", xhr.status);
+          }
+        }
+      };
+
+      xhr.send();
+    }
+
+    fetchProfileXML();
+
+    // Client-side form validation
+    document.getElementById("profileForm").addEventListener("submit", function (event) {
+      const companyName = document.getElementById("companyName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!companyName || !email || !address || !password) {
+        event.preventDefault();
+        alert("⚠️ Please fill in all required fields — especially the password!");
+        return false;
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        event.preventDefault();
+        alert("❌ Please enter a valid email address!");
+        return false;
+      }
+    });
+
+    // Password visibility toggle
+    const passwordInput = document.getElementById("password");
+    const togglePasswordBtn = document.getElementById("togglePassword");
+
+    togglePasswordBtn.addEventListener("click", function () {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
+    });
+  </script>
 </body>
 </html>
