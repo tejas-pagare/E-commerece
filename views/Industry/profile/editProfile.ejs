@@ -111,17 +111,23 @@
           ></textarea>
         </div>
 
-        <!-- Password -->
-        <div class="space-y-2" title="This field is required">
+        <!-- Password with toggle -->
+        <div class="space-y-2 relative" title="This field is required">
           <label for="password" class="text-gray-700 font-medium">Password</label>
           <input 
             type="password" 
             id="password" 
             name="password" 
             placeholder="Enter new password"
-            class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary"
+            class="w-full bg-white border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary pr-10"
             required
           >
+          <button type="button" id="togglePassword" class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+          </button>
           <p class="text-sm text-gray-500 mt-1">⚠️ Password must be entered; otherwise, old password will be overwritten with blank.</p>
         </div>
 
@@ -141,7 +147,7 @@
     </div>
   </div>
 
-  <!-- ✅ XML-based Script -->
+  <!-- Scripts -->
   <script>
     // Fetch profile data via XMLHttpRequest
     function fetchProfileXML() {
@@ -187,12 +193,21 @@
         return false;
       }
 
-      const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         event.preventDefault();
         alert("❌ Please enter a valid email address!");
         return false;
       }
+    });
+
+    // Password visibility toggle
+    const passwordInput = document.getElementById("password");
+    const togglePasswordBtn = document.getElementById("togglePassword");
+
+    togglePasswordBtn.addEventListener("click", function () {
+      const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+      passwordInput.setAttribute("type", type);
     });
   </script>
 </body>
