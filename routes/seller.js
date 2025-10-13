@@ -286,23 +286,33 @@ router.post("/account/update", isAuthenticated, async (req, res) => {
   }
 });
 
+// Render the listed products page (without product data)
 router.get("/", isAuthenticated, async (req, res) => {
   try {
-
-    const userId = req.userId;
-    console.log(userId)
-    const productListed = await Seller.findById(userId).populate("products");
-
-    return res.render("seller/listedProduct/index.ejs", { title: "Listed Product", role: "seller", productListed: productListed?.products })
-    // return res.json({
-    //   productListed: productListed?.products
-    // })
+    return res.render("seller/listedProduct/index.ejs", { title: "Listed Product", role: "seller", productListed: [] });
   } catch (error) {
     res.json({
-      message: "Intenal error"
-    })
+      message: "Internal error"
+    });
   }
-})
+});
+
+// API route to fetch listed products as JSON
+router.get("/products", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const productListed = await Seller.findById(userId).populate("products");
+    res.json({
+      success: true,
+      products: productListed?.products || []
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Internal error"
+    });
+  }
+});
 
 // Route to get sold products for a seller
 router.get('/sold-products', isAuthenticated, async (req, res) => {
