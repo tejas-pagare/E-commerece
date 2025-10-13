@@ -23,11 +23,11 @@
                 </div>
             </div>
 
-            <div class="blog-grid">
+            <div class="blog-grid" id="blogGrid">
                 <!-- Blog Items will be dynamically added here -->
             </div>
 
-            <button class="show-more">Show more</button>
+            <button class="show-more" id="showMoreBtn">Show more</button>
         </div>
     </section>
 
@@ -45,7 +45,70 @@
 
     <!-- Footer -->
  
-    <script src="scripts.js">
-        
-    </script>
+        <script>
+            // Blog rendering logic
+            let blogs = [];
+            let shown = 0;
+            const perPage = 6;
+            const blogGrid = document.getElementById('blogGrid');
+            const showMoreBtn = document.getElementById('showMoreBtn');
+
+            function renderBlogs() {
+                blogGrid.innerHTML = '';
+                if (blogs.length === 0) {
+                    blogGrid.innerHTML = '<div class="text-gray-500 text-center w-full py-8">No blogs yet.</div>';
+                    showMoreBtn.style.display = 'none';
+                    return;
+                }
+                const end = Math.min(shown + perPage, blogs.length);
+                for (let i = shown; i < end; i++) {
+                    const blog = blogs[i];
+                    const div = document.createElement('div');
+                    div.className = 'blog-item bg-white rounded-lg shadow p-4 mb-6 flex flex-col cursor-pointer';
+                    div.innerHTML = `
+                        ${blog.image ? `<img src="${blog.image}" alt="Blog Image" class="w-full h-48 object-cover rounded mb-3">` : ''}
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">${blog.title}</h3>
+                        <div class="text-sm text-gray-500 mb-2">By ${blog.author} &middot; ${new Date(blog.createdAt).toLocaleDateString()}</div>
+                        <p class="text-gray-700 mb-2">${blog.content.length > 150 ? blog.content.substring(0, 150) + '...' : blog.content}</p>
+                    `;
+                    div.onclick = function() {
+                        window.location.href = `/user/blog/${blog._id}`;
+                    };
+                    blogGrid.appendChild(div);
+                }
+                shown = end;
+                showMoreBtn.style.display = shown < blogs.length ? '' : 'none';
+            }
+
+            function fetchBlogs() {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', '/api/v1/admin/blogs', true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            const res = JSON.parse(xhr.responseText);
+                            if (res.success && Array.isArray(res.blogs)) {
+                                blogs = res.blogs;
+                                shown = 0;
+                                blogGrid.innerHTML = '';
+                                renderBlogs();
+                            } else {
+                                blogGrid.innerHTML = '<div class="text-red-500">No blogs found.</div>';
+                                showMoreBtn.style.display = 'none';
+                            }
+                        } else {
+                            blogGrid.innerHTML = '<div class="text-red-500">Failed to load blogs.</div>';
+                            showMoreBtn.style.display = 'none';
+                        }
+                    }
+                };
+                xhr.send();
+            }
+
+            showMoreBtn.onclick = function() {
+                renderBlogs();
+            };
+
+            fetchBlogs();
+        </script>
 </body>

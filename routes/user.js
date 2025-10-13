@@ -1,3 +1,8 @@
+
+// Import Blog model using ES module syntax
+import Blog from '../models/blog.js';
+
+
 import express from 'express';
 import {
     accountRenderController,
@@ -44,7 +49,13 @@ router.get("/products", isAuthenticated, async (req, res) => {
     }
 });
 
-
+// Render blog detail page for a specific blog ID
+router.get('/blog/:id', (req, res) => {
+    res.render('User/blog_post/article.ejs', {
+        title: 'Blog Article',
+        role: 'user'
+    });
+});
 router.get("/login", loginPageRenderController)
 router.post("/login", loginController)
 router.get("/signup", signupPageRenderController)
@@ -88,9 +99,19 @@ router.get("/store", (req, res) => {
         role: "user"
     });
 });
+router.get('/blogs/:id', async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) {
+            return res.status(404).json({ success: false, message: 'Blog not found' });
+        }
+        res.json({ success: true, blog });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+});
 
 
-// IMPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  NEW ROUTE to get the current user's details as JSON
 router.get("/account/details", isAuthenticated, async (req, res) => {
   try {
@@ -170,7 +191,9 @@ router.post("/account/update/address", isAuthenticated, async (req, res) => {
         })
     }
 })
-router.get("/blog/:id", isAuthenticated, blogController);
+
+
+// Place this after /blog/:id so it doesn't catch /blog/:id requests
 router.get("/shop", isAuthenticated, shopController);
 router.get("/vendors", isAuthenticated, vendorsController)
 router.get('/blog', isAuthenticated, blogRenderController);
@@ -281,7 +304,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
             }
         }]);
 
-        const extra = result[0].totalEstimatedValue || 0;
+        const extra = result[0]?.totalEstimatedValue || 0;
 
         let totalAmount = products.reduce(
             (acc, item) => acc + item.price * item.quantity,
