@@ -10,39 +10,44 @@ import mongoose from 'mongoose';
 const router = express.Router();
 
 router.get("/login", (req, res) => {
-  res.render('seller/auth/login.ejs', { title: 'login', error: "", role: "seller" });
+  const { error } = req.query; // Capture error from the URL query
+  res.render('seller/auth/login.ejs', { title: 'login', error: error, role: "seller" });
 });
 
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const sellerCheck = await Seller.findOne({ email });
+
+    // Add error to redirect
     if (!sellerCheck) {
-      return res.redirect("/api/v1/seller/login")
+      return res.redirect("/api/v1/seller/login?error=Invalid email or password");
+    }
+
+    const isMatch = await bcrypt.compare(password, sellerCheck.password);
+    
+    // Add error to redirect here too
+    if (!isMatch) {
+        return res.redirect("/api/v1/seller/login?error=Invalid email or password");
     }
 
     const token = jwt.sign({ userId: sellerCheck._id, role: "seller" }, "JWT_SECRET", { expiresIn: "5h" });
-
     console.log(token);
 
-    // Set token as a cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
       maxAge: 3600000,
     });
 
-    return res.redirect("/api/v1/seller")
-    // res.json({
-    //   token
-    // })
+    return res.redirect("/api/v1/seller");
 
   } catch (error) {
     console.log(error);
-
-    res.redirect("/api/v1/seller/login")
+    // Generic error for other issues
+    res.redirect("/api/v1/seller/login?error=An unexpected error occurred.");
   }
-})
+});
 
 
 router.get("/signup", (req, res) => {
