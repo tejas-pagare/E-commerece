@@ -1,124 +1,123 @@
+
 [
-    {
-        "id": 1,
-        "title": "Latest iPhone 15 Pro - Revolutionary Camera",
-        "image": "https://imgs.search.brave.com/IqBfT2RYlBl8sW8_OFG0Jh-a_cGI0CT1YMgYgEBBFOU/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pbWFn/ZXMubWFjcnVtb3Jz/LmNvbS9hcnRpY2xl/LW5ldy8yMDIyLzA1/L2lwaG9uZS0xNS1z/aXplcy5qcGc",
-        "date": "January 15, 2024",
-        "description": "The iPhone 15 Pro is a game-changer, featuring an industry-leading triple-lens camera with cutting-edge periscope zoom technology. Capture professional-quality photos with ultra-high resolution and stunning night mode enhancements. Powered by the A17 Bionic chip, it offers blazing-fast performance and AI-enhanced imaging. The titanium frame ensures durability while keeping the phone lightweight. If you're looking for innovation, performance, and style, the iPhone 15 Pro is your ultimate smartphone.",
-        "category": "Technology",
-        "author": "John Doe",
-        "readingTime": "5 min"
-    },
-    {
-        "id": 2,
-        "title": "Professional Gaming Setup Collection",
-        "image": "https://imgs.search.brave.com/-jEzrCajphhuRUWCpoMgA-LUYlX4qTUJKK_9Kb4_nME/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly93d3cu/c3R1ZGVudGJlYW5z/LmNvbS9ibG9nL3dw/LWNvbnRlbnQvdXBs/b2Fkcy8yMDI0LzEx/L2Jlbi1pd2FyYS1w/czUtc2V0dXAtZTE3/MzE5MjY3NTczMDEu/anBn",
-        
-        "date": "January 14, 2024",
-        "description": "Elevate your gaming experience with a top-tier professional setup! Featuring an ultra-responsive mechanical keyboard, a high-DPI gaming mouse, and a 240Hz curved monitor, this collection is built for speed and precision. With an ergonomic gaming chair and immersive RGB lighting, your gaming space will be both stylish and comfortable. Get ready to dominate the competition with next-level equipment designed for peak performance!",
-        "category": "Gaming",
-        "author": "Jane Smith",
-        "readingTime": "7 min"
-    },
-    {
-        "id": 3,
-        "title": "Premium Fitness Equipment Set",
-        "image": "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=800&auto=format",
-        "date": "January 12, 2024",
-        "description": "Take your fitness journey to the next level with this premium workout set. Featuring adjustable dumbbells, resistance bands, a smart treadmill, and an AI-powered personal trainer, this collection is designed for serious fitness enthusiasts. Whether you're focusing on strength, cardio, or flexibility, this equipment ensures maximum results with minimal effort. Achieve your dream physique from the comfort of your home!",
-        "category": "Health & Fitness",
-        "author": "Mike Johnson",
-        "readingTime": "6 min"
-    },
-    {
-        "id": 4,
-        "title": "Smart 4K OLED TV - Cinema Experience",
-        "image": "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=800&auto=format",
-        "date": "January 10, 2024",
-        "description": "Immerse yourself in a next-gen cinematic experience with the latest Smart 4K OLED TV. Featuring ultra-rich contrast, stunning colors, and Dolby Atmos surround sound, this TV transforms your living room into a theater. AI-powered upscaling ensures all your favorite content looks sharper than ever. Whether you're streaming, gaming, or watching live sports, this OLED TV delivers unmatched visual and audio quality.",
-        "category": "Entertainment",
-        "author": "Emily Davis",
-        "readingTime": "4 min"
-    },
-    {
-        "id": 5,
-        "title": "Professional DSLR Camera Kit",
-        "image": "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format",
-        "date": "January 8, 2024",
-        "description": "Unleash your inner photographer with this high-performance DSLR camera kit. Equipped with a powerful sensor, multiple lenses, and advanced stabilization technology, this kit allows you to capture stunning landscapes, portraits, and action shots. Perfect for both beginners and professionals, this camera setup offers endless creative possibilities!",
-        "category": "Photography",
-        "author": "Daniel Lee",
-        "readingTime": "6 min"
-    },
-    {
-        "id": 6,
-        "title": "Limited Edition Sports Sneakers",
-        "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format",
-        "date": "January 5, 2024",
-        "description": "Step up your game with these limited-edition sports sneakers. Designed for both style and performance, these shoes feature ultra-lightweight materials, shock-absorbing soles, and breathable mesh fabric. Whether you're running, training, or just making a fashion statement, these sneakers provide the perfect blend of comfort and durability.",
-        "category": "Fashion",
-        "author": "Sarah Wilson",
-        "readingTime": "5 min"
-    },
-    {
-        "id": 7,
-        "title": "Best Laptops for Productivity in 2024",
-        "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format",
-        "date": "January 3, 2024",
-        "description": "Discover the best laptops of 2024, optimized for productivity and efficiency. From ultra-portable models with long battery life to powerhouse machines with high-end graphics, this guide helps you choose the perfect laptop for work, gaming, or creativity. Stay ahead of the curve with cutting-edge technology and premium performance!",
-        "category": "Technology",
-        "author": "Chris Evans",
-        "readingTime": "6 min"
-    },
-    {
-        "id": 8,
-        "title": "Must-Have Accessories for Your PC",
-        "image": "https://images.unsplash.com/photo-1517059224940-d4af9eec41b7?w=800&auto=format",
-        "date": "January 1, 2024",
-        "description": "Boost your PC experience with these must-have accessories! From high-speed external storage to ergonomic peripherals and customizable RGB lighting, these gadgets will enhance your setup. Whether you’re a gamer, a designer, or a casual user, these accessories ensure maximum efficiency and convenience.",
-        "category": "Gadgets",
-        "author": "David Brown",
-        "readingTime": "5 min"
-    },
-    {
-        "id": 9,
-        "title": "Top 10 Travel Destinations for 2024",
-        "image": "https://imgs.search.brave.com/3GVMWcgUizSnup7m_onGyEa8HldwTACN1FZs_hpOsjE/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzU0LzNj/L2VlLzU0M2NlZTJi/MTYyOTZkZWY3ZjYz/ZTE2NGI2NjgyMjlm/LmpwZw",
-        
-        "date": "December 30, 2023",
-        "description": "Pack your bags and get ready for an adventure! Explore the top 10 must-visit destinations of 2024, featuring breathtaking landscapes, vibrant cultures, and unforgettable experiences. Whether you love tropical beaches, historic cities, or thrilling outdoor escapades, this list has something for every traveler!",
-        "category": "Travel",
-        "author": "Olivia Carter",
-        "readingTime": "7 min"
-    },
-    {
-        "id": 10,
-        "title": "The Future of AI in Everyday Life",
-        "image": "https://images.unsplash.com/photo-1556740714-a8395b3bf30f?w=800&auto=format",
-        "date": "December 28, 2023",
-        "description": "AI is transforming our world! From smart assistants and self-driving cars to personalized recommendations and medical innovations, artificial intelligence is making life easier and more efficient. Learn how AI is shaping the future and how you can take advantage of these groundbreaking advancements.",
-        "category": "Science & Tech",
-        "author": "Sophia Miller",
-        "readingTime": "6 min"
-    },
-    {
-        "id": 11,
-        "title": "Essential Kitchen Gadgets for 2024",
-        "image":"https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=800&auto=format",
-        "date": "December 25, 2023",
-        "description": "Upgrade your cooking game with these essential kitchen gadgets! From smart blenders to automated coffee makers, these tools make meal preparation faster and easier. Perfect for food lovers, home chefs, and busy individuals who love convenience in the kitchen!",
-        "category": "Lifestyle",
-        "author": "James Anderson",
-        "readingTime": "5 min"
-    },
-    {
-        "id": 12,
-        "title": "Best Books to Read in 2024",
-        "image": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=800&auto=format",
-        "date": "December 22, 2023",
-        "description": "Expand your mind with the best books of 2024! From thrilling fiction to insightful self-development reads, this curated list offers something for every book lover. Whether you love novels, business strategies, or history, these books will inspire and entertain you.",
-        "category": "Books",
-        "author": "Emma Wilson",
-        "readingTime": "6 min"
-    }
+  {
+    "id": 1,
+    "title": "The Ultimate Guide to Thrifting Like a Pro",
+    "image": "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&auto=format",
+    "date": "October 12, 2025",
+    "description": "Unlock the full potential of second-hand shopping with our comprehensive guide to thrifting. We'll take you beyond just browsing the racks and teach you the strategies the experts use to find incredible value and unique pieces. This article covers everything from the best days of the week to visit your local thrift store for fresh inventory to identifying high-quality fabrics and spotting well-made garments that will stand the test of time. Learn the subtle art of negotiation, how to properly clean and sanitize your pre-loved finds, and even simple alteration tricks to make a good find a perfect fit. We'll also explore online thrifting platforms and how to navigate them effectively. By the end of this guide, you'll have all the tools you need to build a stylish, sustainable, and budget-friendly wardrobe that is completely your own, reducing fashion waste one amazing discovery at a time.",
+    "category": "Thrifting",
+    "author": "Jane Doe",
+    "readingTime": "9 min"
+  },
+  {
+    "id": 2,
+    "title": "Upcycling Your Wardrobe: 5 Easy DIY Projects",
+    "image": "https://images.unsplash.com/photo-1605297635222-f9035a4d4a01?w=800&auto=format",
+    "date": "October 10, 2025",
+    "description": "Don't throw away that old t-shirt or pair of jeans just yet! This article is your gateway into the creative and rewarding world of upcycling. We've compiled five beginner-friendly DIY projects designed to give your old clothes a new lease on life, requiring minimal tools and no advanced sewing skills. Follow our step-by-step tutorials to transform a worn-out flannel shirt into a trendy two-piece set, turn fabric scraps into beautiful, one-of-a-kind headbands, and convert a simple pair of trousers into a stylish summer skirt. We'll also show you how to use natural dyes from food scraps to give faded items a vibrant new color. Upcycling is not just about saving money; it's a powerful way to reduce textile waste and express your unique creativity, turning forgotten items into cherished pieces of your wardrobe.",
+    "category": "DIY Fashion",
+    "author": "Emily White",
+    "readingTime": "8 min"
+  },
+  {
+    "id": 3,
+    "title": "Why Organic Cotton is a Game-Changer for a Greener Closet",
+    "image": "https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=800&auto=format&fit=crop",
+    "date": "October 8, 2025",
+    "description": "Not all cotton is created equal. This article provides a deep dive into the world of organic cotton and explains why it's a fundamentally more sustainable choice than its conventional counterpart. We'll break down the stark differences in farming practices, highlighting how conventional cotton production relies heavily on toxic pesticides and synthetic fertilizers that degrade soil health and contaminate water sources. In contrast, organic farming promotes biodiversity, conserves water, and ensures a safer working environment for farmers. We will explore the certifications to look for, such as GOTS (Global Organic Textile Standard), to ensure you're buying genuinely organic products. By choosing organic cotton, you are making a conscious decision to support a system that respects the planet and its people.",
+    "category": "Sustainable Materials",
+    "author": "Michael Green",
+    "readingTime": "7 min"
+  },
+  {
+    "id": 4,
+    "title": "Building a Capsule Wardrobe: Less is More",
+    "image": "https://images.unsplash.com/photo-1579566346927-c68383817a25?w=800&auto=format",
+    "date": "October 5, 2025",
+    "description": "Imagine a closet where every single item is something you love and can be easily mixed and matched to create countless outfits. That's the promise of a capsule wardrobe. This article will guide you through the philosophy of 'less is more' and provide a practical, step-by-step process for decluttering your current wardrobe and building a curated collection of high-quality, versatile essentials. We'll help you define your personal style, choose a coordinating color palette, and identify the key pieces that will form the foundation of your new closet—from the perfect white t-shirt to a timeless trench coat. A capsule wardrobe not only simplifies your daily routine and saves you money, but it also represents a powerful stand against the culture of overconsumption promoted by fast fashion.",
+    "category": "Minimalism",
+    "author": "Sarah Johnson",
+    "readingTime": "10 min"
+  },
+  {
+    "id": 5,
+    "title": "The Rise of Rental Fashion: A Sustainable Alternative",
+    "image": "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&auto=format",
+    "date": "October 2, 2025",
+    "description": "Have you ever bought an outfit for a single event, only to have it hang in your closet, unworn, for years? The rental fashion economy offers a brilliant solution. This article explores the growing trend of renting clothes for everything from weddings and formal events to everyday workwear. We'll delve into the significant environmental benefits, such as the reduction in textile production and waste that comes from sharing a collective closet. We'll review some of the top fashion rental platforms, comparing their pricing models, style selections, and user experiences. Renting allows you to experiment with new trends, wear high-end designer pieces you might not otherwise be able to afford, and significantly reduce your personal fashion footprint, all without the commitment of ownership.",
+    "category": "Circular Fashion",
+    "author": "David Lee",
+    "readingTime": "7 min"
+  },
+  {
+    "id": 6,
+    "title": "How to Care for Your Clothes to Make Them Last Longer",
+    "image": "https://images.unsplash.com/photo-1603400521630-9f2de124b33b?w=800&auto=format",
+    "date": "September 29, 2025",
+    "description": "The most sustainable piece of clothing is the one you already own. A crucial part of sustainable fashion is extending the lifespan of your garments, and it all starts with proper care. This article provides simple, effective tips to help you do just that. Learn why washing your clothes in cold water is not only better for the environment but also gentler on fabrics, preventing fading and shrinking. We'll explain the benefits of air-drying over machine drying, which can degrade fibers over time. We also cover proper storage techniques, from using the right kind of hangers for different garments to using natural, non-toxic moth repellents like cedar and lavender. By adopting these small habits, you can dramatically reduce wear and tear, keeping your favorite clothes looking beautiful and wearable for years to come.",
+    "category": "Clothing Care",
+    "author": "Jessica Chen",
+    "readingTime": "6 min"
+  },
+  {
+    "id": 7,
+    "title": "Ethical Fashion: Understanding Fair Trade and a Transparent Supply Chain",
+    "image": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format",
+    "date": "September 25, 2025",
+    "description": "The term 'ethical fashion' goes far beyond just using eco-friendly materials. It's fundamentally about the people who make our clothes. In this article, we break down the complex but crucial concepts of ethical production. We'll explain what certifications like 'Fair Trade' actually mean and how they ensure that garment workers receive fair, living wages and work in safe, humane conditions. We'll also explore the growing demand for supply chain transparency, which allows consumers to trace the journey of their clothing from the raw material to the finished product. Learn how to research brands, what questions to ask, and how to use your power as a consumer to support companies that are committed to upholding human rights throughout their entire production process.",
+    "category": "Ethical Production",
+    "author": "Alex Carter",
+    "readingTime": "8 min"
+  },
+  {
+    "id": 8,
+    "title": "Natural Dyes: A Colorful and Eco-Friendly Alternative",
+    "image": "https://images.unsplash.com/photo-1594969155368-f19460a57538?w=800&auto=format",
+    "date": "September 22, 2025",
+    "description": "The vibrant colors in our clothing often come at a steep environmental cost, with conventional synthetic dyes being a major source of water pollution. This article introduces you to the beautiful and sustainable world of natural dyes. Discover how a rich palette of colors can be derived from sources found right in nature—or even in your kitchen. We'll explore the history and process of using plants like indigo for deep blues, madder root for rich reds, and food scraps like onion skins and avocado pits for stunning yellows and pinks. Learn about the benefits of these non-toxic colorants for both the environment and your skin. We'll even provide a simple tutorial for a fun at-home dyeing project, allowing you to give an old garment a beautiful, natural makeover.",
+    "category": "Sustainable Materials",
+    "author": "Sophia Miller",
+    "readingTime": "7 min"
+  },
+  {
+    "id": 9,
+    "title": "The Problem with Fast Fashion: A Look at the Hidden Costs",
+    "image": "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=800&auto=format",
+    "date": "September 18, 2025",
+    "description": "The allure of trendy, inexpensive clothing is strong, but it comes with enormous hidden costs. This article takes a critical look at the fast fashion industry and its devastating impact on our planet and its people. We investigate the full lifecycle of a fast fashion garment, from the resource-intensive production of cheap synthetic fibers like polyester to the alarming amount of textile waste that ends up in landfills—an estimated 92 million tons per year. We'll also shed light on the social consequences, including the exploitative labor practices and unsafe working conditions that are all too common in the industry. Understanding the true cost of that $10 t-shirt is the first step toward making more informed and compassionate choices as a consumer.",
+    "category": "Industry Insights",
+    "author": "Chris Evans",
+    "readingTime": "9 min"
+  },
+  {
+    "id": 10,
+    "title": "Meet the Brands Making a Difference in Sustainable Fashion",
+    "image": "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&auto=format",
+    "date": "September 15, 2025",
+    "description": "The fashion industry is slowly changing, thanks to a growing number of brands that are proving that style and sustainability can go hand-in-hand. This article serves as a spotlight on some of these innovative and inspiring companies. We'll introduce you to brands that are pioneering the use of groundbreaking materials like leather made from mushrooms and fabric made from recycled ocean plastic. Discover companies that have built their entire business model around circular principles, offering repair services and take-back programs to ensure their products never end up in a landfill. We'll highlight brands that are radically transparent about their supply chain, allowing you to see exactly where and how your clothes are made. These are the companies that are paving the way for a better, more responsible future for fashion.",
+    "category": "Brands",
+    "author": "Emma Wilson",
+    "readingTime": "8 min"
+  },
+  {
+    "id": 11,
+    "title": "Eco-Friendly Footwear: Steps in the Right Direction",
+    "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&auto=format",
+    "date": "September 11, 2025",
+    "description": "Our choice of footwear can have a surprisingly large environmental footprint, from the tanning process of leather to the use of petroleum-based plastics in sneakers. This article walks you through the world of sustainable footwear, showcasing brands that are stepping up to make a difference. We'll explore the use of innovative, eco-friendly materials such as recycled rubber for soles, organic cotton for canvases, and even algae foam for cushioning. Learn about companies that prioritize ethical production and use natural, vegetable-tanned leathers that avoid the harmful chemicals used in conventional tanning. Whether you're looking for stylish sneakers, durable boots, or comfortable sandals, we'll show you how to find options that are kinder to the planet without sacrificing quality or style.",
+    "category": "Accessories",
+    "author": "James Brown",
+    "readingTime": "7 min"
+  },
+  {
+    "id": 12,
+    "title": "The Art of Mending: How Visible Repairs Are Making a Statement",
+    "image": "https://images.unsplash.com/photo-1593482382476-74732a0d5c0e?w=800&auto=format",
+    "date": "September 8, 2025",
+    "description": "A hole in your favorite sweater doesn't have to be the end of its life. In fact, it can be the beginning of a new chapter. This article explores the growing movement of 'visible mending,' a practice that turns repairs into a beautiful and intentional act of creativity. We'll introduce you to techniques like Japanese Sashiko stitching and colorful darning that don't just fix a flaw but celebrate it, adding character and a unique story to the garment. Visible mending is a powerful rejection of the disposable culture of fast fashion, encouraging a deeper connection with our clothes. Learn how this traditional craft is becoming a modern form of self-expression and a proud statement of sustainability, proving that a well-loved, well-worn item is something to be cherished.",
+    "category": "DIY Fashion",
+    "author": "Olivia Martinez",
+    "readingTime": "6 min"
+  }
 ]
