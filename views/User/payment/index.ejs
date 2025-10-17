@@ -191,46 +191,69 @@
             document.getElementById('user-phone').textContent = address.phone || 'N/A';
         }
         
-        // NEW: Event listener for saving the address
-        document.getElementById('save-address').addEventListener('click', async () => {
-            const addressData = {
-                plotno: document.getElementById('plotno').value.trim(),
-                street: document.getElementById('street').value.trim(),
-                city: document.getElementById('city').value.trim(),
-                state: document.getElementById('state').value.trim(),
-                pincode: document.getElementById('pincode').value.trim(),
-                phone: document.getElementById('phone-input').value.trim()
-            };
+    // Address validation function
+    function validateAddressFields(addressData) {
+      let error = '';
+      if (!addressData.plotno) error = 'Plot/House Number is required.';
+      else if (!addressData.street) error = 'Street Name/Area is required.';
+      else if (!addressData.city) error = 'City is required.';
+      else if (!addressData.state) error = 'State is required.';
+      else if (!/^[0-9]{6}$/.test(addressData.pincode)) error = 'PIN Code must be 6 digits.';
+      else if (!/^[0-9]{10}$/.test(addressData.phone)) error = 'Phone Number must be 10 digits.';
+      return error;
+    }
 
-            try {
-                const res = await fetch('/api/v1/user/account/update/address', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify(addressData)
-                });
+    // NEW: Event listener for saving the address with validation
+    document.getElementById('save-address').addEventListener('click', async () => {
+      const addressData = {
+        plotno: document.getElementById('plotno').value.trim(),
+        street: document.getElementById('street').value.trim(),
+        city: document.getElementById('city').value.trim(),
+        state: document.getElementById('state').value.trim(),
+        pincode: document.getElementById('pincode').value.trim(),
+        phone: document.getElementById('phone-input').value.trim()
+      };
+      const errorDiv = document.getElementById('address-error');
+      const errorMsg = validateAddressFields(addressData);
+      if (errorMsg) {
+        errorDiv.textContent = errorMsg;
+        errorDiv.classList.remove('hidden');
+        return;
+      } else {
+        errorDiv.classList.add('hidden');
+      }
 
-                if (res.ok) {
-                    // Update the UI with the new address
-                    const newAddressString = `${addressData.plotno}, ${addressData.street}, ${addressData.city}, ${addressData.state} - ${addressData.pincode}`;
-                    document.getElementById('address-display').textContent = newAddressString;
-                    document.getElementById('phone-display').textContent = `Phone: ${addressData.phone}`;
-                    document.getElementById('summary-address').textContent = newAddressString;
-                    document.getElementById('user-phone').textContent = addressData.phone;
-                    
-                    // Switch back to view mode
-                    document.getElementById('address-view').classList.remove('hidden');
-                    document.getElementById('address-edit').classList.add('hidden');
-                } else {
-                    alert('Failed to save address.');
-                }
-            } catch (error) {
-                console.error('Error saving address:', error);
-                alert('An error occurred while saving the address.');
-            }
+      try {
+        const res = await fetch('/api/v1/user/account/update/address', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(addressData)
         });
 
-        // MODIFIED: Event listener for placing the order
+        if (res.ok) {
+          // Update the UI with the new address
+          const newAddressString = `${addressData.plotno}, ${addressData.street}, ${addressData.city}, ${addressData.state} - ${addressData.pincode}`;
+          document.getElementById('address-display').textContent = newAddressString;
+          document.getElementById('phone-display').textContent = `Phone: ${addressData.phone}`;
+          document.getElementById('summary-address').textContent = newAddressString;
+          document.getElementById('user-phone').textContent = addressData.phone;
+                    
+          // Switch back to view mode
+          document.getElementById('address-view').classList.remove('hidden');
+          document.getElementById('address-edit').classList.add('hidden');
+        } else {
+          errorDiv.textContent = 'Failed to save address.';
+          errorDiv.classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error('Error saving address:', error);
+        errorDiv.textContent = 'An error occurred while saving the address.';
+        errorDiv.classList.remove('hidden');
+      }
+    });
+
+        // MODIFIED: Event listener for placing the order with address validation
         document.getElementById('place-order').addEventListener('click', async () => {
           const address = {
               plotno: document.getElementById('plotno').value.trim(),
@@ -240,11 +263,18 @@
               pincode: document.getElementById('pincode').value.trim(),
               phone: document.getElementById('phone-input').value.trim()
             };
-          
+          const errorDiv = document.getElementById('address-error');
+          const errorMsg = validateAddressFields(address);
+          if (errorMsg) {
+            errorDiv.textContent = errorMsg;
+            errorDiv.classList.remove('hidden');
+            return;
+          } else {
+            errorDiv.classList.add('hidden');
+          }
           const payButton = document.getElementById('place-order');
           payButton.disabled = true;
           payButton.innerHTML = '<span class="animate-spin inline-block mr-2">⭕</span>Processing...';
-          
           try {
             const res = await fetch('/api/v1/user/payment', {
               method: 'POST',

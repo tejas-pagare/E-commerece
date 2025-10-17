@@ -1,11 +1,69 @@
+
+// ...existing code...
+
+// Render blogs list page in admin
+
+
 import express from "express";
+const router = express.Router();
 import User from "../models/user.js";
 import Product from "../models/product.js";
 import Seller from "../models/seller.js";
 import Manager from "../models/manager.js";
 import Order from "../models/orders.js";
-import SellProduct from "../models/SellProduct.js"
-const router = express.Router();
+import SellProduct from "../models/SellProduct.js";
+import Blog from "../models/blog.js";
+import cloudinary, { upload as multerUpload } from "../config/cloudinary.js";
+
+// Render blog creation page
+router.get("/blog/create", (req, res) => {
+  res.render("admin/blogCreate.ejs", { title: "Create Blog", role: "admin" });
+});
+router.get("/blogs/page", async (req, res) => {
+  try {
+    const blogs = await Blog.find({}).sort({ createdAt: -1 });
+    res.render("admin/blogs.ejs", { title: "Blogs", role: "admin", blogs });
+  } catch (error) {
+    res.status(500).render("error", { message: "Failed to load blogs page", error });
+  }
+});
+// Create a new blog post with image upload
+router.post("/blog", multerUpload.single("image"), async (req, res) => {
+  try {
+    const { title, content, author } = req.body;
+    let imageUrl = "";
+    if (req.file) {
+      // Upload image to Cloudinary
+      const result = await cloudinary.uploader.upload_stream({ resource_type: "image" }, async (error, result) => {
+        if (error) throw error;
+        imageUrl = result.secure_url;
+        const blog = new Blog({ title, content, author, image: imageUrl });
+        await blog.save();
+        return res.status(201).json({ success: true, message: "Blog created successfully", blog });
+      });
+      // Write the buffer to the stream
+      result.end(req.file.buffer);
+      return;
+    } else {
+      // No image uploaded
+      const blog = new Blog({ title, content, author });
+      await blog.save();
+      return res.status(201).json({ success: true, message: "Blog created successfully", blog });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to create blog", error: error.message });
+  }
+});
+
+// Fetch all blogs
+router.get("/blogs", async (req, res) => {
+  try {
+    const blogs = await Blog.find({}).sort({ createdAt: -1 });
+    res.json({ success: true, blogs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch blogs", error: error.message });
+  }
+});
 
 router.get("/login", (req, res) => {
   const { error } = req.query; // Get error from query
