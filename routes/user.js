@@ -37,6 +37,32 @@ import UserHistory from "../models/userHistory.js";
 import path from 'path';
 const router = express.Router();
 
+// Inject Chatbase widget into all user-rendered HTML pages
+const CHATBASE_SNIPPET = `<script>(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="KC-p2cvseDCtYbj5EzY_h";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();</script>`;
+
+router.use((req, res, next) => {
+  const originalRender = res.render.bind(res);
+  res.render = (view, options, callback) => {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    const wrap = (err, html) => {
+      if (err) {
+        return callback ? callback(err) : res.status(500).send('Template render error');
+      }
+      if (typeof html === 'string') {
+        html = /<\/body>/i.test(html)
+          ? html.replace(/<\/body>/i, `${CHATBASE_SNIPPET}\n</body>`)
+          : `${html}\n${CHATBASE_SNIPPET}`;
+      }
+      return callback ? callback(null, html) : res.send(html);
+    };
+    return originalRender(view, options || {}, wrap);
+  };
+  next();
+});
+
 // New route to get products as JSON
 router.get("/products", isAuthenticated, async (req, res) => {
     try {
