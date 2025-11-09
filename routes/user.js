@@ -1,3 +1,8 @@
+
+// Import Blog model using ES module syntax
+import Blog from '../models/blog.js';
+
+
 import express from 'express';
 import {
     accountRenderController,
@@ -32,6 +37,32 @@ import UserHistory from "../models/userHistory.js";
 import path from 'path';
 const router = express.Router();
 
+// Inject Chatbase widget into all user-rendered HTML pages
+const CHATBASE_SNIPPET = `<script>(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="KC-p2cvseDCtYbj5EzY_h";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();</script>`;
+
+router.use((req, res, next) => {
+  const originalRender = res.render.bind(res);
+  res.render = (view, options, callback) => {
+    if (typeof options === 'function') {
+      callback = options;
+      options = {};
+    }
+    const wrap = (err, html) => {
+      if (err) {
+        return callback ? callback(err) : res.status(500).send('Template render error');
+      }
+      if (typeof html === 'string') {
+        html = /<\/body>/i.test(html)
+          ? html.replace(/<\/body>/i, `${CHATBASE_SNIPPET}\n</body>`)
+          : `${html}\n${CHATBASE_SNIPPET}`;
+      }
+      return callback ? callback(null, html) : res.send(html);
+    };
+    return originalRender(view, options || {}, wrap);
+  };
+  next();
+});
+
 // New route to get products as JSON
 router.get("/products", isAuthenticated, async (req, res) => {
     try {
@@ -44,7 +75,13 @@ router.get("/products", isAuthenticated, async (req, res) => {
     }
 });
 
-
+// Render blog detail page for a specific blog ID
+router.get('/blog/:id', (req, res) => {
+    res.render('User/blog_post/article.ejs', {
+        title: 'Blog Article',
+        role: 'user'
+    });
+});
 router.get("/login", loginPageRenderController)
 router.post("/login", loginController)
 router.get("/signup", signupPageRenderController)
@@ -88,9 +125,19 @@ router.get("/store", (req, res) => {
         role: "user"
     });
 });
+router.get('/blogs/:id', async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) {
+            return res.status(404).json({ success: false, message: 'Blog not found' });
+        }
+        res.json({ success: true, blog });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+});
 
 
-// IMPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 //  NEW ROUTE to get the current user's details as JSON
 router.get("/account/details", isAuthenticated, async (req, res) => {
   try {
@@ -170,7 +217,9 @@ router.post("/account/update/address", isAuthenticated, async (req, res) => {
         })
     }
 })
-router.get("/blog/:id", isAuthenticated, blogController);
+
+
+// Place this after /blog/:id so it doesn't catch /blog/:id requests
 router.get("/shop", isAuthenticated, shopController);
 router.get("/vendors", isAuthenticated, vendorsController)
 router.get('/blog', isAuthenticated, blogRenderController);
@@ -281,7 +330,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
             }
         }]);
 
-        const extra = result[0].totalEstimatedValue || 0;
+        const extra = result[0]?.totalEstimatedValue || 0;
 
         let totalAmount = products.reduce(
             (acc, item) => acc + item.price * item.quantity,

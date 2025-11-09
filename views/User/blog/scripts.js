@@ -3,7 +3,7 @@ const blogPosts = [
     {
         id: 1,
         title: "The Ultimate Guide to Thrifting Like a Pro",
-        image: "https://images.unsplash.com/photo-1576995823528-553315a42b78?w=800&auto=format&fit=crop",
+        image: "https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=800&auto=format&fit=crop",
         date: "October 12, 2025",
         description: "Discover the secrets to finding hidden gems in second-hand stores. This guide covers everything from identifying quality fabrics to negotiating prices and caring for your vintage finds.",
         category: "Thrifting",

@@ -2,18 +2,14 @@
 
     <article class="max-w-6xl w-full mx-auto bg-white p-8 mt-6 shadow-lg rounded-lg">
         <span class="text-sm uppercase text-gray-600 tracking-wide">Article</span>
-        <h1 class="text-4xl font-bold mt-2 text-gray-900 leading-tight"><%= blog.title %></h1>
 
+        <h1 id="blogTitle" class="text-4xl font-bold mt-2 text-gray-900 leading-tight"></h1>
         <div class="flex items-center text-sm text-gray-500 mt-2 space-x-6">
-            <span class="flex items-center"><i class="far fa-user mr-2"></i> <%= blog.author %></span>
-            <span class="flex items-center"><i class="far fa-calendar mr-2"></i> <%= blog.date %></span>
+            <span class="flex items-center"><i class="far fa-user mr-2"></i> <span id="blogAuthor"></span></span>
+            <span class="flex items-center"><i class="far fa-calendar mr-2"></i> <span id="blogDate"></span></span>
         </div>
-
-        <img src="<%= blog.image %>" class="mt-6 w-full h-96 object-cover rounded-lg shadow-md" alt="<%= blog.title %>">
-
-        <p class="mt-6 text-gray-700 text-lg leading-relaxed">
-            <%= blog.description %>
-        </p>
+        <img id="blogImage" class="mt-6 w-full h-96 object-cover rounded-lg shadow-md" alt="Blog Image">
+        <p id="blogContent" class="mt-6 text-gray-700 text-lg leading-relaxed"></p>
         
         <p class="mt-6 text-gray-700 text-lg leading-relaxed">
             In a world dominated by fast fashion, making a conscious choice to embrace sustainability is more than a trend—it's a movement towards a healthier planet and a more ethical industry. Sustainable fashion challenges us to think differently about the clothes we wear, focusing on their entire lifecycle from the materials they are made of to how they are produced and, eventually, disposed of. It's about choosing quality over quantity and timeless style over fleeting trends.
@@ -38,5 +34,41 @@
         </div>
     </section>
 
-    <script src="article.js"></script>
+    <script>
+    // Fetch blog by ID from URL and render
+    function getBlogIdFromUrl() {
+        const match = window.location.pathname.match(/\/blog\/(\w+)/);
+        return match ? match[1] : null;
+    }
+    function renderBlog(blog) {
+        document.getElementById('blogTitle').textContent = blog.title;
+        document.getElementById('blogAuthor').textContent = blog.author;
+        document.getElementById('blogDate').textContent = new Date(blog.createdAt).toLocaleDateString();
+        document.getElementById('blogImage').src = blog.image || '';
+        document.getElementById('blogImage').alt = blog.title;
+        document.getElementById('blogContent').textContent = blog.content;
+    }
+    function fetchBlog() {
+        const blogId = getBlogIdFromUrl();
+        if (!blogId) return;
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `/api/v1/user/blogs/${blogId}`, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    const res = JSON.parse(xhr.responseText);
+                    if (res.success && res.blog) {
+                        renderBlog(res.blog);
+                    } else {
+                        document.body.innerHTML = '<div class="text-red-500 p-8">Blog not found.</div>';
+                    }
+                } else {
+                    document.body.innerHTML = '<div class="text-red-500 p-8">Failed to load blog.</div>';
+                }
+            }
+        };
+        xhr.send();
+    }
+    fetchBlog();
+    </script>
 </body>

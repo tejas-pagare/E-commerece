@@ -1,0 +1,103 @@
+<div class="max-w-2xl mx-auto mt-10 bg-white rounded-lg shadow-lg p-8 border border-gray-200">
+  <h2 class="text-2xl font-bold mb-6 text-green-700">Create Blog</h2>
+  <form id="blogForm" enctype="multipart/form-data" class="space-y-6">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+      <input type="text" name="title" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" />
+      <div id="error-title" class="text-red-500 text-xs mt-1"></div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+      <textarea name="content" rows="5" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"></textarea>
+      <div id="error-content" class="text-red-500 text-xs mt-1"></div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Author</label>
+      <input type="text" name="author" class="block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" />
+      <div id="error-author" class="text-red-500 text-xs mt-1"></div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+      <input type="file" name="image" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" />
+      <div id="error-image" class="text-red-500 text-xs mt-1"></div>
+    </div>
+    <div>
+      <button id="createBtn" type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md transition-colors flex items-center justify-center">
+        <span id="btnText">Create Blog</span>
+        <svg id="btnLoader" class="hidden animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+      </button>
+    </div>
+    <div id="blogMsg" class="text-center text-sm mt-2"></div>
+  </form>
+</div>
+<script>
+  document.getElementById('blogForm').onsubmit = function(e) {
+    e.preventDefault();
+    // Clear previous errors
+    document.getElementById('error-title').textContent = '';
+    document.getElementById('error-content').textContent = '';
+    document.getElementById('error-author').textContent = '';
+    document.getElementById('error-image').textContent = '';
+    document.getElementById('blogMsg').textContent = '';
+
+    const form = e.target;
+    const title = form.title.value.trim();
+    const content = form.content.value.trim();
+    const author = form.author.value.trim();
+    const image = form.image.files[0];
+    let valid = true;
+
+    if (!title) {
+      document.getElementById('error-title').textContent = 'Title is required.';
+      valid = false;
+    }
+    if (!content) {
+      document.getElementById('error-content').textContent = 'Content is required.';
+      valid = false;
+    }
+    if (!author) {
+      document.getElementById('error-author').textContent = 'Author is required.';
+      valid = false;
+    }
+    if (image && !image.type.startsWith('image/')) {
+      document.getElementById('error-image').textContent = 'Only image files are allowed.';
+      valid = false;
+    }
+    if (!valid) return;
+
+    // Loader
+    const createBtn = document.getElementById('createBtn');
+    const btnText = document.getElementById('btnText');
+    const btnLoader = document.getElementById('btnLoader');
+    createBtn.disabled = true;
+    btnText.classList.add('opacity-50');
+    btnLoader.classList.remove('hidden');
+
+    const formData = new FormData(form);
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/v1/admin/blog', true);
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        createBtn.disabled = false;
+        btnText.classList.remove('opacity-50');
+        btnLoader.classList.add('hidden');
+        const msgDiv = document.getElementById('blogMsg');
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (xhr.status === 201 && res.success) {
+            msgDiv.textContent = 'Blog created successfully!';
+            msgDiv.className = 'text-green-600';
+            form.reset();
+          } else {
+            msgDiv.textContent = res.message || 'Failed to create blog.';
+            msgDiv.className = 'text-red-600';
+          }
+        } catch {
+          msgDiv.textContent = 'Unexpected error.';
+          msgDiv.className = 'text-red-600';
+        }
+      }
+    };
+    xhr.send(formData);
+  };
+</script>

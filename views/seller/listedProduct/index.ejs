@@ -31,50 +31,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <% productListed.map(product=> { %>
-                                <tr class="product-row">
-                                    <td>
-                                        <img src="<%= product.image %>" alt="Product" class="h-12 w-12 rounded-md object-cover" style="box-shadow: 0 0 0 1px #e5e7eb inset;" />
-                                    </td>
-                                    <td class="text-sm product-title" style="color:#111827; font-weight:500;">
-                                        <%= product.title %>
-                                    </td>
-                                    <td class="text-sm" style="color:#374151;">
-                                        <%= product.quantity%>
-                                    </td>
-                                    <td class="text-sm product-category" style="color:#374151;">
-                                        <%= product.category %>
-                                    </td>
-                                    <td>
-                                        <% if (product.stock) { %>
-                                            <span class="badge badge-green product-status">In Stock</span>
-                                        <% } else { %>
-                                            <span class="badge badge-red product-status">Out Of Stock</span>
-                                        <% } %>
-                                    </td>
-                                    <td class="text-sm" style="color:#111827; font-weight:500;">
-                                        <%= product.price %>
-                                    </td>
-                                    <td class="text-sm" style="color:#374151;">
-                                        <%= (product.createdAt).toString().split("T")?.[0] %>
-                                    </td>
-                                    <td class="whitespace-nowrap">
-                                        <div class="flex items-center gap-2">
-                                            <a href="/api/v1/seller/update/<%= product.id %>">
-                                                <button class="btn btn-secondary px-3 py-1.5 text-sm">Edit</button>
-                                            </a>
-                                            <button onclick="deleteProduct('<%= product.id %>', this)" class="btn btn-danger px-3 py-1.5 text-sm">
-                                                <span class="btn-label">Delete</span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            <% }) %>
-                            <% if (productListed.length===0) { %>
-                                <tr>
-                                    <td colspan="8" class="p-3 text-center text-sm" style="color:#6b7280;">No Product listed yet</td>
-                                </tr>
-                            <% } %>
+                            <!-- Product rows will be rendered by JS -->
                         </tbody>
                     </table>
                 </div>
@@ -162,26 +119,100 @@
             if (!productId) return;
             if (confirm('Are you sure you want to delete this product?')) {
                 setButtonLoading(btnEl, true, 'Deleting...');
-                fetch(`/api/v1/seller/product/${productId}`, {
-                    method: 'DELETE',
-                    credentials: 'include'
-                })
-                .then(async (response) => {
-                    const data = await response.json().catch(() => ({}));
-                    if (response.ok && (data.success === undefined || data.success === true)) {
-                        location.reload();
-                    } else {
-                        const msg = (data && (data.message || data.error)) || 'Failed to delete product.';
-                        alert(msg);
-                        setButtonLoading(btnEl, false);
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) {
+                            try {
+                                var data = JSON.parse(this.responseText);
+                                if (data.success === undefined || data.success === true) {
+                                    location.reload();
+                                } else {
+                                    var msg = (data && (data.message || data.error)) || 'Failed to delete product.';
+                                    alert(msg);
+                                    setButtonLoading(btnEl, false);
+                                }
+                            } catch (err) {
+                                alert('Failed to delete product.');
+                                setButtonLoading(btnEl, false);
+                            }
+                        } else {
+                            alert('An error occurred while deleting the product.');
+                            setButtonLoading(btnEl, false);
+                        }
                     }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    alert('An error occurred while deleting the product.');
-                    setButtonLoading(btnEl, false);
-                });
+                };
+                xhttp.open('DELETE', `/api/v1/seller/product/${productId}`, true);
+                xhttp.withCredentials = true;
+                xhttp.send();
             }
         }
+    // Fetch and render products
+    async function fetchAndRenderProducts() {
+        const tbody = document.querySelector('tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-sm" style="color:#6b7280;">Loading...</td></tr>';
+        try {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState === 4) {
+                    if (this.status === 200) {
+                        try {
+                            var data = JSON.parse(this.responseText);
+                            if (!data.success) throw new Error(data.message || 'Failed to fetch products');
+                            var products = data.products || [];
+                            if (products.length === 0) {
+                                tbody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-sm" style="color:#6b7280;">No Product listed yet</td></tr>';
+                                return;
+                            }
+                            tbody.innerHTML = '';
+                            for (var i = 0; i < products.length; i++) {
+                                var product = products[i];
+                                var tr = document.createElement('tr');
+                                tr.className = 'product-row';
+                                tr.innerHTML = `
+                                    <td>
+                                        <img src="${product.image}" alt="Product" class="h-12 w-12 rounded-md object-cover" style="box-shadow: 0 0 0 1px #e5e7eb inset;" />
+                                    </td>
+                                    <td class="text-sm product-title" style="color:#111827; font-weight:500;">${product.title}</td>
+                                    <td class="text-sm" style="color:#374151;">${product.quantity}</td>
+                                    <td class="text-sm product-category" style="color:#374151;">${product.category}</td>
+                                    <td>
+                                        ${product.stock ? '<span class="badge badge-green product-status">In Stock</span>' : '<span class="badge badge-red product-status">Out Of Stock</span>'}
+                                    </td>
+                                    <td class="text-sm" style="color:#111827; font-weight:500;">${product.price}</td>
+                                    <td class="text-sm" style="color:#374151;">${(product.createdAt || '').toString().split('T')[0]}</td>
+                                    <td class="whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <a href="/api/v1/seller/update/${product._id || product.id}">
+                                                <button class="btn btn-secondary px-3 py-1.5 text-sm">Edit</button>
+                                            </a>
+                                            <button onclick="deleteProduct('${product._id || product.id}', this)" class="btn btn-danger px-3 py-1.5 text-sm">
+                                                <span class="btn-label">Delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                `;
+                                tbody.appendChild(tr);
+                            }
+                        } catch (err) {
+                            tbody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-sm" style="color:#ef4444;">Failed to load products</td></tr>';
+                        }
+                    } else {
+                        tbody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-sm" style="color:#ef4444;">Failed to load products</td></tr>';
+                    }
+                }
+            };
+            xhttp.open('GET', '/api/v1/seller/products', true);
+            xhttp.withCredentials = true;
+            xhttp.send();
+        } catch (err) {
+            tbody.innerHTML = '<tr><td colspan="8" class="p-3 text-center text-sm" style="color:#ef4444;">Failed to load products</td></tr>';
+        }
+    }
+    // Initial fetch
+    fetchAndRenderProducts();
+    // Optionally, you can re-fetch after delete or add
+    // window.fetchAndRenderProducts = fetchAndRenderProducts;
     </script>
 </body>
