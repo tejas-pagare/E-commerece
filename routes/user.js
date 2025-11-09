@@ -601,7 +601,7 @@ const upload = multer({
 });
 
 // POST /sell route
-router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) => {
+router.post('/sell',  upload.single('photos'), async (req, res) => {
     try {
         // Validate file presence
         if (!req.file) {
