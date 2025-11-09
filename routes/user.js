@@ -612,8 +612,21 @@ router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) 
     }
 });
 
-//  route for filtered products
-router.get("/products/filter", isAuthenticated, async (req, res) => {
+// added this route for react without authentication
+router.get("/public-products", async (req, res) => {
+    try {
+        // Fetch a limited number of products for the homepage
+        const products = await Product.find({}).limit(8); 
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({
+            message: "Error fetching public products."
+        });
+    }
+});
+
+//  removed the isauthenicated here for react frontend to access filter products
+router.get("/products/filter",  async (req, res) => {
     try {
         const {
             category,

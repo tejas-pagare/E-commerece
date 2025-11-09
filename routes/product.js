@@ -7,18 +7,25 @@ const router = express.Router();
 router.get("/details/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const product = await Product.findById(id);
+
+    // 1. Find the main product AND populate the 'sellerId' field
+    //    We only select the 'storeName' from the seller document
+    const product = await Product.findById(id)
+      .populate('sellerId', 'storeName'); // <-- CHANGE 1
 
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    // Also find related products to send along with the main product
+    // 2. Also find and populate related products
     const relatedProducts = await Product.find({
       category: product.category,
       _id: { $ne: product._id } // Exclude the main product itself
-    }).limit(4); // Limit to 4 related products
+    })
+    .populate('sellerId', 'storeName') // <-- CHANGE 2 (So brand names also work on related items)
+    .limit(4); 
 
+    // Now, 'product.sellerId' will be an object like: { _id: "...", storeName: "..." }
     res.json({ success: true, product, relatedProducts });
 
   } catch (error) {
