@@ -21,8 +21,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(
   cors({
-    origin: ["http://localhost:8000","http://localhost:5174","http://localhost:5173"],
-    
+    origin:[ "http://localhost:8000","http://localhost:5174","http://localhost:5173"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(session({
