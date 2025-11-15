@@ -1,3 +1,154 @@
+// Blog Posts Data (Sustainable Fashion)
+const blogPosts = [
+    {
+        id: 1,
+        title: "The Ultimate Guide to Thrifting Like a Pro",
+        image: "https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=800&auto=format&fit=crop",
+        date: "October 12, 2025",
+        description: "Discover the secrets to finding hidden gems in second-hand stores. This guide covers everything from identifying quality fabrics to negotiating prices and caring for your vintage finds.",
+        category: "Thrifting",
+        author: "Jane Doe",
+        readingTime: "6 min"
+    },
+    {
+        id: 2,
+        title: "Upcycling Your Wardrobe: 5 Easy DIY Projects",
+        image: "https://images.unsplash.com/photo-1617606002779-51d866bdd1d1?w=800&auto=format&fit=crop",
+        date: "October 10, 2025",
+        description: "Breathe new life into old clothes with these simple and stylish DIY upcycling projects. Turn old denim into a chic new jacket or a simple t-shirt into a trendy tote bag.",
+        category: "DIY Fashion",
+        author: "Emily White",
+        readingTime: "7 min"
+    },
+    {
+        id: 3,
+        title: "Why Organic Cotton is a Game-Changer for a Greener Closet",
+        image: "https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=800&auto=format&fit=crop",
+        date: "October 8, 2025",
+        description: "Learn about the environmental benefits of choosing organic cotton over conventional cotton. We explore the impact on water, soil health, and the farmers who grow it.",
+        category: "Sustainable Materials",
+        author: "Michael Green",
+        readingTime: "5 min"
+    },
+    {
+        id: 4,
+        title: "Building a Capsule Wardrobe: Less is More",
+        image: "https://images.unsplash.com/photo-1579566346927-c68383817a25?w=800&auto=format&fit=crop",
+        date: "October 5, 2025",
+        description: "Simplify your life and reduce fashion waste by creating a capsule wardrobe. We provide a step-by-step guide to curating a collection of essential, versatile pieces you'll love for years.",
+        category: "Minimalism",
+        author: "Sarah Johnson",
+        readingTime: "8 min"
+    },
+    {
+        id: 5,
+        title: "The Rise of Rental Fashion: A Sustainable Alternative",
+        image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&auto=format&fit=crop",
+        date: "October 2, 2025",
+        description: "From weddings to work events, renting outfits is becoming a popular way to stay stylish without the environmental cost. Explore the benefits of the rental fashion economy.",
+        category: "Circular Fashion",
+        author: "David Lee",
+        readingTime: "6 min"
+    },
+    {
+        id: 6,
+        title: "How to Care for Your Clothes to Make Them Last Longer",
+        image: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop",
+        date: "September 29, 2025",
+        description: "Proper washing, drying, and storage can dramatically extend the life of your garments. Learn simple tips and tricks to reduce wear and tear and keep your clothes looking great.",
+        category: "Clothing Care",
+        author: "Jessica Chen",
+        readingTime: "5 min"
+    },
+    {
+        id: 7,
+        title: "Ethical Fashion: Understanding Fair Trade and a Transparent Supply Chain",
+        image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&auto=format&fit=crop",
+        date: "September 25, 2025",
+        description: "What does 'ethical fashion' truly mean? We break down the importance of fair wages, safe working conditions, and supply chain transparency in the clothing industry.",
+        category: "Ethical Production",
+        author: "Alex Carter",
+        readingTime: "7 min"
+    },
+    {
+        id: 8,
+        title: "Natural Dyes: A Colorful and Eco-Friendly Alternative",
+        image: "https://images.unsplash.com/photo-1523966211588-8fcc1c12f35d?w=800&auto=format&fit=crop",
+        date: "September 22, 2025",
+        description: "Explore the beautiful world of natural dyes made from plants, minerals, and even food scraps. Learn how these non-toxic colorants are better for the planet and your skin.",
+        category: "Sustainable Materials",
+        author: "Sophia Miller",
+        readingTime: "6 min"
+    },
+    {
+        id: 9,
+        title: "The Problem with Fast Fashion: A Look at the Hidden Costs",
+        image: "https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=800&auto=format&fit=crop",
+        date: "September 18, 2025",
+        description: "We dive deep into the environmental and social consequences of the fast fashion industry, from textile waste in landfills to exploitative labor practices.",
+        category: "Industry Insights",
+        author: "Chris Evans",
+        readingTime: "8 min"
+    },
+    {
+        id: 10,
+        title: "Meet the Brands Making a Difference in Sustainable Fashion",
+        image: "https://images.unsplash.com/photo-1579566346927-c68383817a25?w=800&auto=format&fit=crop",
+        date: "September 15, 2025",
+        description: "Spotlight on innovative brands that are putting sustainability at the forefront, using recycled materials, circular models, and ethical production to change the industry for the better.",
+        category: "Brands",
+        author: "Emma Wilson",
+        readingTime: "7 min"
+    },
+    {
+        id: 11,
+        title: "Eco-Friendly Footwear: Steps in the Right Direction",
+        image: "https://images.unsplash.com/photo-1617606002779-51d866bdd1d1?w=800&auto=format&fit=crop",
+        date: "September 11, 2025",
+        description: "Your shoes can have a big environmental footprint. Discover brands that are using materials like recycled plastic, cork, and algae foam to create stylish and sustainable footwear.",
+        category: "Accessories",
+        author: "James Brown",
+        readingTime: "6 min"
+    },
+    {
+        id: 12,
+        title: "The Art of Mending: How Visible Repairs Are Making a Statement",
+        image: "https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?w=800&auto=format&fit=crop",
+        date: "September 8, 2025",
+        description: "Instead of hiding tears, the visible mending movement celebrates them with creative embroidery and patches. Learn how this practice turns repairs into a beautiful form of self-expression.",
+        category: "DIY Fashion",
+        author: "Olivia Martinez",
+        readingTime: "5 min"
+    }
+];
+
+// Function to create blog post HTML
+function createBlogPostHTML(post) {
+    return `
+      <article class="blog-post">
+          <a href="blog/${post.id}" class="product-link">
+              <div class="blog-image">
+                  <img src="${post.image}" alt="${post.title}">
+                  <div class="product-overlay">
+                      <button class="shop-now-btn">Shop Now</button>
+                  </div>
+              </div>
+              <div class="blog-content">
+                  <h3>${post.title}</h3>
+                  <p class="date">New Arrival - ${post.date}</p>
+              </div>
+          </a>
+      </article>
+  `;
+}
+
+// Function to render blog posts
+function renderBlogPosts() {
+    const blogGrid = document.querySelector('.blog-grid');
+    if (blogGrid) {
+        blogGrid.innerHTML = blogPosts.map(post => createBlogPostHTML(post)).join('');
+    }
+}
 
 // Handle view options
 function handleViewOptions() {

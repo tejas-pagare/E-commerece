@@ -104,10 +104,10 @@ const renderCartController = async (req, res) => {
   }
 }
 
-const cartRenderController =  (req, res) => {
+// const cartRenderController =  (req, res) => {
 
-  res.render("User/cart/index.ejs", { title: "Cart", role: "user" });
-}
+//   res.render("User/cart/index.ejs", { title: "Cart", role: "user" });
+// }
 const addToCartController =  async (req, res) => {
   try {
     const id = req.params.id;
@@ -270,4 +270,4 @@ const vendorsController = (req,res)=>{
 
 const blogRenderController = (req, res) => res.render('User/blog/index.ejs', { title: 'Blog Page', role: req.role })
 
-export {loginController ,signupController,logoutController,renderCartController,addToCartController,removeFromCartController,deleteFromCartController,loginPageRenderController,signupPageRenderController,accountRenderController,addressRenderController,blogController,shopController,vendorsController,blogRenderController,cartRenderController,HomePageController,accountShowRenderController}
+export {loginController ,signupController,logoutController,renderCartController,addToCartController,removeFromCartController,deleteFromCartController,loginPageRenderController,signupPageRenderController,accountRenderController,addressRenderController,blogController,shopController,vendorsController,blogRenderController,HomePageController,accountShowRenderController}
