@@ -3,29 +3,34 @@ import Product from "../models/product.js";
 
 const router = express.Router();
 
-
 router.get("/details/:id", async (req, res) => {
   try {
     const id = req.params.id;
 
-    // 1. Find the main product AND populate the 'sellerId' field
-    //    We only select the 'storeName' from the seller document
+    // --- THIS IS THE FIX ---
+    // We are now populating both 'reviews' (with the user)
+    // AND 'sellerId' (to get the storeName)
     const product = await Product.findById(id)
-      .populate('sellerId', 'storeName'); // <-- CHANGE 1
+      .populate({
+        path: 'reviews',
+        populate: {
+          path: 'user',
+          select: 'firstname lastname' // Only select the fields you need
+        }
+      })
+      .populate('sellerId', 'storeName'); // <-- THIS LINE WAS MISSING
+    // --- END OF FIX ---
 
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
-    // 2. Also find and populate related products
+    // Also find related products to send along with the main product
     const relatedProducts = await Product.find({
       category: product.category,
       _id: { $ne: product._id } // Exclude the main product itself
-    })
-    .populate('sellerId', 'storeName') // <-- CHANGE 2 (So brand names also work on related items)
-    .limit(4); 
+    }).limit(4); // Limit to 4 related products
 
-    // Now, 'product.sellerId' will be an object like: { _id: "...", storeName: "..." }
     res.json({ success: true, product, relatedProducts });
 
   } catch (error) {
@@ -33,8 +38,6 @@ router.get("/details/:id", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
-
-
 
 
 
