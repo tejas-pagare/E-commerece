@@ -36,7 +36,7 @@ const router = express.Router();
 // Get all public products
 router.get("/products", isAuthenticated, async (req, res) => {
     try {
-        const products = await Product.find({}).limit(8);
+        const products = await Product.find({}).limit(8).populate('reviews');
         res.json(products); // Sends JSON
     } catch (error) {
         res.status(500).json({
@@ -708,7 +708,7 @@ router.get("/products/filter", isAuthenticated, async (req, res) => {
             if (maxPrice) filter.price.$lte = Number(maxPrice);
         }
 
-        const filteredProducts = await Product.find(filter);
+       const filteredProducts = await Product.find(filter).populate('reviews');
 
         res.status(200).json({
             success: true,
