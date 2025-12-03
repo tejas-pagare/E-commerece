@@ -1,27 +1,17 @@
-
 // Import Blog model using ES module syntax
 import Blog from '../models/blog.js';
 
-
 import express from 'express';
+// --- UPDATED Controller Imports ---
+// Only import controllers that handle data (JSON), not ones that render pages
 import {
-    accountRenderController,
-    accountShowRenderController,
-    addressRenderController,
     addToCartController,
-    blogController,
-    blogRenderController,
-    cartRenderController,
     deleteFromCartController,
     loginController,
-    loginPageRenderController,
     logoutController,
     removeFromCartController,
-    renderCartController,
-    shopController,
-    signupController,
-    signupPageRenderController,
-    vendorsController
+    renderCartController, // This one sends JSON, so we keep it
+    signupController
 } from '../controller/user.js';
 import User from '../models/user.js';
 import isAuthenticated from '../middleware/isAuthenticated.js';
@@ -37,37 +27,17 @@ import UserHistory from "../models/userHistory.js";
 import path from 'path';
 const router = express.Router();
 
-// Inject Chatbase widget into all user-rendered HTML pages
-const CHATBASE_SNIPPET = `<script>(function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="KC-p2cvseDCtYbj5EzY_h";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();</script>`;
+// --- REMOVED ---
+// The Chatbase snippet middleware that injected HTML has been removed.
+// A JSON API does not serve HTML.
 
-router.use((req, res, next) => {
-  const originalRender = res.render.bind(res);
-  res.render = (view, options, callback) => {
-    if (typeof options === 'function') {
-      callback = options;
-      options = {};
-    }
-    const wrap = (err, html) => {
-      if (err) {
-        return callback ? callback(err) : res.status(500).send('Template render error');
-      }
-      if (typeof html === 'string') {
-        html = /<\/body>/i.test(html)
-          ? html.replace(/<\/body>/i, `${CHATBASE_SNIPPET}\n</body>`)
-          : `${html}\n${CHATBASE_SNIPPET}`;
-      }
-      return callback ? callback(null, html) : res.send(html);
-    };
-    return originalRender(view, options || {}, wrap);
-  };
-  next();
-});
+// --- API ROUTES ---
 
-// New route to get products as JSON
+// Get all public products
 router.get("/products", isAuthenticated, async (req, res) => {
     try {
-        const products = await Product.find({}).limit(8); 
-        res.json(products);
+        const products = await Product.find({}).limit(8).populate('reviews');
+        res.json(products); // Sends JSON
     } catch (error) {
         res.status(500).json({
             message: "Error fetching products."
@@ -75,21 +45,38 @@ router.get("/products", isAuthenticated, async (req, res) => {
     }
 });
 
-// Render blog detail page for a specific blog ID
-router.get('/blog/:id', (req, res) => {
-    res.render('User/blog_post/article.ejs', {
-        title: 'Blog Article',
-        role: 'user'
-    });
-});
-router.get("/login", loginPageRenderController)
-router.post("/login", loginController)
-router.get("/signup", signupPageRenderController)
+// --- AUTH ---
+// These routes are kept as they handle data submission
+router.post("/login", loginController);
 router.post("/signup", signupController);
-
 router.get("/logout", logoutController);
-router.get("/account", isAuthenticated, accountShowRenderController);
-router.get("/account/update", isAuthenticated, accountRenderController);
+
+// --- ACCOUNT ---
+
+// Get details for the currently logged-in user
+router.get("/account/details", isAuthenticated, async (req, res) => {
+    try {
+        const user = await User.findById(req.userId).select('firstname lastname email');
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+        res.json({
+            success: true,
+            user
+        });
+    } catch (error) {
+        console.error("Error fetching user details:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
+    }
+});
+
+// Update user's account info
 router.post("/account/update", isAuthenticated, async (req, res) => {
     const {
         firstname,
@@ -99,91 +86,69 @@ router.post("/account/update", isAuthenticated, async (req, res) => {
 
     try {
         if (!email || !firstname || !lastname) {
-            return res.redirect("/api/v1/user/account");
+            // Return JSON error instead of redirecting
+            return res.status(400).json({
+                success: false,
+                message: "All fields are required."
+            });
         }
-        await User.findByIdAndUpdate(req.userId, {
+        // Add { new: true } to get the updated document back
+        const updatedUser = await User.findByIdAndUpdate(req.userId, {
             firstname,
             lastname,
             email
-        })
-        res.redirect("/api/v1/user/account");
-        return;
+        }, {
+            new: true
+        }).select('firstname lastname email');
+        
+        // Return JSON success response
+        res.json({
+            success: true,
+            user: updatedUser
+        });
+
     } catch (error) {
-        return res.redirect("/api/v1/user/account");
-    }
-});
-router.get("/sell", isAuthenticated, async (req, res) => {
-    res.render("User/sell/index.ejs", {
-        title: "Sell Product",
-        role: "user"
-    });
-
-});
-router.get("/store", (req, res) => {
-    return res.render("User/store/index.ejs", {
-        title: "Store",
-        role: "user"
-    });
-});
-router.get('/blogs/:id', async (req, res) => {
-    try {
-        const blog = await Blog.findById(req.params.id);
-        if (!blog) {
-            return res.status(404).json({ success: false, message: 'Blog not found' });
-        }
-        res.json({ success: true, blog });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Server Error' });
+        // Return JSON error
+        return res.status(500).json({
+            success: false,
+            message: "Error updating account."
+        });
     }
 });
 
-
-//  NEW ROUTE to get the current user's details as JSON
-router.get("/account/details", isAuthenticated, async (req, res) => {
-  try {
-    // Find the user by the ID from the token and select only the necessary fields
-    const user = await User.findById(req.userId).select('firstname lastname email');
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-    res.json({ success: true, user });
-  } catch (error) {
-    console.error("Error fetching user details:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
-});
-
+// Get user's address details
 router.get("/account/address/details", isAuthenticated, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId).select('Address');
-    if (!user || !user.Address) {
-      // If no address is set, return a default or empty structure
-      return res.json({ 
-        success: true, 
-        address: { plotno: '', street: '', city: '', state: '', pincode: '', phone: '' } 
-      });
+    try {
+        const user = await User.findById(req.userId).select('Address');
+        if (!user || !user.Address) {
+            return res.json({
+                success: true,
+                address: {
+                    plotno: '',
+                    street: '',
+                    city: '',
+                    state: '',
+                    pincode: '',
+                    phone: ''
+                }
+            });
+        }
+        res.json({
+            success: true,
+            address: user.Address
+        });
+    } catch (error) {
+        console.error("Error fetching user address:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
     }
-    res.json({ success: true, address: user.Address });
-  } catch (error) {
-    console.error("Error fetching user address:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
 });
 
-router.get("/account/address", isAuthenticated, addressRenderController);
-router.get("/account/update/address", isAuthenticated, async (req, res) => {
-    const user = await User.findById(req.userId);
-    console.log(user);
-    res.render("User/accountAddress/edit.ejs", {
-        title: 'Update Account Address',
-        role: "user",
-        user
-    });
-})
+// Update user's address
 router.post("/account/update/address", isAuthenticated, async (req, res) => {
-
     try {
-
         const {
             plotno,
             street,
@@ -206,9 +171,11 @@ router.post("/account/update/address", isAuthenticated, async (req, res) => {
         if (pincode) user.Address.pincode = pincode;
         if (phone) user.Address.phone = phone;
         await user.save();
+        
         res.status(200).json({
             message: "Address updated sucessfully",
-            success: true
+            success: true,
+            address: user.Address // Send back the updated address
         })
     } catch (error) {
         res.status(500).json({
@@ -216,71 +183,98 @@ router.post("/account/update/address", isAuthenticated, async (req, res) => {
             success: false
         })
     }
-})
+});
 
 
-// Place this after /blog/:id so it doesn't catch /blog/:id requests
-router.get("/shop", isAuthenticated, shopController);
-router.get("/vendors", isAuthenticated, vendorsController)
-router.get('/blog', isAuthenticated, blogRenderController);
-router.get('/contact', isAuthenticated, (req, res) => res.render('User/contact/index.ejs', {
-    title: 'Contact Page',
-    role: "user"
-}));
-router.get("/cart", cartRenderController)
-router.post("/cart", isAuthenticated, renderCartController)
-router.post("/cart/add/:id", isAuthenticated, addToCartController)
-router.post("/cart/remove/:id", isAuthenticated, removeFromCartController)
+// --- BLOGS ---
+// Get a single blog post by ID
+router.get('/blogs/:id', async (req, res) => {
+    try {
+        const blog = await Blog.findById(req.params.id);
+        if (!blog) {
+            return res.status(404).json({
+                success: false,
+                message: 'Blog not found'
+            });
+        }
+        res.json({
+            success: true,
+            blog
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Server Error'
+        });
+    }
+});
+
+// --- CART ---
+// Get the user's cart (changed from POST to GET)
+router.get("/cart", isAuthenticated, renderCartController);
+// Add item to cart
+router.post("/cart/add/:id", isAuthenticated, addToCartController);
+// Remove one item from cart
+router.post("/cart/remove/:id", isAuthenticated, removeFromCartController);
+// Delete item (and all its quantity) from cart
 router.delete("/cart/remove/:id", isAuthenticated, deleteFromCartController);
 
 
-//  NEW ROUTE to provide checkout data as JSON
+// --- CHECKOUT & PAYMENT ---
+// Get all data needed for the checkout page
 router.get("/checkout-details", isAuthenticated, async (req, res) => {
-  try {
-    const user = await User.findById(req.userId).populate("cart.productId");
-    if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+    try {
+        const user = await User.findById(req.userId).populate("cart.productId");
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        let total = 0;
+        user.cart?.forEach((e) => {
+            total += Math.round(e?.productId?.price) * e.quantity;
+        });
+
+        const result = await SellProduct.aggregate([{
+            $match: {
+                user_id: req.userId
+            }
+        }, {
+            $group: {
+                _id: '$user_id',
+                totalEstimatedValue: {
+                    $sum: '$estimated_value'
+                }
+            }
+        }]);
+
+        const extra = result.length > 0 ? result[0].totalEstimatedValue : 0;
+
+        res.json({
+            success: true,
+            user: {
+                firstname: user.firstname,
+                lastname: user.lastname,
+                email: user.email,
+                Address: user.Address,
+                cart: user.cart
+            },
+            total,
+            extra
+        });
+
+    } catch (error) {
+        console.error("Checkout details error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
     }
-
-    let total = 0;
-    user.cart?.forEach((e) => {
-      total += Math.round(e?.productId?.price) * e.quantity;
-    });
-
-    const result = await SellProduct.aggregate([
-      { $match: { user_id: req.userId } },
-      { $group: { _id: '$user_id', totalEstimatedValue: { $sum: '$estimated_value' } } }
-    ]);
-  
-    const extra = result.length > 0 ? result[0].totalEstimatedValue : 0;
-
-    res.json({
-      success: true,
-      user: {
-        firstname: user.firstname,
-        lastname: user.lastname,
-        email: user.email,
-        Address: user.Address,
-        cart: user.cart
-      },
-      total,
-      extra
-    });
-
-  } catch (error) {
-    console.error("Checkout details error:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
 });
 
-
-router.get("/checkout", isAuthenticated, async (req, res) => {
-  // This route now just renders the page shell.
-  // The data will be fetched by the client-side script.
-  res.render("User/payment/index.ejs", { title: "Checkout Page", role: "user" });
-});
-
-
+// Process the payment
 router.post("/payment", isAuthenticated, async (req, res) => {
     try {
         const {
@@ -290,7 +284,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
         const {
             userId
         } = req;
-        console.log(address);
+        
         if (!address ||
             !address.plotno ||
             !address.street ||
@@ -378,9 +372,11 @@ router.post("/payment", isAuthenticated, async (req, res) => {
 
         user.cart = [];
         await user.save();
-        console.log("como")
+        
         res.status(200).json({
-            message: "Payment processed and order placed successfully"
+            message: "Payment processed and order placed successfully",
+            success: true,
+            orderId: newOrder._id
         });
     } catch (err) {
         console.error("Payment error:", err);
@@ -391,8 +387,9 @@ router.post("/payment", isAuthenticated, async (req, res) => {
 });
 
 
+// --- DASHBOARD DATA ---
 
-//  NEW ROUTE for fetching donated products data
+// Get user's donated/sold products
 router.get("/donated-products", isAuthenticated, async (req, res) => {
   try {
     const userId = req.userId;
@@ -400,6 +397,7 @@ router.get("/donated-products", isAuthenticated, async (req, res) => {
     const user = await User.findById(userId).select("firstname");
 
     const dataWithImages = products.map(item => ({
+      _id: item._id, // <-- ADD THIS LINE
       username: user.firstname,
       items: item.items,
       fabric: item.fabric,
@@ -422,61 +420,42 @@ router.get("/donated-products", isAuthenticated, async (req, res) => {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 });
-
-
-router.get("/dashboard/sellproduct", isAuthenticated, async (req, res) => {
-  // This route no longer needs to fetch data. It just renders the shell.
-  // The username can also be passed if needed, or fetched client-side.
-  const user = await User.findById(req.userId).select("firstname");
-  res.render("User/dashboard/sellproduct/dummyboard.ejs", { title: "sellproduct", role: "user", username: user.firstname });
-});
-
-
-
-// NEW ROUTE to serve order history data as JSON
+// Get user's order history
 router.get("/order-history", isAuthenticated, async (req, res) => {
-  try {
-    const userId = req.userId;
-    const orderHistory = await UserHistory.findOne({ userId })
-      .populate({
-        path: "orders.products.productId",
-        model: "Product",
-        select: "title description price category image" // Select fields you need
-      });
+    try {
+        const userId = req.userId;
+        const orderHistory = await UserHistory.findOne({
+                userId
+            })
+            .populate({
+                path: "orders.products.productId",
+                model: "Product",
+                select: "title description price category image" // Select fields you need
+            });
 
-    if (!orderHistory) {
-      return res.json({ success: true, orders: [] }); // Send empty array if no history
+        if (!orderHistory) {
+            return res.json({
+                success: true,
+                orders: []
+            }); // Send empty array if no history
+        }
+
+        res.json({
+            success: true,
+            orders: orderHistory.orders
+        });
+    } catch (error) {
+        console.error("Error fetching order history:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server Error"
+        });
     }
-
-    res.json({ success: true, orders: orderHistory.orders });
-  } catch (error) {
-    console.error("Error fetching order history:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
 });
 
 
-router.get("/dashboard", isAuthenticated, async (req, res) => {
-  try {
-    // This route now only needs to fetch the user's name for the welcome message.
-    // The detailed order data will be fetched by the client-side script.
-    const user = await User.findById(req.userId).select("firstname");
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    res.render("User/dashboard/index.ejs", {
-      title: "Dashboard",
-      role: "user",
-      username: user.firstname // Pass only the username
-    });
-  } catch (error) {
-    console.error("Dashboard error:", error);
-    res.status(500).send("Error loading dashboard");
-  }
-});
-
-
-
+// --- REVIEWS ---
+// Create a new review
 router.post("/review/create/:id", isAuthenticated, async (req, res) => {
     try {
         const id = req.params.id;
@@ -523,15 +502,50 @@ router.post("/review/create/:id", isAuthenticated, async (req, res) => {
             success: false
         })
     }
-})
-router.get('/', isAuthenticated, (req, res) => {
-    res.render('User/homepage/index.ejs', {
-        title: 'Home',
-        role: 'user'
-    });
 });
 
+router.delete("/review/delete/:id", isAuthenticated, async (req, res) => {
+    try {
+        const reviewId = req.params.id;
+        const userId = req.userId;
 
+        // Find the review
+        const review = await Review.findById(reviewId);
+        if (!review) {
+            return res.status(404).json({ success: false, message: "Review not found." });
+        }
+
+        // **SECURITY CHECK**: Ensure the logged-in user is the author
+        if (review.user.toString() !== userId) {
+            return res.status(403).json({ success: false, message: "Not authorized to delete this review." });
+        }
+
+        // Proceed with deletion
+        await Review.findByIdAndDelete(reviewId);
+
+        // Remove the reference from the Product
+        await Product.findByIdAndUpdate(review.product, {
+            $pull: { reviews: reviewId }
+        });
+
+        // Remove the reference from the User
+        await User.findByIdAndUpdate(userId, {
+            $pull: { reviews: reviewId }
+        });
+
+        res.json({ success: true, message: "Review deleted successfully." });
+
+    } catch (error) {
+        console.error("Error deleting review:", error);
+        res.status(500).json({
+            message: "Server Error",
+            success: false
+        })
+    }
+});
+// --- SELL/DONATE PRODUCT ---
+
+// Point calculation logic
 const combinationPoints = {
     // 6 months (age = "6")
     "CottonS6": 200,
@@ -591,6 +605,7 @@ const combinationPoints = {
     "PolyesterL1": 100,
 };
 
+// Multer config for file uploads
 import multer from 'multer';
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -603,19 +618,14 @@ const upload = multer({
 // POST /sell route
 router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) => {
     try {
-        // Validate file presence
         if (!req.file) {
             return res.status(400).json({
                 success: false,
                 message: 'Photo is required.'
             });
         }
-        console.log(req.userId);
-
-        // Build combination_id (fabric + size + age)
+        
         const combination_id = req.body.fabric + req.body.size + req.body.age;
-
-        // Lookup estimated value
         const estimated_value = combinationPoints[combination_id];
 
         if (estimated_value === undefined) {
@@ -624,7 +634,7 @@ router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) 
                 message: `Invalid combination: ${combination_id}. Please check your input.`
             });
         }
-        // Create new SellProduct document
+        
         const newProduct = new SellProduct({
             user_id: req.userId,
             items: req.body.items,
@@ -639,7 +649,6 @@ router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) 
             description: req.body.description,
             clothesDate: req.body.clothesDate,
             timeSlot: req.body.timeSlot,
-
             combination_id: combination_id,
             estimated_value: estimated_value
         });
@@ -649,8 +658,13 @@ router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) 
             throw err;
         });
 
-        // res.render("User/sell/index.ejs", { title: "Sell Product", role: "user" });
-        res.redirect('sell');
+        // --- MODIFIED ---
+        // Return JSON instead of redirecting
+        res.status(201).json({ 
+            success: true, 
+            message: "Product submitted successfully.",
+            product: newProduct 
+        });
 
     } catch (error) {
         console.error('Error submitting product:', error);
@@ -661,7 +675,8 @@ router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) 
     }
 });
 
-//  route for filtered products
+// --- FILTER ---
+// Get products based on filter criteria
 router.get("/products/filter", isAuthenticated, async (req, res) => {
     try {
         const {
@@ -673,36 +688,28 @@ router.get("/products/filter", isAuthenticated, async (req, res) => {
             maxPrice
         } = req.query;
 
-        // Build filter object
         const filter = {};
 
         if (category) {
             filter.category = category;
         }
-
         if (material) {
             filter.fabric = material;
         }
-
         if (gender) {
             filter.gender = gender;
         }
-
         if (size) {
             filter.size = size;
         }
-
-        // Add price range filter if provided
         if (minPrice || maxPrice) {
             filter.price = {};
             if (minPrice) filter.price.$gte = Number(minPrice);
             if (maxPrice) filter.price.$lte = Number(maxPrice);
         }
 
-        // Find products with applied filters
-        const filteredProducts = await Product.find(filter);
+       const filteredProducts = await Product.find(filter).populate('reviews');
 
-        // Return filtered products as JSON
         res.status(200).json({
             success: true,
             products: filteredProducts

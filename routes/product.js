@@ -3,11 +3,23 @@ import Product from "../models/product.js";
 
 const router = express.Router();
 
-
 router.get("/details/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const product = await Product.findById(id);
+
+    // --- THIS IS THE FIX ---
+    // We are now populating both 'reviews' (with the user)
+    // AND 'sellerId' (to get the storeName)
+    const product = await Product.findById(id)
+      .populate({
+        path: 'reviews',
+        populate: {
+          path: 'user',
+          select: 'firstname lastname' // Only select the fields you need
+        }
+      })
+      .populate('sellerId', 'storeName'); // <-- THIS LINE WAS MISSING
+    // --- END OF FIX ---
 
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
@@ -26,8 +38,6 @@ router.get("/details/:id", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
-
-
 
 
 
