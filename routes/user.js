@@ -530,6 +530,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
             products,
             totalAmount,
             status: "Pending",
+            orderDate: new Date() // <--- ADDED: This fixes the "Invalid Date" on frontend
         });
 
         await userHistory.save();
@@ -590,32 +591,45 @@ router.get("/donated-products", isAuthenticated, async (req, res) => {
 router.get("/order-history", isAuthenticated, async (req, res) => {
     try {
         const userId = req.userId;
-        const orderHistory = await UserHistory.findOne({
-                userId
-            })
+        const userHistory = await UserHistory.findOne({ userId })
             .populate({
                 path: "orders.products.productId",
                 model: "Product",
-                select: "title description price category image" // Select fields you need
+                select: "title description price category image" 
+            })
+            // Populate the referenced Order to get its createdAt date
+            .populate({
+                path: "orders.orderId",
+                model: "Order",
+                select: "createdAt"
             });
 
-        if (!orderHistory) {
-            return res.json({
-                success: true,
-                orders: []
-            }); // Send empty array if no history
+        if (!userHistory) {
+            return res.json({ success: true, orders: [] }); 
         }
+
+        // Map through orders to ensure date is present
+        const formattedOrders = userHistory.orders.map(order => {
+            const originalOrder = order.orderId; // This is now the populated Object
+            
+            // Determine the date: Use explicit orderDate, or fallback to original Order's createdAt
+            const finalDate = order.orderDate || (originalOrder ? originalOrder.createdAt : new Date());
+
+            return {
+                ...order.toObject(),
+                // Restore orderId to a simple string ID for the frontend to use
+                orderId: originalOrder ? originalOrder._id : order.orderId,
+                orderDate: finalDate
+            };
+        });
 
         res.json({
             success: true,
-            orders: orderHistory.orders
+            orders: formattedOrders
         });
     } catch (error) {
         console.error("Error fetching order history:", error);
-        res.status(500).json({
-            success: false,
-            message: "Server Error"
-        });
+        res.status(500).json({ success: false, message: "Server Error" });
     }
 });
 
