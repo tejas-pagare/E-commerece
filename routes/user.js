@@ -34,7 +34,7 @@ const router = express.Router();
 // --- API ROUTES ---
 
 // Get all public products
-router.get("/products", isAuthenticated, async (req, res) => {
+router.get("/products",  async (req, res) => {
     try {
         const products = await Product.find({}).limit(8).populate('reviews');
         res.json(products); // Sends JSON
