@@ -56,7 +56,8 @@ router.get("/logout", logoutController);
 // Get details for the currently logged-in user
 router.get("/account/details", isAuthenticated, async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select('firstname lastname email');
+        // --- UPDATED: Included 'coins' in selection ---
+        const user = await User.findById(req.userId).select('firstname lastname email coins');
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -212,13 +213,155 @@ router.get('/blogs/:id', async (req, res) => {
 // --- CART ---
 // Get the user's cart (changed from POST to GET)
 router.get("/cart", isAuthenticated, renderCartController);
-// Add item to cart
-router.post("/cart/add/:id", isAuthenticated, addToCartController);
-// Remove one item from cart
-router.post("/cart/remove/:id", isAuthenticated, removeFromCartController);
-// Delete item (and all its quantity) from cart
-router.delete("/cart/remove/:id", isAuthenticated, deleteFromCartController);
 
+// Add item to cart - Updated to handle size
+router.post("/cart/add/:id", isAuthenticated, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const userId = req.userId;
+        const { size } = req.body; // Get size from body
+
+        if (!id) {
+            return res.json({
+                message: "No product id provided",
+                success: false
+            });
+        }
+
+        const product = await Product.findOne({ _id: id });
+        if (!product) {
+            return res.json({
+                message: "No such product",
+                success: false
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        // Check for existing item with SAME ID and SAME SIZE
+        const productCartCheck = user.cart.find(item => 
+            item.productId.equals(product._id) && item.size === size
+        );
+
+        if (!productCartCheck) {
+            user.cart.push({
+                productId: product._id,
+                quantity: 1,
+                size: size
+            });
+        } else {
+            productCartCheck.quantity += 1;
+        }
+        await user.save();
+        
+        res.json({
+            message: "Product added",
+            success: true
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            message: "Server error",
+            success: false
+        });
+    }
+});
+
+// Remove/Decrement item from cart - Updated to handle size
+router.post("/cart/remove/:id", isAuthenticated, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const userId = req.userId;
+        const { size } = req.body; // Get size from body
+
+        if (!id) {
+            return res.json({
+                message: "No product id provided",
+                success: false
+            });
+        }
+
+        const user = await User.findById(userId);
+        
+        // Find item by ID and Size
+        const productCartCheck = user.cart.find(item => 
+            item.productId.toString() === id && item.size === size
+        );
+
+        if (productCartCheck) {
+            if (productCartCheck.quantity <= 1) {
+                // Remove if quantity is 1
+                user.cart = user.cart.filter(item => 
+                    !(item.productId.toString() === id && item.size === size)
+                );
+            } else {
+                productCartCheck.quantity -= 1;
+            }
+            await user.save();
+            res.json({
+                message: "Product quantity updated",
+                success: true
+            });
+        } else {
+            res.json({
+                message: "Item not found in cart",
+                success: false
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            message: "Server error",
+            success: false
+        });
+    }
+});
+
+// Delete item (and all its quantity) from cart - Updated to handle size
+router.delete("/cart/remove/:id", isAuthenticated, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const userId = req.userId;
+        const { size } = req.body; // Get size from body
+
+        if (!id) {
+            return res.json({
+                message: "No product id provided",
+                success: false
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        // Filter out the specific item (matching ID and Size)
+        const initialLength = user.cart.length;
+        user.cart = user.cart.filter(item => 
+            !(item.productId.toString() === id && item.size === size)
+        );
+
+        if (user.cart.length < initialLength) {
+            await user.save();
+            res.json({
+                message: "Product removed from cart",
+                success: true
+            });
+        } else {
+            res.json({
+                message: "Product not found in cart",
+                success: false
+            });
+        }
+        
+    } catch (error) {
+        console.log(error);
+        return res.json({
+            message: "Server error",
+            success: false
+        });
+    }
+});
 
 // --- CHECKOUT & PAYMENT ---
 // Get all data needed for the checkout page
@@ -259,7 +402,8 @@ router.get("/checkout-details", isAuthenticated, async (req, res) => {
                 lastname: user.lastname,
                 email: user.email,
                 Address: user.Address,
-                cart: user.cart
+                cart: user.cart,
+                coins: user.coins || 0 // --- UPDATED: Send coin balance ---
             },
             total,
             extra
@@ -279,7 +423,8 @@ router.post("/payment", isAuthenticated, async (req, res) => {
     try {
         const {
             paymentMethod,
-            address
+            address,
+            useCoins // --- UPDATED: Receive coin flag ---
         } = req.body;
         const {
             userId
@@ -309,6 +454,7 @@ router.post("/payment", isAuthenticated, async (req, res) => {
             productId: item.productId._id,
             quantity: item.quantity,
             price: item.productId.price,
+            size: item.size 
         }));
 
         const result = await SellProduct.aggregate([{
@@ -324,20 +470,38 @@ router.post("/payment", isAuthenticated, async (req, res) => {
             }
         }]);
 
-        const extra = result[0]?.totalEstimatedValue || 0;
-
-        let totalAmount = products.reduce(
-            (acc, item) => acc + item.price * item.quantity,
+        // Calculate Cart Total
+        let totalAmount = user.cart.reduce(
+            (acc, item) => acc + item.productId.price * item.quantity,
             0
         );
-        totalAmount -= extra;
+
+        // --- NEW COIN LOGIC ---
+        let coinsUsed = 0;
+        if (useCoins && user.coins > 0) {
+            // Determine how many coins to use (can't use more than the total price)
+            if (user.coins >= totalAmount) {
+                coinsUsed = totalAmount; // Pay fully with coins
+                totalAmount = 0;         // Remaining to pay is 0
+            } else {
+                coinsUsed = user.coins;  // Pay partially
+                totalAmount -= user.coins; // Deduct balance
+            }
+
+            // Deduct coins from user DB
+            user.coins -= coinsUsed;
+        }
+        // ----------------------
+
+        // Note: I removed the 'extra' subtraction from previous logic as 'coins' replaces 
+        // the generic 'totalEstimatedValue' subtraction for better tracking.
 
         const newOrder = new Order({
             userId: user._id,
             products,
-            totalAmount,
-            paymentStatus: "Pending",
-            paymentMethod,
+            totalAmount, // This is the actual MONEY paid
+            paymentStatus: totalAmount === 0 ? "Completed" : "Pending",
+            paymentMethod: totalAmount === 0 ? "Wallet/Coins" : paymentMethod,
             shippingAddress: {
                 fullname: `${user.firstname} ${user.lastname}`,
                 plotno: address.plotno,
@@ -370,13 +534,15 @@ router.post("/payment", isAuthenticated, async (req, res) => {
 
         await userHistory.save();
 
+        // Clear Cart & Save User (including coin deduction)
         user.cart = [];
         await user.save();
         
         res.status(200).json({
             message: "Payment processed and order placed successfully",
             success: true,
-            orderId: newOrder._id
+            orderId: newOrder._id,
+            coinsDeducted: coinsUsed
         });
     } catch (err) {
         console.error("Payment error:", err);
@@ -397,7 +563,7 @@ router.get("/donated-products", isAuthenticated, async (req, res) => {
     const user = await User.findById(userId).select("firstname");
 
     const dataWithImages = products.map(item => ({
-      _id: item._id, // <-- ADD THIS LINE
+      _id: item._id, 
       username: user.firstname,
       items: item.items,
       fabric: item.fabric,
@@ -658,11 +824,17 @@ router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) 
             throw err;
         });
 
-        // --- MODIFIED ---
+        // --- UPDATED: Award Virtual Coins ---
+        // Increment the user's coin balance by the estimated value
+        await User.findByIdAndUpdate(req.userId, {
+            $inc: { coins: estimated_value }
+        });
+        // -----------------------------------
+
         // Return JSON instead of redirecting
         res.status(201).json({ 
             success: true, 
-            message: "Product submitted successfully.",
+            message: "Product submitted successfully. Coins added to wallet!",
             product: newProduct 
         });
 
