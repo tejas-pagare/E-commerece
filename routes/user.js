@@ -838,17 +838,13 @@ router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) 
             throw err;
         });
 
-        // --- UPDATED: Award Virtual Coins ---
-        // Increment the user's coin balance by the estimated value
-        await User.findByIdAndUpdate(req.userId, {
-            $inc: { coins: estimated_value }
-        });
-        // -----------------------------------
+        // --- CHANGE: Coins are NOT added here anymore. ---
+        // They will be added when admin verifies the product in admin.js
 
         // Return JSON instead of redirecting
         res.status(201).json({ 
             success: true, 
-            message: "Product submitted successfully. Coins added to wallet!",
+            message: "Product submitted successfully. Coins will be added after verification!",
             product: newProduct 
         });
 
