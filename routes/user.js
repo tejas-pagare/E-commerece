@@ -33,8 +33,8 @@ const router = express.Router();
 
 // --- API ROUTES ---
 
-// Get all public products
-router.get("/products",  async (req, res) => {
+// Get all public products - UPDATED: Removed authentication
+router.get("/products", async (req, res) => {
     try {
         const products = await Product.find({}).limit(8).populate('reviews');
         res.json(products); // Sends JSON
@@ -849,7 +849,7 @@ router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) 
 
 // --- FILTER ---
 // Get products based on filter criteria
-router.get("/products/filter", isAuthenticated, async (req, res) => {
+router.get("/products/filter",  async (req, res) => {
     try {
         const {
             category,
