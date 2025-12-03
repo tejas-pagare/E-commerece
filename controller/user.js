@@ -111,8 +111,9 @@ const renderCartController = async (req, res) => {
 const addToCartController =  async (req, res) => {
   try {
     const id = req.params.id;
-    console.log(id)
-    const userId = req.userId
+    console.log(id) ;
+    const userId = req.userId;
+    const { size } = req.body;
     if (!id) {
       return res.json({
         message: "No product id provided",
@@ -128,17 +129,20 @@ const addToCartController =  async (req, res) => {
     }
 
     const user = await User.findById(userId);
-    const productCartCheck = user.cart.find(item => item.productId.equals(product._id));
+    const productCartCheck = user.cart.find(item => 
+      item.productId.equals(product._id) && item.size === size
+    );
 
     if (!productCartCheck) {
       user.cart.push({
         productId: product._id,
-        quantity: 1
+        quantity: 1,
+        size: size
       });
     } else {
       productCartCheck.quantity += 1;
     }
-    (await user).save();
+    await user.save();
     res.json({
       message: "Product added",
       success:true

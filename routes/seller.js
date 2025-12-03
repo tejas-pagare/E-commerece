@@ -7,6 +7,7 @@ import Product from '../models/product.js';
 import cloudinary, { upload } from '../config/cloudinary.js';
 import Order from '../models/orders.js';
 import mongoose from 'mongoose';
+import User from '../models/user.js';
 
 const router = express.Router();
 
@@ -455,6 +456,145 @@ router.get('/sold-products/data', isAuthenticated, async (req, res) => {
     return res.json({ success: true, soldProducts: orders || [] });
   } catch (error) {
     return res.status(500).json({ success: false, message: 'Failed to fetch sold products' });
+  }
+});
+
+// Add: Get order requests for the authenticated seller (JSON)
+router.get('/orders/requests', isAuthenticated, async (req, res) => {
+  try {
+    const sellerId = new mongoose.Types.ObjectId(req.userId);
+
+    const pipeline = [
+      { $match: { orderStatus: { $in: ['Pending', 'Processing'] } } },
+      { $unwind: '$products' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'products.productId',
+          foreignField: '_id',
+          as: 'productDetails'
+        }
+      },
+      { $unwind: '$productDetails' },
+      { $match: { 'productDetails.sellerId': sellerId } },
+      {
+        $group: {
+          _id: '$_id',
+          orderId: { $first: '$_id' },
+          orderStatus: { $first: '$orderStatus' },
+          shippingAddress: { $first: '$shippingAddress' },
+          createdAt: { $first: '$createdAt' },
+          buyerId: { $first: '$userId' },
+          items: {
+            $push: {
+              productId: '$productDetails._id',
+              title: '$productDetails.title',
+              price: '$products.price',
+              quantity: '$products.quantity',
+              image: '$productDetails.image', // include image URL
+              total: { $multiply: ['$products.price', '$products.quantity'] }
+            }
+          },
+          totalAmount: { $sum: { $multiply: ['$products.price', '$products.quantity'] } }
+        }
+      },
+      { $sort: { createdAt: -1 } }
+    ];
+
+    const results = await Order.aggregate(pipeline);
+
+    // Optional: populate buyer name/email for convenience
+    const populated = await Promise.all(results.map(async (r) => {
+      let buyer = null;
+      try {
+        buyer = await User.findById(r.buyerId).select('firstname lastname email').lean();
+      } catch (e) {
+        buyer = null;
+      }
+      return {
+        orderId: r.orderId,
+        status: r.orderStatus,
+        orderDate: r.createdAt,
+        shippingAddress: r.shippingAddress,
+        buyer,
+        items: (r.items || []).map(item => ({
+          productId: item.productId,
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image || null,
+          total: item.total
+        })),
+        totalAmount: r.totalAmount
+      };
+    }));
+
+    return res.status(200).json({ success: true, orders: populated });
+  } catch (error) {
+    console.error('Error fetching seller order requests:', error);
+    return res.status(500).json({ success: false, message: 'Failed to fetch order requests', error: error.message });
+  }
+});
+
+// Update order status for orders that include this seller's products
+// Method: PUT
+// URL (full): /api/v1/seller/orders/:orderId/seller/status
+router.put('/orders/:orderId/seller/status', isAuthenticated, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { orderStatus } = req.body;
+    const sellerId = req.userId;
+
+    // Validate orderId
+    if (!orderId || !mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({ success: false, message: 'Invalid order id' });
+    }
+
+    // Validate requested status
+    const allowedStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
+    if (!orderStatus || !allowedStatuses.includes(orderStatus)) {
+      return res.status(400).json({ success: false, message: 'Invalid or missing orderStatus' });
+    }
+
+    // Load order including product docs to check ownership
+    const order = await Order.findById(orderId).populate({ path: 'products.productId', select: 'sellerId title image price' });
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+
+    // Check if seller owns at least one item in this order
+    const sellerItems = order.products.filter(p => p.productId && String(p.productId.sellerId) === String(sellerId));
+    if (!sellerItems.length) {
+      return res.status(403).json({ success: false, message: 'You do not have permission to update this order' });
+    }
+
+    // Update order status (note: this updates entire order status)
+    order.orderStatus = orderStatus;
+    await order.save();
+
+    // Build response summary: items annotated with sellerOwned flag
+    const responseOrder = {
+      _id: order._id,
+      orderStatus: order.orderStatus,
+      totalAmount: order.totalAmount,
+      shippingAddress: order.shippingAddress,
+      userId: order.userId,
+      products: order.products.map(p => ({
+        productId: p.productId?._id || null,
+        title: p.productId?.title || null,
+        price: p.price,
+        quantity: p.quantity,
+        image: p.productId?.image || null,
+        sellerOwned: !!(p.productId && String(p.productId.sellerId) === String(sellerId))
+      }))
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: 'Order status updated',
+      order: responseOrder
+    });
+  } catch (error) {
+    console.error('Seller update order status error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to update order status', error: error.message });
   }
 });
 
