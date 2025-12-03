@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  coins: {
+    type: Number,
+    default: 0
+  },
 
   products: [
     {
