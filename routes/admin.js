@@ -18,20 +18,34 @@ import cloudinary, { upload as multerUpload } from "../config/cloudinary.js";
 // Helpers for React-compatible API responses and basic validation
 import mongoose from "mongoose";
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
-const sendError = (res, status, message, error) =>
-  res.status(status).json({ success: false, message, error: error?.message });
+
+// Standardized response helpers
+const sendSuccess = (res, message, data = {}) => {
+  return res.status(200).json({ success: true, message, data, errors: null });
+};
+const sendCreated = (res, message, data = {}) => {
+  return res.status(201).json({ success: true, message, data, errors: null });
+};
+const sendError = (res, status, message, error, extra = {}) => {
+  return res.status(status).json({ success: false, message, data: null, errors: { message: error?.message, ...extra } });
+};
+const paginate = (items, page = 1, limit = 50) => {
+  const total = items.length;
+  return { items, total, page, limit };
+};
 
 // React: no server-side rendering; provide API hints instead
 router.get("/blog/create", (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Render blog creation UI on the client. Use POST /api/v1/admin/blog to create."
-  });
+  return sendSuccess(
+    res,
+    "Render blog creation UI on the client. Use POST /api/v1/admin/blog to create.",
+    {}
+  );
 });
 router.get("/blogs/page", async (req, res) => {
   try {
     const blogs = await Blog.find({}).sort({ createdAt: -1 });
-    return res.status(200).json({ success: true, blogs });
+    return sendSuccess(res, "Blogs fetched", paginate(blogs));
   } catch (error) {
     return sendError(res, 500, "Failed to load blogs", error);
   }
@@ -48,7 +62,7 @@ router.post("/blog", multerUpload.single("image"), async (req, res) => {
         imageUrl = result.secure_url;
         const blog = new Blog({ title, content, author, image: imageUrl });
         await blog.save();
-        return res.status(201).json({ success: true, message: "Blog created successfully", blog });
+        return sendCreated(res, "Blog created successfully", { blog });
       });
       // Write the buffer to the stream
       result.end(req.file.buffer);
@@ -57,10 +71,10 @@ router.post("/blog", multerUpload.single("image"), async (req, res) => {
       // No image uploaded
       const blog = new Blog({ title, content, author });
       await blog.save();
-      return res.status(201).json({ success: true, message: "Blog created successfully", blog });
+      return sendCreated(res, "Blog created successfully", { blog });
     }
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to create blog", error: error.message });
+    return sendError(res, 500, "Failed to create blog", error, { code: "BLOG_CREATE_FAILED" });
   }
 });
 
@@ -68,67 +82,195 @@ router.post("/blog", multerUpload.single("image"), async (req, res) => {
 router.get("/blogs", async (req, res) => {
   try {
     const blogs = await Blog.find({}).sort({ createdAt: -1 });
-    res.json({ success: true, blogs });
+    return sendSuccess(res, "Blogs fetched", paginate(blogs));
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to fetch blogs", error: error.message });
+    return sendError(res, 500, "Failed to fetch blogs", error);
   }
 });
 
 router.get("/login", (req, res) => {
   const { error } = req.query;
-  return res.status(200).json({ success: true, error: error || null });
+  return sendSuccess(res, "Login page", { error: error || null });
 });
 
 router.get("/secondHand", async (req, res) => {
   try {
     const products = await SellProduct.find().populate("user_id", "firstname");
-    return res.status(200).json({ success: true, products });
+    return sendSuccess(res, "Second-hand products fetched", paginate(products));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch second hand products", error);
   }
 })
 
+// Simple in-memory cache with TTL
+const dashboardCache = {
+  data: null,
+  key: null,
+  expiresAt: 0,
+};
+
 router.get("/dashboard", async (req, res) => {
   try {
-    const users = await User.find({}).populate(["cart.productId", "products"]);
-    const products = await Product.find({}).populate("sellerId");
-    let totalCartAmount = 0;
-    let customerOrders = 0;
-    let sellerOrders = 0;
-    let UserCount = 0;
-    let CustomerCount = 0;
+    // Query params
+    const daysParam = parseInt(req.query.days, 10);
+    const days = [7, 30, 90].includes(daysParam) ? daysParam : 30;
+    const tz = (req.query.tz === 'local') ? 'local' : 'UTC';
 
-    users.forEach(user => {
-      const isSeller = user.products && user.products.length > 0;
-      if (!isSeller) {
-        UserCount += 1;
-        CustomerCount += 1;
-        if (user.cart && Array.isArray(user.cart)) {
-          user.cart.forEach(cartItem => {
-            if (cartItem.productId) {
-              totalCartAmount += cartItem.productId.price * cartItem.quantity;
-            }
-          });
-          customerOrders += user.cart.length;
+    // Cache key per window and tz
+    const cacheKey = `days:${days}|tz:${tz}`;
+    const nowMs = Date.now();
+    if (dashboardCache.key === cacheKey && dashboardCache.data && dashboardCache.expiresAt > nowMs) {
+      return sendSuccess(res, "Dashboard analytics (cached)", dashboardCache.data);
+    }
+
+    // Summary counts
+    const [userCount, productCount, sellerCount, managerCount, orderCount] = await Promise.all([
+      User.countDocuments({}),
+      Product.countDocuments({}),
+      Seller.countDocuments({}),
+      Manager.countDocuments({}),
+      Order.countDocuments({}),
+    ]);
+
+    // Revenue and orders totals
+    const revenueAgg = await Order.aggregate([
+      { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" }, totalOrders: { $sum: 1 } } },
+    ]);
+    const totalRevenue = revenueAgg[0]?.totalRevenue || 0;
+    const totalOrders = revenueAgg[0]?.totalOrders || 0;
+
+    // Time range: last 30 days
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - (days - 1)); // inclusive of today
+
+    // Helper to build daily buckets with zero fill
+    const buildZeroFilledSeries = (label) => {
+      const series = [];
+      const cursor = new Date(start);
+      while (cursor <= end) {
+        let key;
+        if (tz === 'local') {
+          const year = cursor.getFullYear();
+          const month = String(cursor.getMonth() + 1).padStart(2, '0');
+          const day = String(cursor.getDate()).padStart(2, '0');
+          key = `${year}-${month}-${day}`;
+        } else {
+          key = cursor.toISOString().slice(0, 10); // YYYY-MM-DD in UTC
         }
-      } else {
-        sellerOrders += user.products.length;
+        series.push({ date: key, value: 0, label });
+        cursor.setDate(cursor.getDate() + 1);
       }
-    });
+      return series;
+    };
 
-    return res.status(200).json({
-      success: true,
-      metrics: {
-        totalCartAmount,
-        customerOrders,
-        sellerOrders,
-        UserCount,
-        CustomerCount
+    // Aggregate per day: users created
+    const usersDaily = await User.aggregate([
+      { $match: { createdAt: { $gte: start, $lte: end } } },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]);
+    const productsDaily = await Product.aggregate([
+      { $match: { createdAt: { $gte: start, $lte: end } } },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]);
+    const ordersDaily = await Order.aggregate([
+      { $match: { createdAt: { $gte: start, $lte: end } } },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 }, revenue: { $sum: "$totalAmount" } } },
+      { $sort: { _id: 1 } },
+    ]);
+
+    // Zero-fill series
+    const usersSeries = buildZeroFilledSeries("usersCreated");
+    const productsSeries = buildZeroFilledSeries("productsAdded");
+    const ordersSeries = buildZeroFilledSeries("ordersCount");
+    const revenueSeries = buildZeroFilledSeries("revenue");
+
+    const mapFromAgg = (target, agg, key, field = "count") => {
+      const index = Object.create(null);
+      target.forEach((d, i) => (index[d.date] = i));
+      agg.forEach(a => {
+        const i = index[a._id];
+        if (i !== undefined) target[i].value = a[field] || 0;
+        target[i].label = key;
+      });
+      return target;
+    };
+
+    mapFromAgg(usersSeries, usersDaily, "usersCreated", "count");
+    mapFromAgg(productsSeries, productsDaily, "productsAdded", "count");
+    mapFromAgg(ordersSeries, ordersDaily, "ordersCount", "count");
+    mapFromAgg(revenueSeries, ordersDaily.map(o => ({ _id: o._id, revenue: o.revenue })), "revenue", "revenue");
+
+    // Top entities for quick charts
+    const topProducts = await Product.find({ verified: true })
+      .select("title price category image createdAt")
+      .sort({ createdAt: -1 })
+      .limit(10);
+    const topSellers = await Seller.find({})
+      .select("firstname lastname email createdAt")
+      .select("firstname lastname email profileImage createdAt")
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    // Category breakdown (top categories by product count)
+    const categoryBreakdownAgg = await Product.aggregate([
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 20 },
+    ]);
+    const categoryBreakdown = categoryBreakdownAgg.map(c => ({ category: c._id || 'Unknown', count: c.count }));
+
+    // Seller breakdown (orders per seller if sellerId linked in products)
+    const sellerBreakdownAgg = await Product.aggregate([
+      { $match: { sellerId: { $exists: true } } },
+      { $group: { _id: "$sellerId", productCount: { $sum: 1 } } },
+      { $sort: { productCount: -1 } },
+      { $limit: 20 },
+    ]);
+    const sellersMap = new Map();
+    const sellersInfo = await Seller.find({ _id: { $in: sellerBreakdownAgg.map(s => s._id) } }).select("firstname lastname email");
+    sellersInfo.forEach(s => sellersMap.set(String(s._id), { firstname: s.firstname, lastname: s.lastname, email: s.email }));
+    const sellerBreakdown = sellerBreakdownAgg.map(s => ({
+      sellerId: s._id,
+      productCount: s.productCount,
+      seller: sellersMap.get(String(s._id)) || null,
+    }));
+
+    const data = {
+      summary: {
+        users: userCount,
+        products: productCount,
+        sellers: sellerCount,
+        managers: managerCount,
+        orders: orderCount,
+        totalRevenue,
+        totalOrders,
       },
-      users,
-      products,
-      registeredProducts: products
-    });
+      series: {
+        usersCreated: usersSeries,
+        productsAdded: productsSeries,
+        ordersCount: ordersSeries,
+        revenue: revenueSeries,
+      },
+      top: {
+        products: topProducts,
+        sellers: topSellers,
+      },
+      breakdowns: {
+        categories: categoryBreakdown,
+        sellers: sellerBreakdown,
+      },
+      window: { start: start.toISOString().slice(0,10), end: end.toISOString().slice(0,10), days, tz },
+    };
+
+    // Cache for 60 seconds per key
+    dashboardCache.data = data;
+    dashboardCache.key = cacheKey;
+    dashboardCache.expiresAt = nowMs + 60 * 1000;
+
+    return sendSuccess(res, "Dashboard analytics", data);
   } catch (error) {
     console.error("Dashboard Error:", error);
     return sendError(res, 500, "Error loading dashboard", error);
@@ -138,12 +280,12 @@ router.post("/dashboard", async (req, res) => {
   try {
     const { email, password } = req.body || {};
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: "Email and password are required" });
+      return sendError(res, 400, "Email and password are required", null, { fields: ["email", "password"] });
     }
     if (email !== "adminLogin@gmail.com" || password !== "swiftmart") {
-      return res.status(401).json({ success: false, message: "Invalid credentials" });
+      return sendError(res, 401, "Invalid credentials", null, { code: "INVALID_CREDENTIALS" });
     }
-    return res.status(200).json({ success: true, message: "Authenticated", redirect: "/api/v1/admin/dashboard" });
+    return sendSuccess(res, "Authenticated", { redirect: "/api/v1/admin/dashboard" });
   } catch (error) {
     console.error(error);
     return sendError(res, 500, "Internal server error", error);
@@ -153,7 +295,7 @@ router.post("/dashboard", async (req, res) => {
 router.get("/customers", async (req, res) => {
   try {
     const customers = await User.find({});
-    return res.status(200).json({ success: true, customers });
+    return sendSuccess(res, "Customers fetched", paginate(customers));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch customers", error);
   }
@@ -162,16 +304,9 @@ router.get("/customers", async (req, res) => {
 router.get("/api/customers", async (req, res) => {
   try {
     const customers = await User.find({});
-    return res.json({
-      success: true,
-      customers
-    });
+    return sendSuccess(res, "Customers fetched", paginate(customers));
   } catch (error) {
-    return res.json({
-      success: false,
-      message: "Failed to fetch customers",
-      error: error.message
-    });
+    return sendError(res, 500, "Failed to fetch customers", error);
   }
 });
 
@@ -198,21 +333,21 @@ router.get("/dashboard/sellproduct", async (req, res) => {
       estimated_value: item.estimated_value
     }));
 
-    return res.status(200).json({ success: true, products: dataWithUsernames });
+    return sendSuccess(res, "Second-hand products fetched", paginate(dataWithUsernames));
 
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server Error');
+    return sendError(res, 500, 'Server Error', err);
   }
 });
 router.post("/dashboard/sellproduct", async (req, res) =>{
   const {id , userStatus} = req.body || {};
   try {
     if (!id || !isValidObjectId(id)) {
-      return res.status(400).json({ success: false, message: "Valid id is required" });
+      return sendError(res, 400, "Valid id is required", null, { fields: ["id"] });
     }
     await SellProduct.findByIdAndUpdate(id, { userStatus });
-    return res.status(200).json({ success: true, message: "User status updated" });
+    return sendSuccess(res, "User status updated", {});
   } catch (err) {
     console.error(err);
     return sendError(res, 500, "Error updating user status", err);
@@ -222,20 +357,15 @@ router.post("/dashboard/sellproduct", async (req, res) =>{
 router.get("/customer/details", async (req, res) => {
   try {
     const customers = await User.find({});
-    return res.json({
-      customers
-    })
+    return sendSuccess(res, "Customers fetched", paginate(customers));
   } catch (error) {
-    return res.json({
-      message: "Server error",
-      success: false
-    })
+    return sendError(res, 500, "Server error", error);
   }
 })
 router.get("/products", async (req, res) => {
   try {
     const products = await Product.find({}).populate("sellerId");
-    return res.status(200).json({ success: true, products });
+    return sendSuccess(res, "Products fetched", paginate(products));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch products", error);
   }
@@ -244,7 +374,7 @@ router.get("/products", async (req, res) => {
 router.get("/vendors", async (req, res) => {
   try {
     const sellers = await Seller.find({});
-    return res.status(200).json({ success: true, vendors: sellers });
+    return sendSuccess(res, "Vendors fetched", paginate(sellers));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch vendors", error);
   }
@@ -254,15 +384,15 @@ router.delete("/product/:id", async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
-      return res.status(400).json({ success: false, message: "Invalid product id" });
+      return sendError(res, 400, "Invalid product id", null, { fields: ["id"] });
     }
     const product = await Product.findByIdAndDelete(id);
     if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return sendError(res, 404, "Product not found", null, { code: "PRODUCT_NOT_FOUND" });
     }
     // Best-effort detach from seller's products if such relation exists
     await Seller.updateMany({}, { $pull: { products: id } });
-    return res.status(200).json({ success: true, message: "Product deleted successfully" });
+    return sendSuccess(res, "Product deleted successfully", {});
   } catch (error) {
     console.error("Delete product error:", error);
     return sendError(res, 500, "Server error", error);
@@ -272,15 +402,9 @@ router.delete("/product/:id", async (req, res) => {
 router.get("/api/products", async (req, res) => {
   try {
     const products = await Product.find({}).populate("sellerId");
-    return res.json({
-      success: true,
-      products
-    });
+    return sendSuccess(res, "Products fetched", paginate(products));
   } catch (error) {
-    return res.status(500).json({
-      message: "Server Error",
-      success: false
-    });
+    return sendError(res, 500, "Server Error", error);
   }
 });
 
@@ -288,10 +412,7 @@ router.get("/api/products", async (req, res) => {
 router.get("/products/details", async (req, res) => {
   try {
     const products = await Product.find({}).populate("sellerId");
-    return res.status(200).json({
-      success: true,
-      products
-    });
+    return sendSuccess(res, "Products fetched", paginate(products));
   } catch (error) {
     return sendError(res, 500, "Server Error", error);
   }
@@ -301,21 +422,15 @@ router.delete("/customer/:id", async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
-      return res.status(400).json({ success: false, message: "Invalid user id" });
+      return sendError(res, 400, "Invalid user id", null, { fields: ["id"] });
     }
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({
-        message: "No user with given id exists",
-        success: false
-      });
+      return sendError(res, 404, "No user with given id exists", null, { code: "USER_NOT_FOUND" });
     }
 
     await user.deleteOne();
-    return res.status(200).json({
-      message: "User deleted successfully",
-      success: true
-    })
+    return sendSuccess(res, "User deleted successfully", {});
   } catch (error) {
     console.log(error);
     return sendError(res, 500, "Server error", error);
@@ -327,18 +442,15 @@ router.get("/product/approve/:id", async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
-      return res.status(400).json({ success: false, message: "Invalid product id" });
+      return sendError(res, 400, "Invalid product id", null, { fields: ["id"] });
     }
     const product = await Product.findById(id);
     if (!product) {
-      return res.status(404).json({ success: false, message: "Product not found" });
+      return sendError(res, 404, "Product not found", null, { code: "PRODUCT_NOT_FOUND" });
     }
     product.verified = true;
     await product.save();
-    return res.status(200).json({
-      message: "Product approved successfully",
-      success: true
-    })
+    return sendSuccess(res, "Product approved successfully", {});
   } catch (error) {
     return sendError(res, 500, "Server Error", error);
   }
@@ -348,21 +460,15 @@ router.get("/product/disapprove/:id",async(req,res)=>{
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
-      return res.status(400).json({ success: false, message: "Invalid product id" });
+      return sendError(res, 400, "Invalid product id", null, { fields: ["id"] });
     }
     const product = await Product.findById(id);
     if(!product){
-      return res.status(404).json({
-        message:"No such product exists",
-        success:false
-      })
+      return sendError(res, 404, "No such product exists", null, { code: "PRODUCT_NOT_FOUND" });
     }
     product.verified=false;
     await product.save();
-    return res.status(200).json({
-      message:"Product disapproved successfully",
-      success:true
-    })
+    return sendSuccess(res, "Product disapproved successfully", {});
   } catch (error) {
     return sendError(res, 500, "Server Error", error);
   }
@@ -371,7 +477,7 @@ router.get("/product/disapprove/:id",async(req,res)=>{
 router.get("/seller", async (req, res) => {
   try {
     const sellers = await Seller.find({});
-    return res.status(200).json({ success: true, sellers });
+    return sendSuccess(res, "Sellers fetched", paginate(sellers));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch sellers", error);
   }
@@ -381,21 +487,15 @@ router.get("/seller/approve/:id", async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
-      return res.status(400).json({ success: false, message: "Invalid seller id" });
+      return sendError(res, 400, "Invalid seller id", null, { fields: ["id"] });
     }
     const seller = await Seller.findById(id);
     if (!seller) {
-      return res.status(404).json({
-        message: "No Such user exist",
-        success: false
-      })
+      return sendError(res, 404, "No Such user exist", null, { code: "SELLER_NOT_FOUND" });
     }
     seller.identityVerification.status = "Verified"
     await seller.save();
-    return res.status(200).json({
-      message: "Seller approved successfully",
-      success: true
-    })
+    return sendSuccess(res, "Seller approved successfully", {});
   } catch (error) {
     return sendError(res, 500, "Server Error", error);
   }
@@ -404,11 +504,7 @@ router.get("/seller/approve/:id", async (req, res) => {
 router.get("/seller/details", async (req, res) => {
   try {
     const sellers = await Seller.find({});
-    return res.status(200).json({
-      sellers,
-      success: true,
-      message: "Seller retireved Successfully"
-    })
+    return sendSuccess(res, "Seller retrieved successfully", paginate(sellers));
   } catch (error) {
     return sendError(res, 500, "Server Error", error);
   }
@@ -417,16 +513,9 @@ router.get("/seller/details", async (req, res) => {
 router.get("/api/sellers", async (req, res) => {
   try {
     const sellers = await Seller.find({});
-    res.json({
-      success: true,
-      sellers
-    });
+    return sendSuccess(res, "Sellers fetched", paginate(sellers));
   } catch (error) {
-    res.json({
-      success: false,
-      message: "Failed to fetch sellers",
-      error: error.message
-    });
+    return sendError(res, 500, "Failed to fetch sellers", error);
   }
 });
 
@@ -435,28 +524,28 @@ router.delete("/seller/:id", async (req, res) => {
   try {
     const { id } = req.params;
     if (!isValidObjectId(id)) {
-      return res.status(400).json({ success: false, message: "Invalid seller id" });
+      return sendError(res, 400, "Invalid seller id", null, { fields: ["id"] });
     }
     const seller = await Seller.findById(id);
     if (!seller) {
-      return res.status(404).json({ success: false, message: "Seller not found" });
+      return sendError(res, 404, "Seller not found", null, { code: "SELLER_NOT_FOUND" });
     }
 
     // Optional: remove products belonging to this seller
     await Product.deleteMany({ sellerId: id });
 
     await seller.deleteOne();
-    return res.status(200).json({ success: true, message: "Seller deleted successfully" });
+    return sendSuccess(res, "Seller deleted successfully", {});
   } catch (error) {
     console.error("Error deleting seller:", error);
-    return res.status(500).json({ success: false, message: "Failed to delete seller" });
+    return sendError(res, 500, "Failed to delete seller", error);
   }
 });
 
 router.get("/manager", async (req, res) => {
   try {
     const managers = await Manager.find().select("email createdAt");
-    return res.status(200).json({ success: true, managers });
+    return sendSuccess(res, "Managers fetched", paginate(managers));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch managers", error);
   }
@@ -466,17 +555,17 @@ router.post('/create/manager', async (req, res) => {
   try {
     const { email, password } = req.body || {};
     if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Email and password are required.' });
+      return sendError(res, 400, 'Email and password are required.', null, { fields: ['email','password'] });
     }
 
     const existingManager = await Manager.findOne({ email });
     if (existingManager) {
-      return res.status(409).json({ success: false, message: 'Manager with this email already exists.' });
+      return sendError(res, 409, 'Manager with this email already exists.', null, { code: 'MANAGER_EXISTS' });
     }
 
     const manager = new Manager({ email, password });
     await manager.save();
-    return res.status(201).json({ success: true, message: 'Manager created successfully!' });
+    return sendCreated(res, 'Manager created successfully!', {});
   } catch (error) {
     console.error('Create manager error:', error);
     return sendError(res, 500, 'Error creating manager', error);
@@ -488,7 +577,7 @@ router.get("/order", async (req, res) => {
     const orders = await Order.find({})
       .populate({ path: 'userId', select: 'firstname lastname email' })
       .populate({ path: 'products.productId', select: 'title image price' });
-    return res.status(200).json({ success: true, orders });
+    return sendSuccess(res, 'Orders fetched', paginate(orders));
   } catch (error) {
     return sendError(res, 500, 'Failed to fetch orders', error);
   }
@@ -530,10 +619,12 @@ async function getOrdersGrouped(req, res) {
       return acc;
     }, {});
 
-    return res.json(userOrders);
+    // convert grouped object into array for pagination predictability
+    const groupedArray = Object.values(userOrders);
+    return sendSuccess(res, 'Orders grouped by user', paginate(groupedArray));
   } catch (error) {
     console.error('Error fetching orders:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return sendError(res, 500, 'Internal server error', error);
   }
 }
 
@@ -545,7 +636,7 @@ router.get("/orders/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
     if (!isValidObjectId(userId)) {
-      return res.status(400).json({ success: false, message: 'Invalid user id' });
+      return sendError(res, 400, 'Invalid user id', null, { fields: ['userId'] });
     }
     const user = await User.findById(userId).populate({
       path: 'orders',
@@ -556,22 +647,13 @@ router.get("/orders/:userId", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
+      return sendError(res, 404, 'User not found', null, { code: 'USER_NOT_FOUND' });
     }
 
-    res.json({
-      success: true,
-      orders: user.orders
-    });
+    return sendSuccess(res, 'User orders fetched', paginate(user.orders));
   } catch (error) {
     console.error('Error fetching user orders:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching user orders'
-    });
+    return sendError(res, 500, 'Error fetching user orders', error);
   }
 });
 
@@ -580,26 +662,20 @@ router.put('/orders/:orderId/status', async (req, res) => {
       const { orderId } = req.params;
       const { orderStatus } = req.body;
       if (!isValidObjectId(orderId)) {
-        return res.status(400).json({ success: false, message: 'Invalid order id' });
+        return sendError(res, 400, 'Invalid order id', null, { fields: ['orderId'] });
       }
 
       // Validate order status
       const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
       if (!validStatuses.includes(orderStatus)) {
-          return res.status(400).json({
-              success: false,
-              message: 'Invalid order status'
-          });
+          return sendError(res, 400, 'Invalid order status', null, { validStatuses });
       }
 
       // Find and update the order
       const order = await Order.findById(orderId);
       
       if (!order) {
-          return res.status(404).json({
-              success: false,
-              message: 'Order not found'
-          });
+          return sendError(res, 404, 'Order not found', null, { code: 'ORDER_NOT_FOUND' });
       }
 
       // Update order status
@@ -607,18 +683,11 @@ router.put('/orders/:orderId/status', async (req, res) => {
       await order.save();
 
       // Send success response
-      res.status(200).json({
-          success: true,
-          message: 'Order status updated successfully',
-          order
-      });
+        return sendSuccess(res, 'Order status updated successfully', { order: { _id: order._id, orderStatus: order.orderStatus } });
 
   } catch (error) {
       console.error('Error updating order status:', error);
-      res.status(500).json({
-          success: false,
-          message: 'Internal server error'
-      });
+        return sendError(res, 500, 'Internal server error', error);
   }
 });
 
@@ -627,7 +696,7 @@ router.get('/orders/user/:orderId', async (req, res) => {
   try {
     const orderId = req.params.orderId;
     if (!isValidObjectId(orderId)) {
-      return res.status(400).json({ success: false, message: 'Invalid order id' });
+      return sendError(res, 400, 'Invalid order id', null, { fields: ['orderId'] });
     }
     
     // Find the order and populate user and product details
@@ -639,7 +708,7 @@ router.get('/orders/user/:orderId', async (req, res) => {
       });
 
     if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
+      return sendError(res, 404, 'Order not found', null, { code: 'ORDER_NOT_FOUND' });
     }
 
     // Get user data with all their orders
@@ -653,11 +722,10 @@ router.get('/orders/user/:orderId', async (req, res) => {
         }
       });
 
-    res.status(200).json({
-      success: true,
+    return sendSuccess(res, 'Order user data fetched', {
       userId: userData._id,
       userData: {
-        name: userData.name,
+        name: userData.name ?? null,
         email: userData.email,
         orders: userData.orders
       }
@@ -665,7 +733,7 @@ router.get('/orders/user/:orderId', async (req, res) => {
 
   } catch (error) {
     console.error('Error fetching order user data:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    return sendError(res, 500, 'Internal server error', error);
   }
 });
 
@@ -673,17 +741,10 @@ router.get('/orders/user/:orderId', async (req, res) => {
 router.get('/managers', async (req, res) => {
     try {
         const managers = await Manager.find().select('email createdAt');
-        
-        res.json({
-            success: true,
-            managers
-        });
+      return sendSuccess(res, 'Managers fetched', paginate(managers));
     } catch (error) {
         console.error('Error fetching managers:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch managers'
-        });
+      return sendError(res, 500, 'Failed to fetch managers', error);
     }
 });
 
@@ -694,24 +755,15 @@ router.delete('/managers/:id', async (req, res) => {
         const manager = await Manager.findById(managerId);
         
         if (!manager) {
-            return res.status(404).json({
-                success: false,
-                message: 'Manager not found'
-            });
+          return sendError(res, 404, 'Manager not found', null, { code: 'MANAGER_NOT_FOUND' });
         }
 
         await manager.deleteOne();
         
-        res.json({
-            success: true,
-            message: 'Manager deleted successfully'
-        });
+        return sendSuccess(res, 'Manager deleted successfully', {});
     } catch (error) {
         console.error('Error deleting manager:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to delete manager'
-        });
+        return sendError(res, 500, 'Failed to delete manager', error);
     }
 });
 
@@ -719,7 +771,7 @@ router.delete('/managers/:id', async (req, res) => {
 router.get("/delivery", async (req, res) => {
   try {
     // Placeholder for React UI; implement delivery partner model when available
-    return res.status(200).json({ success: true, message: 'Use client UI to manage deliveries.' });
+    return sendSuccess(res, 'Use client UI to manage deliveries.', {});
   } catch (error) {
     console.error('Error loading delivery management:', error);
     return sendError(res, 500, 'Error loading delivery management', error);
