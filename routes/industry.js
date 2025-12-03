@@ -1,75 +1,44 @@
 import express from 'express';
 import SellProduct from '../models/SellProduct.js';
 import Industry from '../models/Industry.js';
-import {industryAuth} from '../middleware/isAuthenticated.js';
+import { industryAuth } from '../middleware/isAuthenticated.js';
 import { loginController, registerController } from '../controller/industry.js';
-import {v4 as uuidv4} from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcryptjs';
+
 const router = express.Router();
 
-router.get('/login', (req, res) => {
-    // Capture the 'error' query parameter
-    const { error } = req.query;
-    // Pass the error to the template
-    res.render('Industry/Auth/login', { title: 'Login', role: 'User', error: error });
-});
-router.get('/signup', (req, res) => {
-    res.render('Industry/Auth/signup', {title:'Signup',role:'User'})
-})
-router.post('/login', loginController );
+router.post('/login', loginController);
 router.post('/signup', registerController);
 
-router.get("/logout", industryAuth, (req,res)=>{
-  res.clearCookie("token");
-  return res.redirect("/");
+router.get("/logout", industryAuth, (req, res) => {
+    res.clearCookie("token");
+    return res.json({ message: "Logged out successfully" });
 });
 
-router.get('/about',industryAuth ,(req, res) => {
-    res.render('Industry/aboutus/aboutus', {title:'About',role:'Industry'})
-})
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-//  imp sending ejs file just
-router.get('/home', industryAuth ,async (req, res) => {
+router.get('/home', industryAuth, async (req, res) => {
     try {
-        res.render('Industry/homepage/home', { title: 'Home', role:'User' });
-    } catch (error) {
-        console.error("Error fetching combinations with details:", error);
-        res.status(500).json({ message: "Internal Server Error", error });
-    }
-});
-
-
-
-// imp  sending just json data for home
-router.get('/fetchhome', industryAuth, async (req, res) => {
-    try {
-        console.log(req.industry);
         const combinations = await SellProduct.aggregate([
-          {
-            $match: {
-              adminStatus: "Pending",  // Only select products where adminStatus is "Pending"
-              userStatus: "Verified"   // Only select products where userStatus is "Verified"
+            {
+                $match: {
+                    adminStatus: "Pending",
+                    userStatus: "Verified"
+                }
+            },
+            {
+                $group: {
+                    _id: "$combination_id",
+                    quantity: { $sum: 1 },
+                    estimated_value: { $first: "$estimated_value" },
+                    fabric: { $first: "$fabric" },
+                    size: { $first: "$size" },
+                    usageDuration: { $first: "$usageDuration" }
+                }
+            },
+            {
+                $limit: 54
             }
-          },
-          {
-            $group: {
-              _id: "$combination_id", // Group by combination_id
-              quantity: { $sum: 1 },
-              estimated_value:{$first: "$estimated_value"},  // Count the number of products in each combination
-              fabric: { $first: "$fabric" },  // Get first fabric value
-              size: { $first: "$size" },  // Get first size value
-              usageDuration: { $first: "$usageDuration" } // Get first usage duration
-            }
-          },
-          {
-            $limit: 54 // Limit to 54 unique combination_id groups
-          }
         ]);
-         console.log(req.industry);
         res.json(combinations);
     } catch (error) {
         console.error("Error fetching combinations with details:", error);
@@ -77,259 +46,150 @@ router.get('/fetchhome', industryAuth, async (req, res) => {
     }
 });
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-/////////////////////////////////////////////////////////upperdone/////////////////////
-router.get("/blog", industryAuth, (req,res)=>{
-    res.render("Industry/blog/blog", {title:'Blog', role:'Industry' });
-})
-
-
-
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////done////////////
-
-
-
 router.get("/profile", industryAuth, async (req, res) => {
     try {
-    //     const id = req.industry;
-    //     console.log(id);
-    //   const industry = await Industry.findById(id)
-    //  console.log(industry);
-    //   if (!industry) {
-    //     return res.status(404).render("error", {
-    //       message: "Industry profile not found",
-    //       error: { status: 404 },
-    //     })
-    //   }
-  
-      res.render("Industry/Profile/profile", {
-        title: "Profile",
-        role: "Industry"})
+        const id = req.industry;
+        const industry = await Industry.findById(id);
+        if (!industry) {
+            return res.status(404).json({ message: "Industry profile not found" });
+        }
+        res.json({
+            industryName: industry.companyName,
+            email: industry.email,
+            address: industry.Address || "No address provided",
+            date: industry.createdAt || new Date(),
+        });
     } catch (error) {
-      console.error("Error fetching industry:", error)
-      res.status(500).render("error", {
-        message: "Error fetching profile",
-        error: { status: 500 },
-      })
+        console.error("Error fetching industry:", error)
+        res.status(500).json({ message: "Error fetching profile" });
     }
-  })
+});
 
-
-
-
-
-
-  router.get("/fetchprofile", industryAuth, async (req, res) => {
+router.get("/profile/edit", industryAuth, async (req, res) => {
     try {
         const id = req.industry;
-        console.log(id);
-      const industry = await Industry.findById(id)
-     console.log(industry);
-      if (!industry) {
-        return res.status(404).render("error", {
-          message: "Industry profile not found",
-          error: { status: 404 },
-        })
-      }
-  
-      res.json( {
-        industryName: industry.companyName,
-        email: industry.email,
-        address: industry.Address || "No address provided",
-        date: industry.createdAt || new Date(),
-      })
-    } catch (error) {
-      console.error("Error fetching industry:", error)
-      res.status(500).render("error", {
-        message: "Error fetching profile",
-        error: { status: 500 },
-      })
-    }
-  })
-
-
-  
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////done/////////
-  router.get("/profile/edit", industryAuth, async (req, res) => {
-    try {
-      // const id = req.industry
-      // const industry = await Industry.findById(id)
-      
-  
-      // if (!industry) {
-      //   return res.status(404).render("error", {
-      //     message: "Industry profile not found",
-      //     error: { status: 404 },
-      //   })
-      // }
-  
-      res.render("Industry/profile/editProfile", {
-        title: "Profile Update",
-        role: "Industry",
-        // companyName: industry.companyName,
-        // email: industry.email,
-        // address: industry.Address || "",
-      })
-    } catch (error) {
-      console.error("Error fetching industry:", error)
-      res.status(500).render("error", {
-        message: "Error fetching profile for editing",
-        error: { status: 500 },
-      })
-    }
-  })
-
-
-
-
-  router.get("/fetchprofileedit", industryAuth, async (req, res) => {
-    try {
-      const id = req.industry
-      const industry = await Industry.findById(id)
-      
-  
-      if (!industry) {
-        return res.status(404).render("error", {
-          message: "Industry profile not found",
-          error: { status: 404 },
-        })
-      }
-  
-      res.json( {
-        // title: "Profile Update",
-        // role: "Industry",
-        companyName: industry.companyName,
-        email: industry.email,
-        address: industry.Address || "",
-      })
-    } catch (error) {
-      console.error("Error fetching industry:", error)
-      res.status(500).render("error", {
-        message: "Error fetching profile for editing",
-        error: { status: 500 },
-      })
-    }
-  })
-  
-//done//////////////////////////////////////////////////////////////////done
-  router.post("/profile/edit", industryAuth, async (req, res) => {
-    try {
-      const { companyName, email, address, password } = req.body;
-      const id = req.industry;
-      const existingIndustry = await Industry.findById(id);
-  
-      if (!existingIndustry) {
-        return res.status(404).render("error", {
-          message: "Industry profile not found",
-          error: { status: 404 },
+        const industry = await Industry.findById(id);
+        if (!industry) {
+            return res.status(404).json({ message: "Industry profile not found" });
+        }
+        res.json({
+            companyName: industry.companyName,
+            email: industry.email,
+            address: industry.Address || "",
         });
-      }
-  
-      // Handle password
-      let newPassword = existingIndustry.password;
-      const isMatch = await bcrypt.compare(password, newPassword);
-          if (!isMatch) {
-            newPassword = await bcrypt.hash(password, 10);
-          }
-      // Only hash if the password is changed (and not left blank)
-  
-      // Update the industry profile
-      const industry = await Industry.findByIdAndUpdate(
-        id,
-        {
-          companyName,
-          email,
-          Address: address, // Make sure schema matches
-          password: newPassword,
-        },
-        { new: true }
-      );
-  
-      if (!industry) {
-        return res.status(404).render("error", {
-          message: "Industry profile not found",
-          error: { status: 404 },
-        });
-      }
-  
-      res.redirect("/");
     } catch (error) {
-      console.error("Error updating industry profile:", error);
-      res.status(500).render("Industry/profile/editProfile", {
-        title: "Profile Update",
-        role: "Industry",
-        companyName: req.body.companyName || "",
-        email: req.body.email || "",
-        address: req.body.address || "",
-        password: "",
-        error: "An error occurred while updating your profile",
-      });
+        console.error("Error fetching industry:", error);
+        res.status(500).json({ message: "Error fetching profile for editing" });
     }
-  });
-  /////////////////////////////////////////////undone
-  router.get('/checkout', industryAuth, async (req, res) => {
-    try {
-        const id = req.industry; // Get the industry ID from the authenticated request
-        const industry = await Industry.findById(id); // Fetch the industry document from the database
+});
 
-        // If no industry found with the given ID, return an error
+router.post("/profile/edit", industryAuth, async (req, res) => {
+    try {
+        const { companyName, email, address, password } = req.body;
+        const id = req.industry;
+        const existingIndustry = await Industry.findById(id);
+        if (!existingIndustry) {
+            return res.status(404).json({ message: "Industry profile not found" });
+        }
+
+        let newPassword = existingIndustry.password;
+        if (password) {
+            const isMatch = await bcrypt.compare(password, newPassword);
+            if (!isMatch) {
+                newPassword = await bcrypt.hash(password, 10);
+            }
+        }
+
+        const industry = await Industry.findByIdAndUpdate(
+            id,
+            {
+                companyName,
+                email,
+                Address: address,
+                password: newPassword,
+            },
+            { new: true }
+        );
+
+        if (!industry) {
+            return res.status(404).json({ message: "Industry profile not found" });
+        }
+
+        res.json({ message: "Profile updated successfully", industry });
+    } catch (error) {
+        console.error("Error updating industry profile:", error);
+        res.status(500).json({ message: "An error occurred while updating your profile" });
+    }
+});
+
+router.get('/checkout', industryAuth, async (req, res) => {
+    try {
+        const id = req.industry;
+        const industry = await Industry.findById(id);
         if (!industry) {
             return res.status(404).json({ message: "Industry not found" });
         }
-
-        // Render the checkout page, passing the necessary details
-        res.render('Industry/checkout/checkout', {
-            title: 'Checkout',
-            role: 'Industry', // Role should be 'Industry' since we are rendering for industry
+        res.json({
             industryName: industry.companyName,
             email: industry.email,
             address: industry.address,
             cart: industry.cart
         });
-
     } catch (error) {
         console.error("Error fetching industry:", error);
-        // Send a 500 error response with a message
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
-/////////////////////////////////////////////////////////////done////////////
+
+router.post('/checkout', industryAuth, async (req, res) => {
+    try {
+        const industryId = req.industry;
+        const industry = await Industry.findById(industryId);
+
+        if (!industry) {
+            return res.status(404).json({ message: 'Industry not found' });
+        }
+
+        const cartItems = industry.cart;
+
+        for (const item of cartItems) {
+            const { combination_id, quantity } = item;
+
+            const products = await SellProduct.find({
+                combination_id: combination_id,
+                adminStatus: 'Pending'
+            }).limit(quantity);
+
+            const productIdsToUpdate = products.map(p => p._id);
+
+            await SellProduct.updateMany(
+                { _id: { $in: productIdsToUpdate } },
+                { $set: { adminStatus: 'Sold' } }
+            );
+
+            industry.dashboard.push(item);
+        }
+
+        industry.cart = [];
+        await industry.save();
+
+        res.json({
+            orders: industry.dashboard,
+            totalAmount: industry.dashboard.reduce((acc, item) => acc + item.amount, 0)
+        });
+
+    } catch (error) {
+        console.error('Checkout error:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
 router.get('/cart', industryAuth, async (req, res) => {
     try {
         const id = req.industry;
         const industry = await Industry.findById(id);
-        
-        // Check if cart exists, otherwise initialize it as an empty array
-        const cart = industry.cart || []; 
-        
-        res.render('Industry/newCart/cart', {
-            title: 'Cart',
-            role: 'Industry',
+        const cart = industry.cart || [];
+        res.json({
             industryName: industry.companyName,
             email: industry.email,
             address: industry.address,
@@ -343,32 +203,42 @@ router.get('/cart', industryAuth, async (req, res) => {
 
 router.post('/cart', industryAuth, async (req, res) => {
     try {
-        const { _id, quantity, fabric, size, usageDuration, new_quantity, estimated_value } = req.body;
+        // 1. Destructure using the EXACT keys sent by the frontend
+        // Note: Removed 'new_quantity' and '_id', added 'id' and 'combination_id'
+        const { 
+            id, 
+            combination_id, 
+            quantity, 
+            fabric, 
+            size, 
+            usageDuration, 
+            estimated_value, 
+            amount 
+        } = req.body;
 
+        // 2. Create the cart item
         const cartItem = {
             fabric: fabric,
             size: size,
             usageDuration: usageDuration,
-            quantity: new_quantity,
-            amount: estimated_value * new_quantity,
-            combination_id: _id,
+            // Use 'quantity' from frontend. || 1 ensures it defaults to 1 if missing.
+            quantity: Number(quantity) || 1, 
+            // Calculate amount using the correct quantity variable
+            amount: Number(estimated_value) * (Number(quantity) || 1), 
+            // Map the combination_id correctly
+            combination_id: combination_id || id, 
             id: uuidv4(),
         };
 
-        // Update the cart for the specific industry
-        const id = req.industry;
+        const iid = req.industry;
         const updatedIndustry = await Industry.findByIdAndUpdate(
-            id,
+            iid,
             { $push: { cart: cartItem } },
-            { new: true } // Returns the updated document
+            { new: true }
         );
 
-        // Fetch the updated cart and render it again
         const cart = updatedIndustry.cart || [];
-
-        res.render('Industry/newCart/cart', {
-            title: 'Cart',
-            role: 'Industry',
+        res.json({
             industryName: updatedIndustry.companyName,
             email: updatedIndustry.email,
             address: updatedIndustry.address,
@@ -376,186 +246,56 @@ router.post('/cart', industryAuth, async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Error fetching product:", error);
-        res.status(500).json({ msg: 'Server Error' });
+        console.error("Error adding to cart:", error);
+        res.status(500).json({ msg: 'Server Error', error: error.message });
     }
 });
-
-router.post('/cartDelete', industryAuth, async (req, res) => {
+router.post('/cart/delete', industryAuth, async (req, res) => {
     try {
-        const { combination_id, id } = req.body;
+        const { id } = req.body;
         const iid = req.industry;
 
-        // Ensure that we are working with the correct industry
         const updatedIndustry = await Industry.findByIdAndUpdate(
             iid,
-            { $pull: { cart: { id: id } } }, // Pull the item with matching `id` from the cart array
-            { new: true } // Return the updated document after the update operation
+            { $pull: { cart: { id: id } } },
+            { new: true }
         );
 
-        // Check if the cart was updated successfully and exists
         const updatedCart = updatedIndustry.cart || [];
-
-        // Render the updated cart page
-        res.render('Industry/newCart/cart', {
-            title: 'Cart',
-            role: 'Industry',
+        res.json({
             updatedIndustry: updatedIndustry,
             cart: updatedCart
         });
 
     } catch (error) {
         console.error("Error deleting product from cart:", error);
-        // Render an error page or send an error response
         res.status(500).send("Error occurred while deleting item from cart.");
     }
 });
 
-
-
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// /////////////////////////////////////////////
-// router.get('/dashboard', industryAuth, async (req, res) => {
-//     try {
-//       const industryId = req.industry;
-//       // Fetch orders for this industry
-//       const orders = await industry.findById(industryId).dashboard;
-//       // Calculate total amount
-//       const totalAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-//       res.render('Industry/Dashboard/dashboard', { orders, totalAmount });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).render('error', { message: 'Could not load dashboard' });
-//     }
-//   });
-router.post('/checkout', industryAuth, async (req, res) => {
+router.get("/dashboard", industryAuth, async (req, res) => {
     try {
-      const industryId = req.industry;
-      const industry = await Industry.findById(industryId);
-  
-      if (!industry) {
-        return res.status(404).json({ message: 'Industry not found' });
-      }
-  
-      const cartItems = industry.cart;
-  
-      // For each cart item
-      for (const item of cartItems) {
-        const { combination_id, quantity } = item;
-  
-        // Update first `quantity` SellProduct entries to Sold
-        const products = await SellProduct.find({
-          combination_id: combination_id,
-          adminStatus: 'Pending'
-        }).limit(quantity);
-  
-        const productIdsToUpdate = products.map(p => p._id);
-  
-        await SellProduct.updateMany(
-          { _id: { $in: productIdsToUpdate } },
-          { $set: { adminStatus: 'Sold' } }
-        );
-  
-        // Push to dashboard
-        industry.dashboard.push(item);
-      }
-  
-      // Clear cart
-      industry.cart = [];
-  
-      await industry.save();
-  
-      res.render('Industry/Dashboard/dashboard', {
-        title: 'Dashboard',
-        role: 'Industry',
-        orders: industry.dashboard,
-        totalAmount: industry.dashboard.reduce((acc, item) => acc + item.amount, 0)
-      });
-  
-    } catch (error) {
-      console.error('Checkout error:', error);
-      res.status(500).json({ message: 'Internal Server Error' });
-    }
-  });
-  
+        const Id = req.industry;
+        if (!Id) {
+            return res.status(400).json({ message: "Industry ID missing" });
+        }
 
+        const industry = await Industry.findById(Id);
+        if (!industry) {
+            return res.status(404).json({ message: "Industry not found" });
+        }
 
+        const orders = industry.dashboard || [];
+        const totalAmount = orders.reduce((sum, order) => sum + (order.amount || 0), 0);
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-  router.get("/dashboard", industryAuth ,async (req, res) => {
-    try {
-      // Assume user is authenticated and ID is available
-      // const Id = req.industry;
-      // console.log(Id);
-      // if (!Id) {
-      //   return res.status(400).send("Industry ID missing");
-      // }
-  
-      // const industry = await Industry.findById(Id);
-      // if (!industry) {
-      //   return res.status(404).send("Industry not found");
-      // }
-  
-      // const orders = industry.dashboard || [];
-      // const totalAmount = orders.reduce((sum, order) => sum + (order.amount || 0), 0);
-  
-      res.render("Industry/Dashboard/dashboard", {
-        title: 'Dashboard',
-        role: 'Industry',
-      });
+        res.json({
+            orders,
+            totalAmount,
+        });
     } catch (err) {
-      console.error("Dashboard error:", err);
-      res.status(500).send("Server error");
+        console.error("Dashboard error:", err);
+        res.status(500).json({ message: "Server error" });
     }
-  });
-
-
-
-
-
-
- router.get("/fetchdashboard", industryAuth ,async (req, res) => {
-    try {
-      // Assume user is authenticated and ID is available
-      const Id = req.industry;
-      console.log(Id);
-      if (!Id) {
-        return res.status(400).send("Industry ID missing");
-      }
-  
-      const industry = await Industry.findById(Id);
-      if (!industry) {
-        return res.status(404).send("Industry not found");
-      }
-  
-      const orders = industry.dashboard || [];
-      const totalAmount = orders.reduce((sum, order) => sum + (order.amount || 0), 0);
-  
-      res.json( {
-        orders,
-        totalAmount,
-      });
-    } catch (err) {
-      console.error("Dashboard error:", err);
-      res.status(500).send("Server error");
-    }
-  });
-
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
+});
 
 export default router;
