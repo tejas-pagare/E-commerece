@@ -905,4 +905,21 @@ router.get("/products/filter",  async (req, res) => {
     }
 });
 
+router.get('/blogs', async (req, res) => {
+    try {
+        // Fetch all blogs, sorted by newest first
+        const blogs = await Blog.find({}).sort({ createdAt: -1 });
+        res.json({
+            success: true,
+            blogs
+        });
+    } catch (error) {
+        console.error("Error fetching blogs:", error);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error'
+        });
+    }
+});
+
 export default router;
