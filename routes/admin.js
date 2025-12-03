@@ -15,16 +15,25 @@ import SellProduct from "../models/SellProduct.js";
 import Blog from "../models/blog.js";
 import cloudinary, { upload as multerUpload } from "../config/cloudinary.js";
 
-// Render blog creation page
+// Helpers for React-compatible API responses and basic validation
+import mongoose from "mongoose";
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+const sendError = (res, status, message, error) =>
+  res.status(status).json({ success: false, message, error: error?.message });
+
+// React: no server-side rendering; provide API hints instead
 router.get("/blog/create", (req, res) => {
-  res.render("admin/blogCreate.ejs", { title: "Create Blog", role: "admin" });
+  return res.status(200).json({
+    success: true,
+    message: "Render blog creation UI on the client. Use POST /api/v1/admin/blog to create."
+  });
 });
 router.get("/blogs/page", async (req, res) => {
   try {
     const blogs = await Blog.find({}).sort({ createdAt: -1 });
-    res.render("admin/blogs.ejs", { title: "Blogs", role: "admin", blogs });
+    return res.status(200).json({ success: true, blogs });
   } catch (error) {
-    res.status(500).render("error", { message: "Failed to load blogs page", error });
+    return sendError(res, 500, "Failed to load blogs", error);
   }
 });
 // Create a new blog post with image upload
@@ -66,20 +75,20 @@ router.get("/blogs", async (req, res) => {
 });
 
 router.get("/login", (req, res) => {
-  const { error } = req.query; // Get error from query
-  return res.render('admin/login/index.ejs', { 
-    title: 'login', 
-    role: "admin",
-    error: error // Pass error to the template
-  });
+  const { error } = req.query;
+  return res.status(200).json({ success: true, error: error || null });
 });
 
-router.get("/secondHand", (req, res) => {
-  return res.render("admin/secondhandProducts/index.ejs", { title: "secondHandProduct", role: "admin" });
+router.get("/secondHand", async (req, res) => {
+  try {
+    const products = await SellProduct.find().populate("user_id", "firstname");
+    return res.status(200).json({ success: true, products });
+  } catch (error) {
+    return sendError(res, 500, "Failed to fetch second hand products", error);
+  }
 })
 
 router.get("/dashboard", async (req, res) => {
-
   try {
     const users = await User.find({}).populate(["cart.productId", "products"]);
     const products = await Product.find({}).populate("sellerId");
@@ -87,14 +96,13 @@ router.get("/dashboard", async (req, res) => {
     let customerOrders = 0;
     let sellerOrders = 0;
     let UserCount = 0;
-    let CustomerCount = 0; // Added CustomerCount variable
+    let CustomerCount = 0;
 
     users.forEach(user => {
       const isSeller = user.products && user.products.length > 0;
-      
       if (!isSeller) {
         UserCount += 1;
-        CustomerCount += 1; // Increment CustomerCount for non-sellers
+        CustomerCount += 1;
         if (user.cart && Array.isArray(user.cart)) {
           user.cart.forEach(cartItem => {
             if (cartItem.productId) {
@@ -108,47 +116,47 @@ router.get("/dashboard", async (req, res) => {
       }
     });
 
-    res.render("admin/dashboard/index.ejs", {
-      title: "Admin Dashboard",
-      role: "admin",
-      totalCartAmount,
-      customerOrders,
-      sellerOrders,
-      UserCount,
-      CustomerCount, // Added CustomerCount to template data
+    return res.status(200).json({
+      success: true,
+      metrics: {
+        totalCartAmount,
+        customerOrders,
+        sellerOrders,
+        UserCount,
+        CustomerCount
+      },
       users,
       products,
-      registeredProducts: products // Add this line to pass products as registeredProducts
+      registeredProducts: products
     });
   } catch (error) {
     console.error("Dashboard Error:", error);
-    res.status(500).render("error", {
-      message: "Error loading dashboard",
-      error: error
-    });
+    return sendError(res, 500, "Error loading dashboard", error);
   }
 });
 router.post("/dashboard", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    // Corrected condition: if email OR password doesn't match
-    if (email !== "adminLogin@gmail.com" || password !== "swiftmart") {
-      // Redirect back to admin login with an error
-      return res.redirect("/api/v1/admin/login?error=Invalid credentials.");
+    const { email, password } = req.body || {};
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: "Email and password are required" });
     }
-    // On success, redirect to the dashboard
-    res.redirect("/api/v1/admin/dashboard");
+    if (email !== "adminLogin@gmail.com" || password !== "swiftmart") {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+    return res.status(200).json({ success: true, message: "Authenticated", redirect: "/api/v1/admin/dashboard" });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    return sendError(res, 500, "Internal server error", error);
   }
 });
 
 router.get("/customers", async (req, res) => {
-  return res.render("admin/Customers/index.ejs", { 
-    title: "Customers", 
-    role: "admin"
-  });
+  try {
+    const customers = await User.find({});
+    return res.status(200).json({ success: true, customers });
+  } catch (error) {
+    return sendError(res, 500, "Failed to fetch customers", error);
+  }
 });
 
 router.get("/api/customers", async (req, res) => {
@@ -190,7 +198,7 @@ router.get("/dashboard/sellproduct", async (req, res) => {
       estimated_value: item.estimated_value
     }));
 
-    res.render("admin/dashboard/sellproduct/dummyboard", { title: "Admin Product Dashboard",role: "admin" , products: dataWithUsernames });
+    return res.status(200).json({ success: true, products: dataWithUsernames });
 
   } catch (err) {
     console.error(err);
@@ -198,13 +206,16 @@ router.get("/dashboard/sellproduct", async (req, res) => {
   }
 });
 router.post("/dashboard/sellproduct", async (req, res) =>{
-  const {id , userStatus} = req.body;
+  const {id , userStatus} = req.body || {};
   try {
+    if (!id || !isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: "Valid id is required" });
+    }
     await SellProduct.findByIdAndUpdate(id, { userStatus });
-    res.redirect("/api/v1/admin/dashboard/sellproduct");
+    return res.status(200).json({ success: true, message: "User status updated" });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error updating user status");
+    return sendError(res, 500, "Error updating user status", err);
   }
   
 })
@@ -221,28 +232,40 @@ router.get("/customer/details", async (req, res) => {
     })
   }
 })
-router.get("/products", (req, res) => {
-  return res.render("admin/Products/index.ejs", { title: "Products", role: "admin" });
+router.get("/products", async (req, res) => {
+  try {
+    const products = await Product.find({}).populate("sellerId");
+    return res.status(200).json({ success: true, products });
+  } catch (error) {
+    return sendError(res, 500, "Failed to fetch products", error);
+  }
 })
 
-router.get("/vendors", (req, res) => {
-  res.render("User/Vendor/index.ejs", { title: 'Vendors', role: "admin" });
+router.get("/vendors", async (req, res) => {
+  try {
+    const sellers = await Seller.find({});
+    return res.status(200).json({ success: true, vendors: sellers });
+  } catch (error) {
+    return sendError(res, 500, "Failed to fetch vendors", error);
+  }
 });
 
 router.delete("/product/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const product = await Product.findByIdAndDelete(id, { new: true });
-    await Seller.findOneAndUpdate({ _id: product._id }, { $pull: { id } })
-    res.json({
-      message: "Product deleted successfully",
-      success: true
-    })
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: "Invalid product id" });
+    }
+    const product = await Product.findByIdAndDelete(id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+    // Best-effort detach from seller's products if such relation exists
+    await Seller.updateMany({}, { $pull: { products: id } });
+    return res.status(200).json({ success: true, message: "Product deleted successfully" });
   } catch (error) {
-    res.json({
-      message: "Server Error",
-      success: false
-    })
+    console.error("Delete product error:", error);
+    return sendError(res, 500, "Server error", error);
   }
 })
 
@@ -265,40 +288,37 @@ router.get("/api/products", async (req, res) => {
 router.get("/products/details", async (req, res) => {
   try {
     const products = await Product.find({}).populate("sellerId");
-    return res.json({
+    return res.status(200).json({
       success: true,
       products
     });
   } catch (error) {
-    return res.status(500).json({
-      message: "Server Error",
-      success: false
-    });
+    return sendError(res, 500, "Server Error", error);
   }
 });
 
 router.delete("/customer/:id", async (req, res) => {
   try {
     const id = req.params.id;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: "Invalid user id" });
+    }
     const user = await User.findById(id);
     if (!user) {
-      return res.json({
-        message: "No user with give id exists",
+      return res.status(404).json({
+        message: "No user with given id exists",
         success: false
-      })
+      });
     }
 
     await user.deleteOne();
-    return res.json({
+    return res.status(200).json({
       message: "User deleted successfully",
       success: true
     })
   } catch (error) {
     console.log(error);
-    return res.json({
-      message: "Server error",
-      success: false
-    })
+    return sendError(res, 500, "Server error", error);
   }
 });
 
@@ -306,92 +326,91 @@ router.delete("/customer/:id", async (req, res) => {
 router.get("/product/approve/:id", async (req, res) => {
   try {
     const id = req.params.id;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: "Invalid product id" });
+    }
     const product = await Product.findById(id);
-    if (!id) {
-      res.json({
-        message: "Error in approving",
-        success: true
-      })
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
     }
     product.verified = true;
     await product.save();
-    res.json({
+    return res.status(200).json({
       message: "Product approved successfully",
       success: true
     })
   } catch (error) {
-    res.json({
-      message: "Server Error",
-      success: false
-    })
+    return sendError(res, 500, "Server Error", error);
   }
 });
 
 router.get("/product/disapprove/:id",async(req,res)=>{
   try {
     const id = req.params.id;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: "Invalid product id" });
+    }
     const product = await Product.findById(id);
     if(!product){
-      return res.json({
-        message:"No such Product exits",
+      return res.status(404).json({
+        message:"No such product exists",
         success:false
       })
     }
     product.verified=false;
     await product.save();
-    return res.json({
+    return res.status(200).json({
       message:"Product disapproved successfully",
       success:true
     })
   } catch (error) {
-    res.json({
-      message:"Server Error",
-      success:false
-    })
+    return sendError(res, 500, "Server Error", error);
   }
 })
 
-router.get("/seller", (req, res) => {
-  res.render("admin/Sellers/index.ejs", { title: "Sellers", role: "admin" });
+router.get("/seller", async (req, res) => {
+  try {
+    const sellers = await Seller.find({});
+    return res.status(200).json({ success: true, sellers });
+  } catch (error) {
+    return sendError(res, 500, "Failed to fetch sellers", error);
+  }
 });
 
 router.get("/seller/approve/:id", async (req, res) => {
   try {
     const id = req.params.id;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: "Invalid seller id" });
+    }
     const seller = await Seller.findById(id);
     if (!seller) {
-      return res.json({
+      return res.status(404).json({
         message: "No Such user exist",
         success: false
       })
     }
     seller.identityVerification.status = "Verified"
     await seller.save();
-    res.json({
+    return res.status(200).json({
       message: "Seller approved successfully",
       success: true
     })
   } catch (error) {
-    res.json({
-      message: "Server Error",
-      success: false
-    })
+    return sendError(res, 500, "Server Error", error);
   }
 })
 
 router.get("/seller/details", async (req, res) => {
   try {
     const sellers = await Seller.find({});
-    res.json({
+    return res.status(200).json({
       sellers,
       success: true,
       message: "Seller retireved Successfully"
     })
   } catch (error) {
-    res.json({
-      message: "Server Error",
-      success: false
-    })
+    return sendError(res, 500, "Server Error", error);
   }
 });
 
@@ -415,6 +434,9 @@ router.get("/api/sellers", async (req, res) => {
 router.delete("/seller/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ success: false, message: "Invalid seller id" });
+    }
     const seller = await Seller.findById(id);
     if (!seller) {
       return res.status(404).json({ success: false, message: "Seller not found" });
@@ -424,40 +446,52 @@ router.delete("/seller/:id", async (req, res) => {
     await Product.deleteMany({ sellerId: id });
 
     await seller.deleteOne();
-    return res.json({ success: true, message: "Seller deleted successfully" });
+    return res.status(200).json({ success: true, message: "Seller deleted successfully" });
   } catch (error) {
     console.error("Error deleting seller:", error);
     return res.status(500).json({ success: false, message: "Failed to delete seller" });
   }
 });
 
-router.get("/manager", (req, res) => {
-  return res.render("admin/manager/index.ejs", { title: "Manager", role: "admin" });
+router.get("/manager", async (req, res) => {
+  try {
+    const managers = await Manager.find().select("email createdAt");
+    return res.status(200).json({ success: true, managers });
+  } catch (error) {
+    return sendError(res, 500, "Failed to fetch managers", error);
+  }
 });
 
 router.post('/create/manager', async (req, res) => {
-    const { email, password } = req.body;
-    console.log(email,password)
-
-    try {
-        // Check if manager already exists
-        const existingManager = await Manager.findOne({ email });
-        if (existingManager) {
-            return res.status(400).json({ message: 'Manager with this email already exists.' });
-        }
-
-        // Create new manager
-        const manager = new Manager({ email, password });
-        await manager.save();
-
-        res.status(201).json({ message: 'Manager created successfully!' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error creating manager', error });
+  try {
+    const { email, password } = req.body || {};
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required.' });
     }
+
+    const existingManager = await Manager.findOne({ email });
+    if (existingManager) {
+      return res.status(409).json({ success: false, message: 'Manager with this email already exists.' });
+    }
+
+    const manager = new Manager({ email, password });
+    await manager.save();
+    return res.status(201).json({ success: true, message: 'Manager created successfully!' });
+  } catch (error) {
+    console.error('Create manager error:', error);
+    return sendError(res, 500, 'Error creating manager', error);
+  }
 });
 
-router.get("/order", (req, res) => {
-  return res.render("admin/Orders/index.ejs", { title: "Orders", role: "admin" });
+router.get("/order", async (req, res) => {
+  try {
+    const orders = await Order.find({})
+      .populate({ path: 'userId', select: 'firstname lastname email' })
+      .populate({ path: 'products.productId', select: 'title image price' });
+    return res.status(200).json({ success: true, orders });
+  } catch (error) {
+    return sendError(res, 500, 'Failed to fetch orders', error);
+  }
 });
 
 // Shared handler: group orders by user (used for both GET and POST)
@@ -510,6 +544,9 @@ router.get("/orders", getOrdersGrouped);
 router.get("/orders/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
+    if (!isValidObjectId(userId)) {
+      return res.status(400).json({ success: false, message: 'Invalid user id' });
+    }
     const user = await User.findById(userId).populate({
       path: 'orders',
       populate: {
@@ -542,6 +579,9 @@ router.put('/orders/:orderId/status', async (req, res) => {
   try {
       const { orderId } = req.params;
       const { orderStatus } = req.body;
+      if (!isValidObjectId(orderId)) {
+        return res.status(400).json({ success: false, message: 'Invalid order id' });
+      }
 
       // Validate order status
       const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
@@ -586,6 +626,9 @@ router.put('/orders/:orderId/status', async (req, res) => {
 router.get('/orders/user/:orderId', async (req, res) => {
   try {
     const orderId = req.params.orderId;
+    if (!isValidObjectId(orderId)) {
+      return res.status(400).json({ success: false, message: 'Invalid order id' });
+    }
     
     // Find the order and populate user and product details
     const order = await Order.findById(orderId)
@@ -610,7 +653,7 @@ router.get('/orders/user/:orderId', async (req, res) => {
         }
       });
 
-    res.json({
+    res.status(200).json({
       success: true,
       userId: userData._id,
       userData: {
@@ -625,54 +668,6 @@ router.get('/orders/user/:orderId', async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
-
-
-
-// Update order status
-router.put('/orders/:orderId/status', async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const { orderStatus } = req.body;
-
-        // Validate order status
-        const validStatuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'];
-        if (!validStatuses.includes(orderStatus)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid order status'
-            });
-        }
-
-        // Find and update the order
-        const order = await Order.findById(orderId);
-        
-        if (!order) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
-        }
-
-        // Update order status
-        order.orderStatus = orderStatus;
-        await order.save();
-
-        // Send success response
-        res.status(200).json({
-            success: true,
-            message: 'Order status updated successfully',
-            order
-        });
-
-    } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        });
-    }
-});
-
 
 // Get all managers
 router.get('/managers', async (req, res) => {
@@ -723,47 +718,11 @@ router.delete('/managers/:id', async (req, res) => {
 
 router.get("/delivery", async (req, res) => {
   try {
-    // // Get pending orders (orders without delivery partner assigned)
-    // const orders = await Order.find({ deliveryPartner: null })
-    //   .populate('userId', 'firstname lastname email')
-    //   .populate('address');
-
-    // // Get all delivery partners
-    // const deliveryPartners = await DeliveryPartner.find({ isAvailable: true });
-
-    // // Get orders assigned today
-    // const today = new Date();
-    // today.setHours(0, 0, 0, 0);
-    // const assignedToday = await Order.countDocuments({
-    //   deliveryPartner: { $ne: null },
-    //   updatedAt: { $gte: today }
-    // });
-
-    return res.render("admin/Delivery/index.ejs", {
-      title: "Delivery Management",
-      role: "admin",
-      // pendingOrders: orders.length,
-      // availablePartners: deliveryPartners.length,
-      // assignedToday,
-      // orders: orders.map(order => ({
-      //   _id: order._id,
-      //   customer: {
-      //     name: `${order.userId.firstname} ${order.userId.lastname}`,
-      //     email: order.userId.email
-      //   },
-      //   address: order.address
-      // })),
-      // deliveryPartners: deliveryPartners.map(partner => ({
-      //   _id: partner._id,
-      //   name: partner.name
-      // }))
-    });
+    // Placeholder for React UI; implement delivery partner model when available
+    return res.status(200).json({ success: true, message: 'Use client UI to manage deliveries.' });
   } catch (error) {
-    console.error('Error loading delivery management page:', error);
-    return res.status(500).render('error', {
-      message: 'Error loading delivery management page',
-      error: error
-    });
+    console.error('Error loading delivery management:', error);
+    return sendError(res, 500, 'Error loading delivery management', error);
   }
 });
 
