@@ -36,11 +36,7 @@ app.use(session({
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, "public")));
-app.set('views', path.join(__dirname, 'views'));
-app.use(expressLayouts);
-app.set('layout', 'layouts/main');
 app.use("/api/v1/user", userController);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/seller",sellerRouter);
@@ -50,7 +46,7 @@ app.use("/api/v1/manager", managerRouter);
 
 
 app.get("/", (req, res) => {
-  res.render("Home/index.ejs", { title: "Home", role: "" });
+  res.json({ message: "Welcome to SwiftMart API" });
 })
 
 app.get("*", (req, res) => {
