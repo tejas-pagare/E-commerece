@@ -1,9 +1,3 @@
-
-// ...existing code...
-
-// Render blogs list page in admin
-
-
 import express from "express";
 const router = express.Router();
 import User from "../models/user.js";
@@ -14,10 +8,33 @@ import Order from "../models/orders.js";
 import SellProduct from "../models/SellProduct.js";
 import Blog from "../models/blog.js";
 import cloudinary, { upload as multerUpload } from "../config/cloudinary.js";
+import jwt from "jsonwebtoken"; 
 
 // Helpers for React-compatible API responses and basic validation
 import mongoose from "mongoose";
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
+// --- SECRET KEY (Move to .env in production) ---
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key_change_me";
+
+// --- MIDDLEWARE: Verify Admin Token ---
+const verifyAdmin = (req, res, next) => {
+  const token = req.cookies.adminToken;
+  if (!token) {
+    return res.status(401).json({ success: false, message: "Not authenticated", errors: { code: "NO_TOKEN" } });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access denied", errors: { code: "NOT_ADMIN" } });
+    }
+    req.admin = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ success: false, message: "Invalid token", errors: { code: "INVALID_TOKEN" } });
+  }
+};
 
 // Standardized response helpers
 const sendSuccess = (res, message, data = {}) => {
@@ -34,15 +51,67 @@ const paginate = (items, page = 1, limit = 50) => {
   return { items, total, page, limit };
 };
 
+// --- AUTH ROUTES ---
+
+// 1. Check Auth (Fixes frontend "Not authenticated" loop)
+router.get("/check-auth", verifyAdmin, (req, res) => {
+  return sendSuccess(res, "Admin is authenticated", { user: req.admin });
+});
+
+// 2. Login Route (Renamed from /dashboard to /login)
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body || {};
+    
+    if (!email || !password) {
+      return sendError(res, 400, "Email and password are required", null, { fields: ["email", "password"] });
+    }
+
+    // --- CREDENTIALS CHECK ---
+    // You MUST use these credentials to log in:
+    // Email: adminLogin@gmail.com
+    // Password: swiftmart
+    if (email !== "adminLogin@gmail.com" || password !== "swiftmart") {
+      return sendError(res, 401, "Invalid credentials", null, { code: "INVALID_CREDENTIALS" });
+    }
+
+    // Generate Token
+    const token = jwt.sign({ email, role: "admin" }, JWT_SECRET, { expiresIn: "1d" });
+
+    // Set Cookie
+    res.cookie("adminToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
+
+    return sendSuccess(res, "Authenticated successfully", { redirect: "/api/v1/admin/dashboard" });
+  } catch (error) {
+    console.error(error);
+    return sendError(res, 500, "Internal server error", error);
+  }
+});
+
+// 3. Logout Route
+router.post("/logout", (req, res) => {
+  res.clearCookie("adminToken");
+  return sendSuccess(res, "Logged out successfully", {});
+});
+
+
+// --- PROTECTED DATA ROUTES (Added verifyAdmin) ---
+
 // React: no server-side rendering; provide API hints instead
-router.get("/blog/create", (req, res) => {
+router.get("/blog/create", verifyAdmin, (req, res) => {
   return sendSuccess(
     res,
     "Render blog creation UI on the client. Use POST /api/v1/admin/blog to create.",
     {}
   );
 });
-router.get("/blogs/page", async (req, res) => {
+
+router.get("/blogs/page", verifyAdmin, async (req, res) => {
   try {
     const blogs = await Blog.find({}).sort({ createdAt: -1 });
     return sendSuccess(res, "Blogs fetched", paginate(blogs));
@@ -50,8 +119,9 @@ router.get("/blogs/page", async (req, res) => {
     return sendError(res, 500, "Failed to load blogs", error);
   }
 });
+
 // Create a new blog post with image upload
-router.post("/blog", multerUpload.single("image"), async (req, res) => {
+router.post("/blog", verifyAdmin, multerUpload.single("image"), async (req, res) => {
   try {
     const { title, content, author } = req.body;
     let imageUrl = "";
@@ -79,7 +149,7 @@ router.post("/blog", multerUpload.single("image"), async (req, res) => {
 });
 
 // Fetch all blogs
-router.get("/blogs", async (req, res) => {
+router.get("/blogs", verifyAdmin, async (req, res) => {
   try {
     const blogs = await Blog.find({}).sort({ createdAt: -1 });
     return sendSuccess(res, "Blogs fetched", paginate(blogs));
@@ -88,12 +158,7 @@ router.get("/blogs", async (req, res) => {
   }
 });
 
-router.get("/login", (req, res) => {
-  const { error } = req.query;
-  return sendSuccess(res, "Login page", { error: error || null });
-});
-
-router.get("/secondHand", async (req, res) => {
+router.get("/secondHand", verifyAdmin, async (req, res) => {
   try {
     const products = await SellProduct.find().populate("user_id", "firstname");
     return sendSuccess(res, "Second-hand products fetched", paginate(products));
@@ -109,7 +174,8 @@ const dashboardCache = {
   expiresAt: 0,
 };
 
-router.get("/dashboard", async (req, res) => {
+// --- MAIN DASHBOARD (PROTECTED) ---
+router.get("/dashboard", verifyAdmin, async (req, res) => {
   try {
     // Query params
     const daysParam = parseInt(req.query.days, 10);
@@ -276,23 +342,9 @@ router.get("/dashboard", async (req, res) => {
     return sendError(res, 500, "Error loading dashboard", error);
   }
 });
-router.post("/dashboard", async (req, res) => {
-  try {
-    const { email, password } = req.body || {};
-    if (!email || !password) {
-      return sendError(res, 400, "Email and password are required", null, { fields: ["email", "password"] });
-    }
-    if (email !== "adminLogin@gmail.com" || password !== "swiftmart") {
-      return sendError(res, 401, "Invalid credentials", null, { code: "INVALID_CREDENTIALS" });
-    }
-    return sendSuccess(res, "Authenticated", { redirect: "/api/v1/admin/dashboard" });
-  } catch (error) {
-    console.error(error);
-    return sendError(res, 500, "Internal server error", error);
-  }
-});
 
-router.get("/customers", async (req, res) => {
+
+router.get("/customers", verifyAdmin, async (req, res) => {
   try {
     const customers = await User.find({});
     return sendSuccess(res, "Customers fetched", paginate(customers));
@@ -301,7 +353,7 @@ router.get("/customers", async (req, res) => {
   }
 });
 
-router.get("/api/customers", async (req, res) => {
+router.get("/api/customers", verifyAdmin, async (req, res) => {
   try {
     const customers = await User.find({});
     return sendSuccess(res, "Customers fetched", paginate(customers));
@@ -310,7 +362,7 @@ router.get("/api/customers", async (req, res) => {
   }
 });
 
-router.get("/dashboard/sellproduct", async (req, res) => {
+router.get("/dashboard/sellproduct", verifyAdmin, async (req, res) => {
   try {
     const products = await SellProduct.find().populate("user_id", "firstname");
 
@@ -340,21 +392,39 @@ router.get("/dashboard/sellproduct", async (req, res) => {
     return sendError(res, 500, 'Server Error', err);
   }
 });
-router.post("/dashboard/sellproduct", async (req, res) =>{
+
+router.post("/dashboard/sellproduct", verifyAdmin, async (req, res) =>{
   const {id , userStatus} = req.body || {};
   try {
     if (!id || !isValidObjectId(id)) {
       return sendError(res, 400, "Valid id is required", null, { fields: ["id"] });
     }
-    await SellProduct.findByIdAndUpdate(id, { userStatus });
+    
+    // Check if status is "Verified" and add coins if so
+    const sellProduct = await SellProduct.findById(id);
+    if (!sellProduct) {
+        return sendError(res, 404, "Product not found", null, { code: "PRODUCT_NOT_FOUND" });
+    }
+
+    if (userStatus === "Verified" && sellProduct.userStatus !== "Verified") {
+        const userId = sellProduct.user_id;
+        const coinsToAdd = sellProduct.estimated_value;
+        if (userId && coinsToAdd) {
+            await User.findByIdAndUpdate(userId, { $inc: { coins: coinsToAdd } });
+        }
+    }
+
+    sellProduct.userStatus = userStatus;
+    await sellProduct.save();
+
     return sendSuccess(res, "User status updated", {});
   } catch (err) {
     console.error(err);
     return sendError(res, 500, "Error updating user status", err);
   }
-  
 })
-router.get("/customer/details", async (req, res) => {
+
+router.get("/customer/details", verifyAdmin, async (req, res) => {
   try {
     const customers = await User.find({});
     return sendSuccess(res, "Customers fetched", paginate(customers));
@@ -362,7 +432,8 @@ router.get("/customer/details", async (req, res) => {
     return sendError(res, 500, "Server error", error);
   }
 })
-router.get("/products", async (req, res) => {
+
+router.get("/products", verifyAdmin, async (req, res) => {
   try {
     const products = await Product.find({}).populate("sellerId");
     return sendSuccess(res, "Products fetched", paginate(products));
@@ -371,7 +442,7 @@ router.get("/products", async (req, res) => {
   }
 })
 
-router.get("/vendors", async (req, res) => {
+router.get("/vendors", verifyAdmin, async (req, res) => {
   try {
     const sellers = await Seller.find({});
     return sendSuccess(res, "Vendors fetched", paginate(sellers));
@@ -380,7 +451,7 @@ router.get("/vendors", async (req, res) => {
   }
 });
 
-router.delete("/product/:id", async (req, res) => {
+router.delete("/product/:id", verifyAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
@@ -399,7 +470,7 @@ router.delete("/product/:id", async (req, res) => {
   }
 })
 
-router.get("/api/products", async (req, res) => {
+router.get("/api/products", verifyAdmin, async (req, res) => {
   try {
     const products = await Product.find({}).populate("sellerId");
     return sendSuccess(res, "Products fetched", paginate(products));
@@ -409,7 +480,7 @@ router.get("/api/products", async (req, res) => {
 });
 
 // Backward compatibility: keep old route pointing to same handler
-router.get("/products/details", async (req, res) => {
+router.get("/products/details", verifyAdmin, async (req, res) => {
   try {
     const products = await Product.find({}).populate("sellerId");
     return sendSuccess(res, "Products fetched", paginate(products));
@@ -418,7 +489,7 @@ router.get("/products/details", async (req, res) => {
   }
 });
 
-router.delete("/customer/:id", async (req, res) => {
+router.delete("/customer/:id", verifyAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
@@ -438,7 +509,7 @@ router.delete("/customer/:id", async (req, res) => {
 });
 
 
-router.get("/product/approve/:id", async (req, res) => {
+router.get("/product/approve/:id", verifyAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
@@ -456,7 +527,7 @@ router.get("/product/approve/:id", async (req, res) => {
   }
 });
 
-router.get("/product/disapprove/:id",async(req,res)=>{
+router.get("/product/disapprove/:id", verifyAdmin, async(req,res)=>{
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
@@ -474,7 +545,7 @@ router.get("/product/disapprove/:id",async(req,res)=>{
   }
 })
 
-router.get("/seller", async (req, res) => {
+router.get("/seller", verifyAdmin, async (req, res) => {
   try {
     const sellers = await Seller.find({});
     return sendSuccess(res, "Sellers fetched", paginate(sellers));
@@ -483,7 +554,7 @@ router.get("/seller", async (req, res) => {
   }
 });
 
-router.get("/seller/approve/:id", async (req, res) => {
+router.get("/seller/approve/:id", verifyAdmin, async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
@@ -501,7 +572,7 @@ router.get("/seller/approve/:id", async (req, res) => {
   }
 })
 
-router.get("/seller/details", async (req, res) => {
+router.get("/seller/details", verifyAdmin, async (req, res) => {
   try {
     const sellers = await Seller.find({});
     return sendSuccess(res, "Seller retrieved successfully", paginate(sellers));
@@ -510,7 +581,7 @@ router.get("/seller/details", async (req, res) => {
   }
 });
 
-router.get("/api/sellers", async (req, res) => {
+router.get("/api/sellers", verifyAdmin, async (req, res) => {
   try {
     const sellers = await Seller.find({});
     return sendSuccess(res, "Sellers fetched", paginate(sellers));
@@ -520,7 +591,7 @@ router.get("/api/sellers", async (req, res) => {
 });
 
 // Delete a seller by id (and optionally their products)
-router.delete("/seller/:id", async (req, res) => {
+router.delete("/seller/:id", verifyAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     if (!isValidObjectId(id)) {
@@ -542,7 +613,7 @@ router.delete("/seller/:id", async (req, res) => {
   }
 });
 
-router.get("/manager", async (req, res) => {
+router.get("/manager", verifyAdmin, async (req, res) => {
   try {
     const managers = await Manager.find().select("email createdAt");
     return sendSuccess(res, "Managers fetched", paginate(managers));
@@ -551,7 +622,7 @@ router.get("/manager", async (req, res) => {
   }
 });
 
-router.post('/create/manager', async (req, res) => {
+router.post('/create/manager', verifyAdmin, async (req, res) => {
   try {
     const { email, password } = req.body || {};
     if (!email || !password) {
@@ -572,7 +643,7 @@ router.post('/create/manager', async (req, res) => {
   }
 });
 
-router.get("/order", async (req, res) => {
+router.get("/order", verifyAdmin, async (req, res) => {
   try {
     const orders = await Order.find({})
       .populate({ path: 'userId', select: 'firstname lastname email' })
@@ -629,10 +700,10 @@ async function getOrdersGrouped(req, res) {
 }
 
 // Replace the POST and GET routes to use the same handler
-router.post("/orders", getOrdersGrouped);
-router.get("/orders", getOrdersGrouped);
+router.post("/orders", verifyAdmin, getOrdersGrouped);
+router.get("/orders", verifyAdmin, getOrdersGrouped);
 
-router.get("/orders/:userId", async (req, res) => {
+router.get("/orders/:userId", verifyAdmin, async (req, res) => {
   try {
     const userId = req.params.userId;
     if (!isValidObjectId(userId)) {
@@ -657,7 +728,7 @@ router.get("/orders/:userId", async (req, res) => {
   }
 });
 
-router.put('/orders/:orderId/status', async (req, res) => {
+router.put('/orders/:orderId/status', verifyAdmin, async (req, res) => {
   try {
       const { orderId } = req.params;
       const { orderStatus } = req.body;
@@ -692,7 +763,7 @@ router.put('/orders/:orderId/status', async (req, res) => {
 });
 
 // Route to fetch order user data by order ID
-router.get('/orders/user/:orderId', async (req, res) => {
+router.get('/orders/user/:orderId', verifyAdmin, async (req, res) => {
   try {
     const orderId = req.params.orderId;
     if (!isValidObjectId(orderId)) {
@@ -738,7 +809,7 @@ router.get('/orders/user/:orderId', async (req, res) => {
 });
 
 // Get all managers
-router.get('/managers', async (req, res) => {
+router.get('/managers', verifyAdmin, async (req, res) => {
     try {
         const managers = await Manager.find().select('email createdAt');
       return sendSuccess(res, 'Managers fetched', paginate(managers));
@@ -749,7 +820,7 @@ router.get('/managers', async (req, res) => {
 });
 
 // Delete manager
-router.delete('/managers/:id', async (req, res) => {
+router.delete('/managers/:id', verifyAdmin, async (req, res) => {
     try {
         const managerId = req.params.id;
         const manager = await Manager.findById(managerId);
@@ -768,7 +839,7 @@ router.delete('/managers/:id', async (req, res) => {
 });
 
 
-router.get("/delivery", async (req, res) => {
+router.get("/delivery", verifyAdmin, async (req, res) => {
   try {
     // Placeholder for React UI; implement delivery partner model when available
     return sendSuccess(res, 'Use client UI to manage deliveries.', {});
@@ -779,4 +850,4 @@ router.get("/delivery", async (req, res) => {
 });
 
 
-export default router
+export default router;
