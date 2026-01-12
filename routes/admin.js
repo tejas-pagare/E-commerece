@@ -424,6 +424,47 @@ router.post("/dashboard/sellproduct", verifyAdmin, async (req, res) =>{
   }
 })
 
+router.put("/sellproduct/:id/status", verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!isValidObjectId(id)) {
+      return sendError(res, 400, "Invalid product id", null, { fields: ["id"] });
+    }
+
+    const validStatuses = ["Pending", "Verified", "Rejected"];
+    if (!status || !validStatuses.includes(status)) {
+      return sendError(res, 400, "Invalid status provided", null, { validStatuses });
+    }
+
+    const sellProduct = await SellProduct.findById(id);
+    if (!sellProduct) {
+      return sendError(res, 404, "Product not found", null, { code: "PRODUCT_NOT_FOUND" });
+    }
+
+    // Logic to add coins if status becomes Verified
+    if (status === "Verified" && sellProduct.userStatus !== "Verified") {
+      const userId = sellProduct.user_id;
+      const coinsToAdd = sellProduct.estimated_value || 0;
+      if (userId && coinsToAdd > 0) {
+        // Assuming user_id is a valid User ObjectId string
+        if (isValidObjectId(userId)) {
+             await User.findByIdAndUpdate(userId, { $inc: { coins: coinsToAdd } });
+        }
+      }
+    }
+
+    sellProduct.userStatus = status;
+    await sellProduct.save();
+
+    return sendSuccess(res, "Second-hand product status updated", { sellProduct });
+  } catch (error) {
+    console.error("Error updating second-hand product status:", error);
+    return sendError(res, 500, "Internal server error", error);
+  }
+});
+
 router.get("/customer/details", verifyAdmin, async (req, res) => {
   try {
     const customers = await User.find({});
