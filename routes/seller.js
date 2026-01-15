@@ -8,6 +8,7 @@ import cloudinary, { upload } from '../config/cloudinary.js';
 import Order from '../models/orders.js';
 import mongoose from 'mongoose';
 import User from '../models/user.js';
+import { classifyImage } from '../utils/classifier.js';
 
 const router = express.Router();
 
@@ -146,6 +147,36 @@ router.post('/create', upload.single('img'), isAuthenticated, async (req, res) =
         success: false
       });
     }
+
+    // --- ML Model Verification ---
+    if (req.file && req.file.buffer) {
+      try {
+        console.log("Verifying image with ML models...");
+        const classification = await classifyImage(req.file.buffer);
+
+        if (!classification.is_cloth) {
+          return res.status(400).json({
+            success: false,
+            message: "Image verification failed: The uploaded image does not appear to be a cloth."
+          });
+        }
+
+        console.log(`Image verified. Predicted Category: ${classification.category}`);
+        // Override the category with the specialist model's prediction
+        // This ensures the DB stores the verified category
+        req.body.category = classification.category;
+
+      } catch (mlError) {
+        console.error("ML Verification Error:", mlError);
+        // Fail safely or block? Requirement implies strict verification.
+        return res.status(500).json({
+          success: false,
+          message: "Image verification service unavailable."
+        });
+      }
+    }
+    // -----------------------------
+
     const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { folder: 'uploads', resource_type: 'auto' },

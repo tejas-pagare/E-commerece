@@ -25,6 +25,8 @@ import SellProduct from '../models/SellProduct.js';
 import Order from "../models/orders.js";
 import UserHistory from "../models/userHistory.js";
 import path from 'path';
+import { classifyImage } from '../utils/classifier.js';
+
 const router = express.Router();
 
 // --- REMOVED ---
@@ -804,6 +806,33 @@ router.post('/sell', isAuthenticated, upload.single('photos'), async (req, res) 
                 message: 'Photo is required.'
             });
         }
+
+        // --- ML Model Verification ---
+        if (req.file && req.file.buffer) {
+            try {
+                console.log("Verifying second-hand product image...");
+                const classification = await classifyImage(req.file.buffer);
+
+                if (!classification.is_cloth) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Image verification failed: The uploaded image does not appear to be a cloth."
+                    });
+                }
+
+                console.log(`Image verified. Predicted Category: ${classification.category}`);
+                // Automatically set the item name/category based on the model
+                req.body.items = classification.category;
+
+            } catch (mlError) {
+                console.error("ML Verification Error:", mlError);
+                return res.status(500).json({
+                    success: false,
+                    message: "Image verification service unavailable."
+                });
+            }
+        }
+        // -----------------------------
         
         const combination_id = req.body.fabric + req.body.size + req.body.age;
         const estimated_value = combinationPoints[combination_id];
