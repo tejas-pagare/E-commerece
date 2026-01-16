@@ -16,28 +16,11 @@ export const classifyImage = (imageBuffer) => {
         const venvWindows = path.join(venvDir, 'Scripts', 'python.exe');
         const venvPosix = path.join(venvDir, 'bin', 'python');
 
-        const isVenvValid = () => {
-            try {
-                if (!fs.existsSync(venvCfgPath)) return false;
-                const cfg = fs.readFileSync(venvCfgPath, 'utf8');
-                const executableLine = cfg.split('\n').find(line => line.toLowerCase().startsWith('executable='));
-                const homeLine = cfg.split('\n').find(line => line.toLowerCase().startsWith('home='));
-                const executablePath = executableLine ? executableLine.split('=')[1]?.trim() : null;
-                const homePath = homeLine ? homeLine.split('=')[1]?.trim() : null;
-                if (executablePath && fs.existsSync(executablePath)) return true;
-                if (homePath && fs.existsSync(homePath)) return true;
-                return false;
-            } catch {
-                return false;
-            }
-        };
-
-        const venvOk = isVenvValid();
         const candidates = [
             process.env.ML_PYTHON,
             process.env.PYTHON,
-            venvOk && fs.existsSync(venvWindows) ? venvWindows : null,
-            venvOk && fs.existsSync(venvPosix) ? venvPosix : null,
+            fs.existsSync(venvWindows) ? venvWindows : null,
+            fs.existsSync(venvPosix) ? venvPosix : null,
             'python',
             'py'
         ].filter(Boolean);
