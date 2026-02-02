@@ -572,7 +572,7 @@ router.get("/donated-products", isAuthenticated, async (req, res) => {
       fabric: item.fabric,
       size: item.size,
       gender: item.gender,
-      readableUsage: item.usageDuration > 1 ? '> 1 year' : 'Less than 6 months',
+      readableUsage: item.usageDuration > 1 ? '> 1 year' : 'Less than 1 year',
       imageSrc: item.image?.data
         ? `data:${item.image.contentType};base64,${item.image.data.toString('base64')}`
         : null,

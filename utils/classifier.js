@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -8,10 +9,42 @@ const __dirname = path.dirname(__filename);
 export const classifyImage = (imageBuffer) => {
     return new Promise((resolve, reject) => {
         const scriptPath = path.join(__dirname, '../ml_models/classify.py');
-        
-        // Spawn python process
-        // Ensure 'python' is in your PATH. If using a virtual env, point to that python executable.
-        const pythonProcess = spawn('python', [scriptPath]);
+
+        const projectRoot = path.join(__dirname, '..');
+        const venvDir = path.join(projectRoot, '.venv');
+        const venvCfgPath = path.join(venvDir, 'pyvenv.cfg');
+        const venvWindows = path.join(venvDir, 'Scripts', 'python.exe');
+        const venvPosix = path.join(venvDir, 'bin', 'python');
+
+        const candidates = [
+            process.env.ML_PYTHON,
+            process.env.PYTHON,
+            fs.existsSync(venvWindows) ? venvWindows : null,
+            fs.existsSync(venvPosix) ? venvPosix : null,
+            'python',
+            'py'
+        ].filter(Boolean);
+
+        const spawnWithFallback = (index = 0) => {
+            if (index >= candidates.length) {
+                return reject(new Error("No valid Python executable found. Set ML_PYTHON or ensure python/py is on PATH."));
+            }
+
+            const pythonCmd = candidates[index];
+            const child = spawn(pythonCmd, [scriptPath]);
+
+            child.on('error', (err) => {
+                if (err.code === 'ENOENT') {
+                    return spawnWithFallback(index + 1);
+                }
+                return reject(err);
+            });
+
+            return child;
+        };
+
+        // Spawn python process with fallback candidates
+        const pythonProcess = spawnWithFallback();
 
         let dataString = '';
         let errorString = '';

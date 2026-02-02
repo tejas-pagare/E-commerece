@@ -16,15 +16,39 @@ const HomePageController = async (req, res) => {
 const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const userCheck = await User.findOne({ email });
 
-    if (!userCheck) {
-      return res.redirect("/api/v1/user/login?error=Invalid email or password");
+    const wantsJson =
+      req.xhr ||
+      req.is('application/json') ||
+      (req.headers.accept && req.headers.accept.includes('application/json'));
+    const prefersHtml = !wantsJson;
+    const redirectWithError = (message) =>
+      res.redirect(`/api/v1/user/login?error=${encodeURIComponent(message)}`);
+
+    // Always clear any existing auth cookie before processing login
+    res.clearCookie("token");
+
+    if (!email || !password) {
+      res.clearCookie("token");
+      return prefersHtml
+        ? redirectWithError("Email and password are required")
+        : res.status(400).json({ success: false, message: "Email and password are required" });
     }
 
-    const isMatch = await bcrypt.compare(password, userCheck.password);
+    const userCheck = await User.findOne({ email });
+    if (!userCheck) {
+      return prefersHtml
+        ? redirectWithError("Invalid email or password")
+        : res.status(401).json({ success: false, message: "Invalid email or password" });
+    }
+
+    const isMatch = userCheck.password
+      ? await bcrypt.compare(password, userCheck.password)
+      : false;
     if (!isMatch) {
-      return res.redirect("/api/v1/user/login?error=Invalid email or password");
+      return prefersHtml
+        ? redirectWithError("Invalid email or password")
+        : res.status(401).json({ success: false, message: "Invalid email or password" });
     }
 
     const token = jwt.sign(
@@ -39,10 +63,32 @@ const loginController = async (req, res) => {
       maxAge: 3600000,
     });
 
-    res.redirect("/api/v1/user/");
+    if (prefersHtml) {
+      return res.redirect("/api/v1/user/");
+    }
+
+    return res.json({
+      success: true,
+      message: "Login successful",
+      user: {
+        id: userCheck._id,
+        firstname: userCheck.firstname,
+        lastname: userCheck.lastname,
+        email: userCheck.email,
+      },
+    });
   } catch (error) {
     console.log(error);
-    res.redirect("/api/v1/user/login?error=Something went wrong");
+    res.clearCookie("token");
+    const wantsJson =
+      req.xhr ||
+      req.is('application/json') ||
+      (req.headers.accept && req.headers.accept.includes('application/json'));
+    const prefersHtml = !wantsJson;
+    if (prefersHtml) {
+      return res.redirect("/api/v1/user/login?error=Something went wrong");
+    }
+    return res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
 
@@ -63,22 +109,40 @@ const signupPageRenderController = (req, res) => {
 const signupController =  async (req, res) => {
   try {
     const { firstname, lastname, password, email } = req.body;
+    const prefersHtml = req.accepts(['html', 'json']) === 'html';
+    const redirectWithError = (message) =>
+      res.redirect(`/api/v1/user/signup?error=${encodeURIComponent(message)}`);
+
+    if (!firstname || !lastname || !email || !password) {
+      return prefersHtml
+        ? redirectWithError("All fields are required")
+        : res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
     const userCheck = await User.findOne({ email });
     if (userCheck) {
-      return res.redirect("/api/v1/user/signup")
+      return prefersHtml
+        ? redirectWithError("Email already in use")
+        : res.status(409).json({ success: false, message: "Email already in use" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
-    console.log(hashPassword);
     const user = User.create({
       firstname, lastname, password: hashPassword, email
     });
     (await user).save()
 
-    return res.redirect("/api/v1/user/login");
+    if (prefersHtml) {
+      return res.redirect("/api/v1/user/login");
+    }
+    return res.status(201).json({ success: true, message: "Signup successful" });
   } catch (error) {
     console.log(error);
-    return res.redirect("/api/v1/user/signup")
+    const prefersHtml = req.accepts(['html', 'json']) === 'html';
+    if (prefersHtml) {
+      return res.redirect("/api/v1/user/signup?error=Something went wrong");
+    }
+    return res.status(500).json({ success: false, message: "Something went wrong" });
   }
 }
 

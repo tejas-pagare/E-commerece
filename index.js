@@ -1,4 +1,6 @@
 import express from 'express';
+import http from "http";
+import { Server as SocketIOServer } from "socket.io";
 const app = express();
 import session from 'express-session';
 import path from "path"
@@ -19,14 +21,14 @@ dotenv.config({});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-app.use(
-  cors({
-    origin:[ "http://localhost:8000","http://localhost:5174","http://localhost:5173"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+const corsOptions = {
+  origin:[ "http://localhost:8000","http://localhost:5174","http://localhost:5173"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
 app.use(session({
   secret: "secret-swiftmart",
   resave: false,
@@ -37,6 +39,32 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+
+const server = http.createServer(app);
+const io = new SocketIOServer(server, { cors: corsOptions });
+
+io.on("connection", (socket) => {
+  console.log(`Socket connected: ${socket.id}`);
+  socket.on("disconnect", () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+  });
+});
+
+// Emit refresh events after successful mutations
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    const method = req.method?.toUpperCase();
+    if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && res.statusCode < 400) {
+      io.emit("backend-updated", {
+        method,
+        path: req.originalUrl,
+        status: res.statusCode,
+        at: new Date().toISOString(),
+      });
+    }
+  });
+  next();
+});
 app.use("/api/v1/user", userController);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/seller",sellerRouter);
@@ -59,7 +87,7 @@ app.get("*", (req, res) => {
 
 
 const PORT = 8000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   dbConnection();
   console.log(`Server running on http://localhost:${PORT}`)
 });
