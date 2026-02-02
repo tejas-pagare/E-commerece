@@ -7,24 +7,86 @@ const isAuthenticated = async (req, res, next) => {
     
     const token = req.cookies.token;
     
-    if (!token) {
-      return res.redirect("/");
+    const isApiRequest = req.originalUrl?.startsWith("/api/");
 
+    if (!token) {
+      // Clear any stale cookies
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/'
+      });
+
+      if (isApiRequest) {
+        return res.status(401).json({ success: false, message: "Authentication required" });
+      }
+      
+      const wantsJson = 
+        req.xhr || 
+        req.is('application/json') || 
+        (req.headers.accept && req.headers.accept.includes('application/json'));
+
+      if (wantsJson) {
+        return res.status(401).json({ success: false, message: "Authentication required" });
+      }
+      return res.redirect("/");
     }
 
     const decode = jwt.verify(token, "JWT_SECRET");
     if (!decode) {
-      return res.redirect("/");
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/'
+      });
 
+      if (isApiRequest) {
+        return res.status(401).json({ success: false, message: "Invalid token" });
+      }
+
+      const wantsJson = 
+        req.xhr || 
+        req.is('application/json') || 
+        (req.headers.accept && req.headers.accept.includes('application/json'));
+
+      if (wantsJson) {
+        return res.status(401).json({ success: false, message: "Invalid token" });
+      }
+      return res.redirect("/");
     }
+    
     let user = "";
     if (decode.role === "user") {
       user = await User.findById(decode.userId);
-
     } else {
       user = await Seller.findById(decode.userId);
     }
-   
+    
+    // If user doesn't exist in database, clear cookie
+    if (!user) {
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+        path: '/'
+      });
+
+      if (isApiRequest) {
+        return res.status(401).json({ success: false, message: "User not found" });
+      }
+
+      const wantsJson = 
+        req.xhr || 
+        req.is('application/json') || 
+        (req.headers.accept && req.headers.accept.includes('application/json'));
+      
+      if (wantsJson) {
+        return res.status(401).json({ success: false, message: "User not found" });
+      }
+      return res.redirect("/");
+    }
     
     req.role = decode.role || "admin";
     req.userId = decode.userId;
@@ -32,9 +94,27 @@ const isAuthenticated = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(error);
-    console.log("/error")
-    return res.redirect("/");
+    // Clear cookie on any error
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/'
+    });
+    
+    const wantsJson = 
+      req.xhr || 
+      req.is('application/json') || 
+      (req.headers.accept && req.headers.accept.includes('application/json'));
+    
+    if (isApiRequest) {
+      return res.status(401).json({ success: false, message: "Authentication failed" });
+    }
 
+    if (wantsJson) {
+      return res.status(401).json({ success: false, message: "Authentication failed" });
+    }
+    return res.redirect("/");
   }
 }
 
