@@ -17,6 +17,7 @@ import dotenv from "dotenv";
 import cors from "cors"
 import cookieParser from "cookie-parser";
 import multer from "multer"
+import jwt from "jsonwebtoken";
 dotenv.config({});
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,13 +33,38 @@ app.use(cors(corsOptions));
 app.use(session({
   secret: "secret-swiftmart",
   resave: false,
-  saveUninitialized: true,
-  cookie: { maxAge: 600000 },
+  saveUninitialized: false,
+  cookie: { 
+    maxAge: 600000,
+    httpOnly: true,
+    secure: false, // set to true if using HTTPS
+    sameSite: 'lax'
+  },
 }))
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+
+// Clear invalid auth token cookies on every request
+app.use((req, res, next) => {
+  const token = req.cookies?.token;
+  if (!token) {
+    return next();
+  }
+  try {
+    jwt.verify(token, "JWT_SECRET");
+    return next();
+  } catch (err) {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+    });
+    return next();
+  }
+});
 
 const server = http.createServer(app);
 const io = new SocketIOServer(server, { cors: corsOptions });

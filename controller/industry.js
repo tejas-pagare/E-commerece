@@ -5,18 +5,24 @@ import Industry from '../models/Industry.js';
 
 
 const loginController = async (req, res) => {
+  const wantsJson = req.headers.accept?.includes('application/json') || req.is('application/json');
+
   try {
     const { email, password } = req.body;
     const industryCheck = await Industry.findOne({ email });
 
     if (!industryCheck) {
-      // Pass an error message for invalid credentials
+      if (wantsJson) {
+        return res.status(401).json({ success: false, message: "Invalid email or password" });
+      }
       return res.redirect("/api/v1/industry/login?error=Invalid email or password");
     }
 
     const isMatch = await bcrypt.compare(password, industryCheck.password);
     if (!isMatch) {
-      // Pass an error message for invalid credentials
+      if (wantsJson) {
+        return res.status(401).json({ success: false, message: "Invalid email or password" });
+      }
       return res.redirect("/api/v1/industry/login?error=Invalid email or password");
     }
 
@@ -28,12 +34,26 @@ const loginController = async (req, res) => {
       maxAge: 3600000000,
     });
 
-    res.redirect("/api/v1/industry/home");
+    if (wantsJson) {
+      return res.json({
+        success: true,
+        message: "Login successful",
+        industry: {
+          _id: industryCheck._id,
+          companyName: industryCheck.companyName,
+          email: industryCheck.email,
+        }
+      });
+    }
+
+    return res.redirect("/api/v1/industry/home");
 
   } catch (error) {
     console.log(error);
-    // Pass a generic error message for other failures
-    res.redirect("/api/v1/industry/login?error=An error occurred. Please try again.");
+    if (wantsJson) {
+      return res.status(500).json({ success: false, message: "An error occurred. Please try again." });
+    }
+    return res.redirect("/api/v1/industry/login?error=An error occurred. Please try again.");
   }
 }
 

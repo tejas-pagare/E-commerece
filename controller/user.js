@@ -149,7 +149,41 @@ const signupController =  async (req, res) => {
 
 
 const logoutController = (req, res) => {
-  res.clearCookie("token");
+  // Clear the token cookie with all options to ensure removal
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    path: '/'
+  });
+
+  // Also overwrite the cookie immediately to force removal in strict browsers
+  res.cookie("token", "", {
+    httpOnly: true,
+    secure: false,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0
+  });
+  
+  // Destroy session if it exists
+  if (req.session) {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Session destruction error:", err);
+      }
+    });
+  }
+  
+  const wantsJson = 
+    req.xhr || 
+    req.is('application/json') || 
+    (req.headers.accept && req.headers.accept.includes('application/json'));
+  
+  if (wantsJson) {
+    return res.status(200).json({ success: true, message: "Logged out successfully" });
+  }
+  
   return res.redirect("/");
 }
 
