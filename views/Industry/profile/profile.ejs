@@ -132,7 +132,7 @@
             }
           } else if (xhr.status === 401) {
             alert("⚠️ Access Denied! Please log in again.");
-            window.location.href = "/industry/login";
+            window.location.href = "/api/v1/industry/login";
           } else {
             console.error("Failed to fetch profile. Status:", xhr.status);
           }

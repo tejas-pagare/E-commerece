@@ -44,11 +44,11 @@ const industryAuth= async (req,res,next)=>{
   try{
     const token= req.cookies.token || req.headers.authorization?.split(' ')[1];
     if(!token){
-      return res.redirect("/api/v1/indusrty/login");
+      return res.status(401).json({ message: "Authentication required. Please login.", redirect: "/api/v1/industry/login" });
     }
     const decode= jwt.verify(token,"JWT_SECRET");
-    if(!decode){
-      return res.redirect("/api/v1/indusrty/login");
+    if(!decode || decode.role !== "industry"){
+      return res.status(401).json({ message: "Invalid or expired token. Please login again.", redirect: "/api/v1/industry/login" });
     }
     console.log(decode);
 
@@ -58,7 +58,7 @@ const industryAuth= async (req,res,next)=>{
   }
   catch(error){
     console.log(error)
-    return res.redirect("/api/v1/indusrty/login");
+    return res.status(401).json({ message: "Authentication failed. Please login.", redirect: "/api/v1/industry/login" });
   }
 }
 
