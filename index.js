@@ -24,6 +24,8 @@ import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import csurf from "csurf";
 import { createStream } from "rotating-file-stream";
+import passport from "passport";
+import configurePassport from "./config/passport.js";
 
 // Fail fast on missing critical env vars
 if (!process.env.JWT_SECRET) {
@@ -46,6 +48,8 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+configurePassport();
+app.use(passport.initialize());
 const logsDir = path.join(__dirname, "logs");
 if (!fs.existsSync(logsDir)) {
   fs.mkdirSync(logsDir, { recursive: true });

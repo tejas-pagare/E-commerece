@@ -29,6 +29,8 @@ import { classifyImage } from '../utils/classifier.js';
 import Stripe from "stripe";
 import dotenv from "dotenv";
 import { fileURLToPath } from 'url';
+import passport from "passport";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
@@ -59,6 +61,38 @@ router.get("/products", async (req, res) => {
 router.post("/login", loginController);
 router.post("/signup", signupController);
 router.get("/logout", logoutController);
+
+// Google OAuth
+router.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"], session: false })
+);
+
+router.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { session: false, failureRedirect: "/login" }),
+    async (req, res) => {
+        const user = req.user;
+        if (!user) {
+            return res.redirect("/login");
+        }
+
+        const token = jwt.sign(
+            { userId: user._id, role: "user" },
+            process.env.JWT_SECRET || "JWT_SECRET",
+            { expiresIn: "5h" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            maxAge: 3600000,
+        });
+
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+        return res.redirect(`${frontendUrl}/`);
+    }
+);
 
 // --- ACCOUNT ---
 
