@@ -50,6 +50,18 @@ const orderSchema = new mongoose.Schema({
     default:"Online",
     
   },
+  paymentProvider: {
+    type: String,
+    default: "Manual",
+  },
+  stripeSessionId: {
+    type: String,
+    default: null,
+  },
+  coinsUsed: {
+    type: Number,
+    default: 0,
+  },
   shippingAddress: {
     fullname: { type: String, required: true },
     street: { type: String, required: true },

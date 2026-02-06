@@ -24,7 +24,6 @@ import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import csurf from "csurf";
 import { createStream } from "rotating-file-stream";
-dotenv.config({});
 
 // Fail fast on missing critical env vars
 if (!process.env.JWT_SECRET) {
@@ -38,6 +37,7 @@ if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, "..", ".env") });
 const corsOptions = {
   origin:[ "http://localhost:8000","http://localhost:5174","http://localhost:5173"],
   credentials: true,
@@ -69,7 +69,14 @@ app.use(session({
   },
 }))
 app.use(cookieParser());
-app.use(bodyParser.json({ limit: "2mb" }));
+app.use(bodyParser.json({
+  limit: "2mb",
+  verify: (req, res, buf) => {
+    if (req.originalUrl === "/api/v1/user/stripe/webhook") {
+      req.rawBody = buf;
+    }
+  },
+}));
 app.use(bodyParser.urlencoded({ extended: true, limit: "2mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
