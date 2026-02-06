@@ -33,7 +33,7 @@ const isAuthenticated = async (req, res, next) => {
       return res.redirect("/");
     }
 
-    const decode = jwt.verify(token, "JWT_SECRET");
+    const decode = jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret_key_change_me");
     if (!decode) {
       res.clearCookie("token", {
         httpOnly: true,
@@ -126,9 +126,9 @@ const industryAuth= async (req,res,next)=>{
     if(!token){
       return res.status(401).json({ message: "Authentication required. Please login.", redirect: "/api/v1/industry/login" });
     }
-    const decode= jwt.verify(token,"JWT_SECRET");
-    if(!decode || decode.role !== "industry"){
-      return res.status(401).json({ message: "Invalid or expired token. Please login again.", redirect: "/api/v1/industry/login" });
+    const decode= jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret_key_change_me");
+    if(!decode){
+      return res.redirect("/api/v1/indusrty/login");
     }
     console.log(decode);
 

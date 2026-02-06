@@ -25,6 +25,16 @@ import rateLimit from "express-rate-limit";
 import csurf from "csurf";
 import { createStream } from "rotating-file-stream";
 
+// Fail fast on missing critical env vars
+if (!process.env.JWT_SECRET) {
+  console.error("FATAL: JWT_SECRET is not defined in .env");
+  process.exit(1);
+}
+if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
+  console.error("FATAL: ADMIN_EMAIL or ADMIN_PASSWORD is not defined in .env");
+  process.exit(1);
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, "..", ".env") });
@@ -157,8 +167,8 @@ app.get("/", (req, res) => {
 
 app.get("*", (req, res) => {
   
-  res.json({
-    message: "Acess denied"
+  res.status(404).json({
+    message: "Access denied (Route not found)"
   })
 })
 
