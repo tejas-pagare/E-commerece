@@ -3,6 +3,7 @@ import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 const app = express();
 import session from 'express-session';
+import fs from "fs";
 import path from "path"
 import expressLayouts from 'express-ejs-layouts'
 import userController from "./routes/user.js"
@@ -18,6 +19,11 @@ import cors from "cors"
 import cookieParser from "cookie-parser";
 import multer from "multer"
 import jwt from "jsonwebtoken";
+import bodyParser from "body-parser";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
+import csurf from "csurf";
+import { createStream } from "rotating-file-stream";
 dotenv.config({});
 
 const __filename = fileURLToPath(import.meta.url);
@@ -30,6 +36,17 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+const logsDir = path.join(__dirname, "logs");
+if (!fs.existsSync(logsDir)) {
+  fs.mkdirSync(logsDir, { recursive: true });
+}
+const accessLogStream = createStream("access.log", {
+  size: "5M",
+  interval: "1d",
+  compress: "gzip",
+  path: logsDir,
+});
+app.use(morgan("combined", { stream: accessLogStream }));
 app.use(session({
   secret: "secret-swiftmart",
   resave: false,
@@ -41,10 +58,34 @@ app.use(session({
     sameSite: 'lax'
   },
 }))
-app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: "2mb" }));
+app.use(bodyParser.urlencoded({ extended: true, limit: "2mb" }));
 app.use(express.static(path.join(__dirname, "public")));
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use("/api/", apiLimiter);
+
+const csrfProtection = csurf({
+  cookie: {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: false, // set to true if using HTTPS
+  },
+});
+
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/") && req.path !== "/api/v1/csrf-token") {
+    return next();
+  }
+  return csrfProtection(req, res, next);
+});
 
 // Clear invalid auth token cookies on every request
 app.use((req, res, next) => {
@@ -91,6 +132,10 @@ app.use((req, res, next) => {
   });
   next();
 });
+app.get("/api/v1/csrf-token", (req, res) => {
+  res.json({ csrfToken: req.csrfToken() });
+});
+
 app.use("/api/v1/user", userController);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/seller",sellerRouter);
