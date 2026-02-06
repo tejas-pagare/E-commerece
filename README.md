@@ -15,10 +15,10 @@ Roll No: S20230010172
 - Developed pages for Secondhand, Manager, and Delivery management.
 - Handled core modules: Seller, Product, Customer, and Order management.
 - Built the Admin Dashboard to monitor platform metrics and operations.
+- Managed Customer Module – Maintained customer details and monitored activity.
+- Developed Admin Dashboard – Showed key stats like users, orders, and revenue.
+- Implemented Order Management – Tracked orders and updated their statuses.
 
-### Seller Side
-- Designed Product Creation, Edit Product, and Product Listing pages.
-- Implemented Seller Profile Edit functionality for account and business updates.
 
 ---
 
@@ -51,10 +51,10 @@ Roll No: S20230010172
 ### Admin Side
 - Managed Seller Module – Controlled seller registrations, details, and activity.
 - Handled Product Module – Verified and managed products listed on the platform.
-- Managed Customer Module – Maintained customer details and monitored activity.
-- Developed Admin Dashboard – Showed key stats like users, orders, and revenue.
-- Implemented Order Management – Tracked orders and updated their statuses.
 
+### Seller Side
+- Designed Product Creation, Edit Product, and Product Listing pages.
+- Implemented Seller Profile Edit functionality for account and business updates.
 ---
 
 ## Kranthi Banoth
@@ -419,3 +419,4 @@ npm run test:win
 - Cloudinary credentials must be present
 - CORS origin in `index.js` is fixed to `http://localhost:8000`
 - Unify JWT secret usage across middlewares and controllers before production
+

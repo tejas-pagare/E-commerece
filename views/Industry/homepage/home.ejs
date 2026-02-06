@@ -161,7 +161,9 @@ function loadOrders() {
         tbody.innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">Invalid response format</td></tr>`;
       }
     } else if (xhr.status === 401) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">Access Denied — please login.</td></tr>`;
+      // Redirect to login on authentication failure
+      alert("Authentication required. Please login.");
+      window.location.href = "/api/v1/industry/login";
     } else {
       tbody.innerHTML = `<tr><td colspan="7" class="text-red-600 py-4">Server Error (${xhr.status})</td></tr>`;
     }
@@ -248,6 +250,7 @@ function attachCartEvents() {
         window.location.href = "cart"; // ✅ redirect to cart
       } else if (res.status === 401) {
         alert("⚠️ Please login first.");
+        window.location.href = "/api/v1/industry/login";
       } else {
         alert("❌ Failed to add item to cart.");
       }

@@ -46,6 +46,36 @@ router.get('/home', industryAuth, async (req, res) => {
     }
 });
 
+router.get('/fetchhome', industryAuth, async (req, res) => {
+    try {
+        const combinations = await SellProduct.aggregate([
+            {
+                $match: {
+                    adminStatus: "Pending",
+                    userStatus: "Verified"
+                }
+            },
+            {
+                $group: {
+                    _id: "$combination_id",
+                    quantity: { $sum: 1 },
+                    estimated_value: { $first: "$estimated_value" },
+                    fabric: { $first: "$fabric" },
+                    size: { $first: "$size" },
+                    usageDuration: { $first: "$usageDuration" }
+                }
+            },
+            {
+                $limit: 54
+            }
+        ]);
+        res.json(combinations);
+    } catch (error) {
+        console.error("Error fetching combinations with details:", error);
+        res.status(500).json({ message: "Internal Server Error", error });
+    }
+});
+
 router.get("/profile", industryAuth, async (req, res) => {
     try {
         const id = req.industry;
