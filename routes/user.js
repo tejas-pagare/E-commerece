@@ -26,8 +26,17 @@ import Order from "../models/orders.js";
 import UserHistory from "../models/userHistory.js";
 import path from 'path';
 import { classifyImage } from '../utils/classifier.js';
+import Stripe from "stripe";
+import dotenv from "dotenv";
+import { fileURLToPath } from 'url';
+import passport from "passport";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, "..", "..", ".env") });
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
 // --- REMOVED ---
 // The Chatbase snippet middleware that injected HTML has been removed.
@@ -52,6 +61,38 @@ router.get("/products", async (req, res) => {
 router.post("/login", loginController);
 router.post("/signup", signupController);
 router.get("/logout", logoutController);
+
+// Google OAuth
+router.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"], session: false })
+);
+
+router.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { session: false, failureRedirect: "/login" }),
+    async (req, res) => {
+        const user = req.user;
+        if (!user) {
+            return res.redirect("/login");
+        }
+
+        const token = jwt.sign(
+            { userId: user._id, role: "user" },
+            process.env.JWT_SECRET || "JWT_SECRET",
+            { expiresIn: "5h" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            maxAge: 3600000,
+        });
+
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+        return res.redirect(`${frontendUrl}/`);
+    }
+);
 
 // --- ACCOUNT ---
 
@@ -424,7 +465,6 @@ router.get("/checkout-details", isAuthenticated, async (req, res) => {
 router.post("/payment", isAuthenticated, async (req, res) => {
     try {
         const {
-            paymentMethod,
             address,
             useCoins // --- UPDATED: Receive coin flag ---
         } = req.body;
@@ -478,80 +518,292 @@ router.post("/payment", isAuthenticated, async (req, res) => {
             0
         );
 
-        // --- NEW COIN LOGIC ---
+        // --- COIN LOGIC ---
         let coinsUsed = 0;
         if (useCoins && user.coins > 0) {
-            // Determine how many coins to use (can't use more than the total price)
             if (user.coins >= totalAmount) {
-                coinsUsed = totalAmount; // Pay fully with coins
-                totalAmount = 0;         // Remaining to pay is 0
+                coinsUsed = totalAmount;
+                totalAmount = 0;
             } else {
-                coinsUsed = user.coins;  // Pay partially
-                totalAmount -= user.coins; // Deduct balance
+                coinsUsed = user.coins;
+                totalAmount -= user.coins;
+            }
+        }
+        // ------------------
+
+        const shippingAddress = {
+            fullname: `${user.firstname} ${user.lastname}`,
+            plotno: address.plotno,
+            street: address.street,
+            city: address.city,
+            state: address.state,
+            pincode: address.pincode,
+            phone: address.phone,
+        };
+
+        // Wallet/coins-only payment
+        if (totalAmount === 0) {
+            user.coins = Math.max(0, (user.coins || 0) - coinsUsed);
+
+            const newOrder = new Order({
+                userId: user._id,
+                products,
+                totalAmount,
+                paymentStatus: "Completed",
+                paymentMethod: "Wallet/Coins",
+                paymentProvider: "Coins",
+                coinsUsed,
+                shippingAddress,
+            });
+
+            await newOrder.save();
+
+            let userHistory = await UserHistory.findOne({
+                userId: user._id
+            });
+            if (!userHistory) {
+                userHistory = new UserHistory({
+                    userId: user._id,
+                    orders: [],
+                });
             }
 
-            // Deduct coins from user DB
-            user.coins -= coinsUsed;
-        }
-        // ----------------------
+            userHistory.orders.push({
+                orderId: newOrder._id,
+                products,
+                totalAmount,
+                purchaseDate: new Date(),
+                status: "Completed",
+            });
 
-        // Note: I removed the 'extra' subtraction from previous logic as 'coins' replaces 
-        // the generic 'totalEstimatedValue' subtraction for better tracking.
+            await userHistory.save();
+            user.cart = [];
+            await user.save();
+
+            return res.status(200).json({
+                message: "Payment processed and order placed successfully",
+                success: true,
+                orderId: newOrder._id,
+                coinsDeducted: coinsUsed
+            });
+        }
+
+        if (!process.env.STRIPE_SECRET_KEY || !stripe) {
+            return res.status(500).json({
+                error: "Stripe is not configured on the server"
+            });
+        }
 
         const newOrder = new Order({
             userId: user._id,
             products,
-            totalAmount, // This is the actual MONEY paid
-            paymentStatus: totalAmount === 0 ? "Completed" : "Pending",
-            paymentMethod: totalAmount === 0 ? "Wallet/Coins" : paymentMethod,
-            shippingAddress: {
-                fullname: `${user.firstname} ${user.lastname}`,
-                plotno: address.plotno,
-                street: address.street,
-                city: address.city,
-                state: address.state,
-                pincode: address.pincode,
-                phone: address.phone,
-            },
+            totalAmount,
+            paymentStatus: "Pending",
+            paymentMethod: "Stripe",
+            paymentProvider: "Stripe",
+            coinsUsed,
+            shippingAddress,
         });
 
         await newOrder.save();
 
-        let userHistory = await UserHistory.findOne({
-            userId: user._id
-        });
-        if (!userHistory) {
-            userHistory = new UserHistory({
-                userId: user._id,
-                orders: [],
+        const lineItems = user.cart.map((item) => ({
+            price_data: {
+                currency: "inr",
+                product_data: {
+                    name: item.productId.title,
+                },
+                unit_amount: Math.round(item.productId.price * 100),
+            },
+            quantity: item.quantity,
+        }));
+
+        let discounts = [];
+        if (coinsUsed > 0) {
+            const coupon = await stripe.coupons.create({
+                amount_off: Math.round(coinsUsed * 100),
+                currency: "inr",
+                duration: "once",
             });
+            discounts = [{ coupon: coupon.id }];
         }
 
-        userHistory.orders.push({
-            orderId: newOrder._id,
-            products,
-            totalAmount,
-            status: "Pending",
-            orderDate: new Date() // <--- ADDED: This fixes the "Invalid Date" on frontend
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+        const session = await stripe.checkout.sessions.create({
+            mode: "payment",
+            payment_method_types: ["card"],
+            line_items: lineItems,
+            discounts,
+            success_url: `${frontendUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `${frontendUrl}/checkout/cancel`,
+            client_reference_id: user._id.toString(),
+            metadata: {
+                orderId: newOrder._id.toString(),
+                userId: user._id.toString(),
+                coinsUsed: String(coinsUsed),
+            },
         });
 
-        await userHistory.save();
+        newOrder.stripeSessionId = session.id;
+        await newOrder.save();
 
-        // Clear Cart & Save User (including coin deduction)
-        user.cart = [];
-        await user.save();
-        
-        res.status(200).json({
-            message: "Payment processed and order placed successfully",
+        return res.status(200).json({
             success: true,
+            checkoutUrl: session.url,
             orderId: newOrder._id,
-            coinsDeducted: coinsUsed
         });
     } catch (err) {
         console.error("Payment error:", err);
         res.status(500).json({
             error: "Something went wrong"
         });
+    }
+});
+
+// Confirm Stripe payment without webhooks (dev flow)
+router.post("/stripe/confirm", isAuthenticated, async (req, res) => {
+    if (!stripe) {
+        return res.status(500).json({ error: "Stripe is not configured on the server" });
+    }
+
+    const { sessionId } = req.body;
+    if (!sessionId) {
+        return res.status(400).json({ error: "Missing sessionId" });
+    }
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        if (session.payment_status !== "paid") {
+            return res.status(400).json({ error: "Payment not completed" });
+        }
+
+        const orderId = session.metadata?.orderId;
+        if (!orderId) {
+            return res.status(400).json({ error: "Order reference missing" });
+        }
+
+        if (session.client_reference_id && session.client_reference_id !== String(req.userId)) {
+            return res.status(403).json({ error: "Order does not belong to user" });
+        }
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        if (order.paymentStatus === "Completed") {
+            return res.json({ success: true, orderId: order._id });
+        }
+
+        order.paymentStatus = "Completed";
+        order.orderStatus = "Processing";
+        order.paymentMethod = "Stripe";
+        order.paymentProvider = "Stripe";
+        order.stripeSessionId = session.id;
+        await order.save();
+
+        const user = await User.findById(order.userId);
+        if (user) {
+            if (order.coinsUsed > 0) {
+                user.coins = Math.max(0, (user.coins || 0) - order.coinsUsed);
+            }
+            user.cart = [];
+            await user.save();
+
+            let userHistory = await UserHistory.findOne({ userId: user._id });
+            if (!userHistory) {
+                userHistory = new UserHistory({ userId: user._id, orders: [] });
+            }
+
+            userHistory.orders.push({
+                orderId: order._id,
+                products: order.products,
+                totalAmount: order.totalAmount,
+                purchaseDate: new Date(),
+                status: "Completed",
+            });
+
+            await userHistory.save();
+        }
+
+        return res.json({ success: true, orderId: order._id });
+    } catch (err) {
+        console.error("Stripe confirm error:", err);
+        return res.status(500).json({ error: "Stripe confirmation failed" });
+    }
+});
+
+// Stripe webhook for completing orders
+router.post("/stripe/webhook", async (req, res) => {
+    if (!stripe) {
+        return res.status(500).json({ error: "Stripe is not configured on the server" });
+    }
+    const signature = req.headers["stripe-signature"];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+        return res.status(500).json({ error: "Stripe webhook is not configured" });
+    }
+
+    let event;
+    try {
+        event = stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
+    } catch (err) {
+        return res.status(400).json({ error: "Invalid Stripe signature" });
+    }
+
+    if (event.type !== "checkout.session.completed") {
+        return res.json({ received: true });
+    }
+
+    try {
+        const session = event.data.object;
+        const orderId = session.metadata?.orderId;
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        if (order.paymentStatus === "Completed") {
+            return res.json({ received: true });
+        }
+
+        order.paymentStatus = "Completed";
+        order.orderStatus = "Processing";
+        order.paymentMethod = "Stripe";
+        order.paymentProvider = "Stripe";
+        order.stripeSessionId = session.id;
+        await order.save();
+
+        const user = await User.findById(order.userId);
+        if (user) {
+            if (order.coinsUsed > 0) {
+                user.coins = Math.max(0, (user.coins || 0) - order.coinsUsed);
+            }
+            user.cart = [];
+            await user.save();
+
+            let userHistory = await UserHistory.findOne({ userId: user._id });
+            if (!userHistory) {
+                userHistory = new UserHistory({ userId: user._id, orders: [] });
+            }
+
+            userHistory.orders.push({
+                orderId: order._id,
+                products: order.products,
+                totalAmount: order.totalAmount,
+                purchaseDate: new Date(),
+                status: "Completed",
+            });
+
+            await userHistory.save();
+        }
+
+        return res.json({ received: true });
+    } catch (err) {
+        console.error("Stripe webhook error:", err);
+        return res.status(500).json({ error: "Webhook handler failed" });
     }
 });
 
