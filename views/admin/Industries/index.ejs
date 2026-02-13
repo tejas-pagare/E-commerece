@@ -1,0 +1,399 @@
+<body class="bg-gray-100 text-gray-900">
+  <div class="min-h-screen">
+    <!-- Improved Header -->
+    <header class="sticky top-0 z-40 w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+        <div class="flex items-start gap-3">
+          <div class="h-10 w-10 rounded-md bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl font-semibold tracking-tight">Industries</h1>
+            <p class="text-sm text-gray-500">Manage registered industries and their information</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="refresh-btn" data-idle="Refresh" data-loading="Refreshing..."
+            class="inline-flex items-center justify-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-80" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5a5.002 5.002 0 01-8.66 3.32l-1.42 1.42A7 7 0 0019 13c0-3.87-3.13-7-7-7z"/>
+            </svg>
+            <span class="btn-label">Refresh</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-6">
+      <div class="w-full bg-white border border-gray-200 shadow-sm rounded-lg">
+        <div class="p-6 border-b">
+          <h2 class="text-lg font-medium">Industry List</h2>
+          <p class="text-sm text-gray-500">View and manage all registered industries</p>
+        </div>
+
+        <!-- Flash/Toast Container -->
+        <div class="notification-container fixed top-5 right-5 z-50 space-y-2"></div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full bg-white text-left text-sm">
+            <thead class="bg-gray-50/80">
+              <tr class="border-b">
+                <th class="px-4 py-3 font-medium text-gray-600">Company Name</th>
+                <th class="px-4 py-3 font-medium text-gray-600">Email</th>
+                <th class="px-4 py-3 font-medium text-gray-600">Address</th>
+                <th class="px-4 py-3 font-medium text-gray-600">Cart Items</th>
+                <th class="px-4 py-3 font-medium text-gray-600">Dashboard Items</th>
+                <th class="px-4 py-3 font-medium text-gray-600">Registered Date</th>
+                <th class="px-4 py-3 font-medium text-gray-600">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="industry-table" class="divide-y divide-gray-100">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Dialog (shadcn-like) -->
+  <div id="view-dialog" class="fixed inset-0 z-50 hidden items-center justify-center">
+    <div class="fixed inset-0 bg-black/50" data-close="view"></div>
+    <div class="relative w-full max-w-lg bg-white rounded-lg shadow-lg border border-gray-200">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold">Industry Details</h2>
+          <button class="rounded-md p-2 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2" data-close="view" aria-label="Close">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.3 5.71L12 12.01l-6.3-6.3-1.4 1.41 6.29 6.29-6.3 6.3 1.41 1.41 6.3-6.29 6.29 6.29 1.41-1.41-6.29-6.3 6.3-6.29z"/>
+            </svg>
+          </button>
+        </div>
+        <div id="view-content" class="mt-4 space-y-2"></div>
+      </div>
+      <div class="flex justify-end gap-2 border-t p-4">
+        <button class="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2" data-close="view">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Dialog (shadcn-like) -->
+  <div id="alert-dialog" class="fixed inset-0 z-50 hidden items-center justify-center">
+    <div class="fixed inset-0 bg-black/50" data-close="alert"></div>
+    <div role="alertdialog" aria-modal="true" aria-labelledby="alert-title" aria-describedby="alert-description"
+         class="relative w-full max-w-md bg-white rounded-lg shadow-lg border border-gray-200">
+      <div class="p-6">
+        <h2 id="alert-title" class="text-lg font-semibold">Are you absolutely sure?</h2>
+        <p id="alert-description" class="mt-2 text-sm text-gray-600">This action cannot be undone.</p>
+      </div>
+      <div class="flex justify-end gap-2 border-t p-4">
+        <button id="alert-cancel"
+          class="inline-flex items-center justify-center rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2">
+          Cancel
+        </button>
+        <button id="alert-confirm"
+          class="inline-flex items-center justify-center rounded-md bg-red-600 text-white px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
+          Continue
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    window.__industries = new Map();
+    let __pendingAction = null;
+    let __listLoading = false;
+
+    // Toast-like notification
+    function showNotification(message, type) {
+      let container = document.querySelector('.notification-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.className = 'notification-container fixed top-5 right-5 z-50 space-y-2';
+        document.body.appendChild(container);
+      }
+      const el = document.createElement('div');
+      const isSuccess = type === 'success';
+      el.className =
+        'flex items-start gap-3 rounded-md border px-4 py-3 shadow-lg bg-white text-gray-900 border-gray-200 ' +
+        'transition-all duration-300 transform translate-x-6 opacity-0';
+      el.innerHTML = `
+        <div class="h-2.5 w-2.5 mt-1 rounded-full ${isSuccess ? 'bg-green-500' : 'bg-red-500'}"></div>
+        <div class="text-sm">${message}</div>
+      `;
+      container.appendChild(el);
+      requestAnimationFrame(() => {
+        el.classList.remove('translate-x-6', 'opacity-0');
+      });
+      setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-x-6');
+        setTimeout(() => el.remove(), 200);
+      }, 2200);
+    }
+
+    // Button loading helper
+    function setButtonLoading(button, isLoading, loadingText) {
+      if (!button) return;
+      const labelEl = button.querySelector('.btn-label');
+      const idleText = button.dataset.idle || (labelEl ? labelEl.textContent : button.textContent);
+      const loadingLabel = loadingText || button.dataset.loading || 'Loading...';
+      if (isLoading) {
+        button.disabled = true;
+        button.setAttribute('aria-busy', 'true');
+        const spinner = `<svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>`;
+        if (labelEl) labelEl.textContent = loadingLabel; else button.textContent = loadingLabel;
+        if (!button.querySelector('.animate-spin')) {
+          button.insertAdjacentHTML('afterbegin', spinner);
+        }
+      } else {
+        button.disabled = false;
+        button.removeAttribute('aria-busy');
+        const spin = button.querySelector('.animate-spin');
+        if (spin) spin.remove();
+        if (labelEl) labelEl.textContent = idleText; else button.textContent = idleText;
+      }
+    }
+
+    // Render skeleton rows while loading
+    function renderSkeletonRows(count = 6) {
+      const table = document.getElementById('industry-table');
+      let rows = '';
+      for (let i = 0; i < count; i++) {
+        rows += `
+          <tr class="animate-pulse">
+            <td class="px-4 py-3"><div class="h-4 w-32 rounded bg-gray-200"></div></td>
+            <td class="px-4 py-3"><div class="h-4 w-40 rounded bg-gray-200"></div></td>
+            <td class="px-4 py-3"><div class="h-4 w-48 rounded bg-gray-200"></div></td>
+            <td class="px-4 py-3"><div class="h-4 w-16 rounded bg-gray-200"></div></td>
+            <td class="px-4 py-3"><div class="h-4 w-16 rounded bg-gray-200"></div></td>
+            <td class="px-4 py-3"><div class="h-4 w-24 rounded bg-gray-200"></div></td>
+            <td class="px-4 py-3">
+              <div class="flex items-center gap-2">
+                <div class="h-7 w-14 rounded-md bg-gray-200"></div>
+                <div class="h-7 w-14 rounded-md bg-gray-200"></div>
+              </div>
+            </td>
+          </tr>`;
+      }
+      table.innerHTML = rows;
+    }
+
+    function toggleListLoading(isLoading) {
+      __listLoading = isLoading;
+      const refreshBtn = document.getElementById('refresh-btn');
+      setButtonLoading(refreshBtn, isLoading, refreshBtn?.dataset?.loading || 'Refreshing...');
+      if (isLoading) renderSkeletonRows();
+    }
+
+    // Data fetching and rendering
+    function RenderIndustries() {
+      toggleListLoading(true);
+      const xhttp = new XMLHttpRequest();
+      xhttp.onload = function () {
+        let data = {};
+        try { data = JSON.parse(this.responseText || '{}'); } catch (e) {}
+        const industries = data.data?.items || [];
+        const table = document.getElementById('industry-table');
+        window.__industries = new Map();
+        let row = '';
+        industries.forEach((e) => {
+          window.__industries.set(e._id, e);
+          const cartCount = e.cart?.length || 0;
+          const dashboardCount = e.dashboard?.length || 0;
+          const createdDate = e.createdAt ? new Date(e.createdAt).toLocaleDateString() : '-';
+          row += `
+            <tr class="hover:bg-gray-50/60">
+              <td class="px-4 py-3">
+                <div class="font-medium">${e.companyName || '-'}</div>
+                <div class="text-xs text-gray-500">${e._id || ''}</div>
+              </td>
+              <td class="px-4 py-3">${e.email || '-'}</td>
+              <td class="px-4 py-3">
+                <div class="max-w-xs truncate" title="${e.Address || 'N/A'}">${e.Address || 'N/A'}</div>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${cartCount > 0 ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 text-gray-600 border-gray-200'}">${cartCount}</span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${dashboardCount > 0 ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-50 text-gray-600 border-gray-200'}">${dashboardCount}</span>
+              </td>
+              <td class="px-4 py-3">${createdDate}</td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <button data-action="view" data-id="${e._id}"
+                    class="inline-flex items-center justify-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2">
+                    <span class="btn-label">View</span>
+                  </button>
+                  <button data-action="delete" data-id="${e._id}"
+                    class="inline-flex items-center justify-center gap-2 rounded-md bg-red-600 text-white px-3 py-1.5 text-xs font-medium shadow-sm transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
+                    <span class="btn-label">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>`;
+        });
+        table.innerHTML = row;
+        toggleListLoading(false);
+      };
+      xhttp.onerror = function () {
+        toggleListLoading(false);
+        showNotification('Failed to load industries', 'error');
+      };
+      xhttp.open('GET', '/api/v1/admin/industries', true);
+      xhttp.send();
+    }
+
+    // Delete industry by id
+    function deleteIndustry(id) {
+      return new Promise((resolve) => {
+        const xhttp = new XMLHttpRequest();
+        xhttp.onload = function () {
+          let data = {};
+          try { data = JSON.parse(this.responseText || "{}"); } catch (e) {}
+          resolve({ ok: !!data.success, data });
+        };
+        xhttp.onerror = function () {
+          resolve({ ok: false, data: { message: "Network error" } });
+        };
+        xhttp.open("DELETE", `/api/v1/admin/industries/${id}`, true);
+        xhttp.send();
+      });
+    }
+
+    // View dialog
+    function openViewDialog(industry) {
+      const wrap = document.getElementById('view-dialog');
+      const content = document.getElementById('view-content');
+      const cartItems = industry.cart?.map((item, idx) => `
+        <div class="text-xs bg-gray-50 p-2 rounded border border-gray-200">
+          <div><strong>Item ${idx + 1}:</strong> ${item.fabric || 'N/A'} - ${item.size || 'N/A'}</div>
+          <div>Qty: ${item.quantity || 0}, Amount: ₹${item.amount || 0}</div>
+        </div>
+      `).join('') || '<div class="text-xs text-gray-500">No cart items</div>';
+      
+      const dashboardItems = industry.dashboard?.map((item, idx) => `
+        <div class="text-xs bg-gray-50 p-2 rounded border border-gray-200">
+          <div><strong>Item ${idx + 1}:</strong> ${item.fabric || 'N/A'} - ${item.size || 'N/A'}</div>
+          <div>Qty: ${item.quantity || 0}, Amount: ₹${item.amount || 0}</div>
+        </div>
+      `).join('') || '<div class="text-xs text-gray-500">No dashboard items</div>';
+
+      content.innerHTML = `
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+            <div><span class="text-gray-500">Company:</span> <span class="font-medium">${industry.companyName || '-'}</span></div>
+            <div><span class="text-gray-500">Email:</span> <span class="font-medium">${industry.email || '-'}</span></div>
+            <div class="col-span-2"><span class="text-gray-500">Address:</span> <span class="font-medium">${industry.Address || 'N/A'}</span></div>
+            <div><span class="text-gray-500">Registered:</span> <span class="font-medium">${industry.createdAt ? new Date(industry.createdAt).toLocaleDateString() : '-'}</span></div>
+          </div>
+          <div>
+            <div class="text-sm font-medium mb-2">Cart Items (${industry.cart?.length || 0})</div>
+            <div class="space-y-1 max-h-40 overflow-y-auto">${cartItems}</div>
+          </div>
+          <div>
+            <div class="text-sm font-medium mb-2">Dashboard Items (${industry.dashboard?.length || 0})</div>
+            <div class="space-y-1 max-h-40 overflow-y-auto">${dashboardItems}</div>
+          </div>
+        </div>
+      `;
+      wrap.classList.remove('hidden');
+      wrap.classList.add('flex');
+    }
+
+    function closeViewDialog() {
+      const wrap = document.getElementById('view-dialog');
+      wrap.classList.add('hidden');
+      wrap.classList.remove('flex');
+    }
+
+    // Alert dialog
+    function openAlertDialog(type, industry) {
+      __pendingAction = { type, id: industry._id };
+      const wrap = document.getElementById('alert-dialog');
+      const title = document.getElementById('alert-title');
+      const desc = document.getElementById('alert-description');
+      const confirm = document.getElementById('alert-confirm');
+
+      title.textContent = 'Delete industry?';
+      desc.textContent = `This action cannot be undone. This will permanently delete ${industry.companyName || 'this industry'} and remove their data.`;
+      confirm.innerHTML = `<span class="btn-label">Delete</span>`;
+      confirm.dataset.idle = 'Delete';
+      confirm.dataset.loading = 'Deleting...';
+
+      wrap.classList.remove('hidden');
+      wrap.classList.add('flex');
+    }
+
+    function closeAlertDialog() {
+      const wrap = document.getElementById('alert-dialog');
+      wrap.classList.add('hidden');
+      wrap.classList.remove('flex');
+      __pendingAction = null;
+    }
+
+    // Global event delegation
+    document.addEventListener('click', (ev) => {
+      const btn = ev.target.closest('[data-action]');
+      if (btn) {
+        const id = btn.dataset.id;
+        const industry = window.__industries.get(id);
+        if (!industry) return;
+        const action = btn.dataset.action;
+        if (action === 'view') {
+          openViewDialog(industry);
+        } else if (action === 'delete') {
+          openAlertDialog('delete', industry);
+        }
+      }
+
+      const closeView = ev.target.closest("[data-close='view']");
+      if (closeView) closeViewDialog();
+
+      const closeAlert = ev.target.closest("[data-close='alert']");
+      if (closeAlert) closeAlertDialog();
+    });
+
+    // Alert dialog controls
+    document.getElementById('alert-cancel').addEventListener('click', closeAlertDialog);
+    document.getElementById('alert-confirm').addEventListener('click', async () => {
+      if (!__pendingAction) return;
+      const { type, id } = __pendingAction;
+      const confirmBtn = document.getElementById('alert-confirm');
+      const cancelBtn = document.getElementById('alert-cancel');
+      setButtonLoading(confirmBtn, true);
+      cancelBtn.disabled = true;
+
+      const result = await deleteIndustry(id);
+
+      setButtonLoading(confirmBtn, false);
+      cancelBtn.disabled = false;
+      closeAlertDialog();
+
+      const ok = result && result.ok;
+      const message = (result && result.data && result.data.message) || (ok ? 'Success' : 'Failed');
+      showNotification(message, ok ? 'success' : 'error');
+      if (ok) RenderIndustries();
+    });
+
+    // Keyboard support for dialogs
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeViewDialog();
+        closeAlertDialog();
+      }
+    });
+
+    // Refresh button
+    document.getElementById('refresh-btn').addEventListener('click', () => RenderIndustries());
+
+    document.addEventListener('DOMContentLoaded', () => RenderIndustries());
+  </script>
+</body>
