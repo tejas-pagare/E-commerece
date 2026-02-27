@@ -496,7 +496,7 @@ router.get('/orders/requests', isAuthenticated, async (req, res) => {
     const sellerId = new mongoose.Types.ObjectId(req.userId);
 
     const pipeline = [
-      { $match: { orderStatus: { $in: ['Pending', 'Processing'] } } },
+      { $match: { orderStatus: { $in: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Returned'] } } },
       { $unwind: '$products' },
       {
         $lookup: {
