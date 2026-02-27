@@ -42,7 +42,7 @@ const corsOptions = {
   origin:[ "http://localhost:8000","http://localhost:5174","http://localhost:5173"],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "cache-control", "X-Requested-With"],
 };
 
 app.use(cors(corsOptions));
