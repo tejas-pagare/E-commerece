@@ -10,8 +10,10 @@ import userController from "./routes/user.js"
 import productRouter from "./routes/product.js"
 import sellerRouter from "./routes/seller.js"
 import adminRouter from "./routes/admin.js"
+import adminRiderRouter from "./routes/admin_rider.js"
 import industryRouter from "./routes/industry.js"
 import managerRouter from "./routes/manager.js"
+import riderRouter from "./routes/rider.js"
 import dbConnection from "./config/db.js"
 import { fileURLToPath } from 'url';
 import dotenv from "dotenv";
@@ -41,9 +43,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, "..", ".env") });
 const corsOptions = {
-  origin:[ "http://localhost:8000","http://localhost:5174","http://localhost:5173"],
+  origin: ["http://localhost:8000", "http://localhost:5174", "http://localhost:5173"],
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
@@ -65,7 +67,7 @@ app.use(session({
   secret: "secret-swiftmart",
   resave: false,
   saveUninitialized: false,
-  cookie: { 
+  cookie: {
     maxAge: 600000,
     httpOnly: true,
     secure: false, // set to true if using HTTPS
@@ -159,10 +161,12 @@ app.get("/api/v1/csrf-token", (req, res) => {
 
 app.use("/api/v1/user", userController);
 app.use("/api/v1/product", productRouter);
-app.use("/api/v1/seller",sellerRouter);
+app.use("/api/v1/seller", sellerRouter);
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/admin/rider", adminRiderRouter);
 app.use("/api/v1/industry", industryRouter);
 app.use("/api/v1/manager", managerRouter);
+app.use("/api/v1/rider", riderRouter);
 
 
 app.get("/", (req, res) => {
@@ -170,7 +174,7 @@ app.get("/", (req, res) => {
 })
 
 app.get("*", (req, res) => {
-  
+
   res.status(404).json({
     message: "Access denied (Route not found)"
   })
