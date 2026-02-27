@@ -44,8 +44,17 @@ import Order from "../models/orders.js";
 import UserHistory from "../models/userHistory.js";
 import path from 'path';
 import { classifyImage } from '../utils/classifier.js';
+import Stripe from "stripe";
+import dotenv from "dotenv";
+import { fileURLToPath } from 'url';
+import passport from "passport";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, "..", "..", ".env") });
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 
 // --- REMOVED ---
 // The Chatbase snippet middleware that injected HTML has been removed.
@@ -61,6 +70,38 @@ router.get("/products", getAllProductsController);
 router.post("/login", loginController);
 router.post("/signup", signupController);
 router.get("/logout", logoutController);
+
+// Google OAuth
+router.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"], session: false })
+);
+
+router.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { session: false, failureRedirect: "/login" }),
+    async (req, res) => {
+        const user = req.user;
+        if (!user) {
+            return res.redirect("/login");
+        }
+
+        const token = jwt.sign(
+            { userId: user._id, role: "user" },
+            process.env.JWT_SECRET || "JWT_SECRET",
+            { expiresIn: "5h" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+            maxAge: 3600000,
+        });
+
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+        return res.redirect(`${frontendUrl}/`);
+    }
+);
 
 // --- ACCOUNT ---
 
@@ -100,6 +141,153 @@ router.get("/checkout-details", isAuthenticated, getCheckoutDetailsController);
 
 // Process the payment
 router.post("/payment", isAuthenticated, processPaymentController);
+
+// Confirm Stripe payment without webhooks (dev flow)
+router.post("/stripe/confirm", isAuthenticated, async (req, res) => {
+    if (!stripe) {
+        return res.status(500).json({ error: "Stripe is not configured on the server" });
+    }
+
+    const { sessionId } = req.body;
+    if (!sessionId) {
+        return res.status(400).json({ error: "Missing sessionId" });
+    }
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        if (session.payment_status !== "paid") {
+            return res.status(400).json({ error: "Payment not completed" });
+        }
+
+        const orderId = session.metadata?.orderId;
+        if (!orderId) {
+            return res.status(400).json({ error: "Order reference missing" });
+        }
+
+        if (session.client_reference_id && session.client_reference_id !== String(req.userId)) {
+            return res.status(403).json({ error: "Order does not belong to user" });
+        }
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        if (order.paymentStatus === "Completed") {
+            return res.json({ success: true, orderId: order._id });
+        }
+
+        order.paymentStatus = "Completed";
+        order.orderStatus = "Processing";
+        order.paymentMethod = "Stripe";
+        order.paymentProvider = "Stripe";
+        order.stripeSessionId = session.id;
+        await order.save();
+
+        const user = await User.findById(order.userId);
+        if (user) {
+            if (order.coinsUsed > 0) {
+                user.coins = Math.max(0, (user.coins || 0) - order.coinsUsed);
+            }
+            user.cart = [];
+            await user.save();
+
+            let userHistory = await UserHistory.findOne({ userId: user._id });
+            if (!userHistory) {
+                userHistory = new UserHistory({ userId: user._id, orders: [] });
+            }
+
+            userHistory.orders.push({
+                orderId: order._id,
+                products: order.products,
+                totalAmount: order.totalAmount,
+                purchaseDate: new Date(),
+                status: "Completed",
+            });
+
+            await userHistory.save();
+        }
+
+        return res.json({ success: true, orderId: order._id });
+    } catch (err) {
+        console.error("Stripe confirm error:", err);
+        return res.status(500).json({ error: "Stripe confirmation failed" });
+    }
+});
+
+// Stripe webhook for completing orders
+router.post("/stripe/webhook", async (req, res) => {
+    if (!stripe) {
+        return res.status(500).json({ error: "Stripe is not configured on the server" });
+    }
+    const signature = req.headers["stripe-signature"];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+        return res.status(500).json({ error: "Stripe webhook is not configured" });
+    }
+
+    let event;
+    try {
+        event = stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
+    } catch (err) {
+        return res.status(400).json({ error: "Invalid Stripe signature" });
+    }
+
+    if (event.type !== "checkout.session.completed") {
+        return res.json({ received: true });
+    }
+
+    try {
+        const session = event.data.object;
+        const orderId = session.metadata?.orderId;
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        if (order.paymentStatus === "Completed") {
+            return res.json({ received: true });
+        }
+
+        order.paymentStatus = "Completed";
+        order.orderStatus = "Processing";
+        order.paymentMethod = "Stripe";
+        order.paymentProvider = "Stripe";
+        order.stripeSessionId = session.id;
+        await order.save();
+
+        const user = await User.findById(order.userId);
+        if (user) {
+            if (order.coinsUsed > 0) {
+                user.coins = Math.max(0, (user.coins || 0) - order.coinsUsed);
+            }
+            user.cart = [];
+            await user.save();
+
+            let userHistory = await UserHistory.findOne({ userId: user._id });
+            if (!userHistory) {
+                userHistory = new UserHistory({ userId: user._id, orders: [] });
+            }
+
+            userHistory.orders.push({
+                orderId: order._id,
+                products: order.products,
+                totalAmount: order.totalAmount,
+                purchaseDate: new Date(),
+                status: "Completed",
+            });
+
+            await userHistory.save();
+        }
+
+        return res.json({ received: true });
+    } catch (err) {
+        console.error("Stripe webhook error:", err);
+        return res.status(500).json({ error: "Webhook handler failed" });
+    }
+});
 
 
 // --- DASHBOARD DATA ---

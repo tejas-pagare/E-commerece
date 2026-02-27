@@ -3,12 +3,11 @@ import jwt from "jsonwebtoken"
 import User from "../models/user.js";
 import Seller from "../models/seller.js";
 const isAuthenticated = async (req, res, next) => {
+  const isApiRequest = req.originalUrl?.startsWith("/api/");
   try {
     
     const token = req.cookies.token;
     
-    const isApiRequest = req.originalUrl?.startsWith("/api/");
-
     if (!token) {
       // Clear any stale cookies
       res.clearCookie("token", {
