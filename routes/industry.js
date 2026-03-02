@@ -39,7 +39,11 @@ router.get('/home', industryAuth, async (req, res) => {
                 $limit: 54
             }
         ]);
-        res.json(combinations);
+        const markedUpCombinations = combinations.map(c => ({
+            ...c,
+            estimated_value: Math.ceil(c.estimated_value * 1.1)
+        }));
+        res.json(markedUpCombinations);
     } catch (error) {
         console.error("Error fetching combinations with details:", error);
         res.status(500).json({ message: "Internal Server Error", error });
@@ -69,7 +73,11 @@ router.get('/fetchhome', industryAuth, async (req, res) => {
                 $limit: 54
             }
         ]);
-        res.json(combinations);
+        const markedUpCombinations = combinations.map(c => ({
+            ...c,
+            estimated_value: Math.ceil(c.estimated_value * 1.1)
+        }));
+        res.json(markedUpCombinations);
     } catch (error) {
         console.error("Error fetching combinations with details:", error);
         res.status(500).json({ message: "Internal Server Error", error });
@@ -235,15 +243,15 @@ router.post('/cart', industryAuth, async (req, res) => {
     try {
         // 1. Destructure using the EXACT keys sent by the frontend
         // Note: Removed 'new_quantity' and '_id', added 'id' and 'combination_id'
-        const { 
-            id, 
-            combination_id, 
-            quantity, 
-            fabric, 
-            size, 
-            usageDuration, 
-            estimated_value, 
-            amount 
+        const {
+            id,
+            combination_id,
+            quantity,
+            fabric,
+            size,
+            usageDuration,
+            estimated_value,
+            amount
         } = req.body;
 
         // 2. Create the cart item
@@ -252,11 +260,11 @@ router.post('/cart', industryAuth, async (req, res) => {
             size: size,
             usageDuration: usageDuration,
             // Use 'quantity' from frontend. || 1 ensures it defaults to 1 if missing.
-            quantity: Number(quantity) || 1, 
+            quantity: Number(quantity) || 1,
             // Calculate amount using the correct quantity variable
-            amount: Number(estimated_value) * (Number(quantity) || 1), 
+            amount: Number(estimated_value) * (Number(quantity) || 1),
             // Map the combination_id correctly
-            combination_id: combination_id || id, 
+            combination_id: combination_id || id,
             id: uuidv4(),
         };
 

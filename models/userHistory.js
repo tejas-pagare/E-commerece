@@ -28,6 +28,9 @@ const userHistorySchema = new mongoose.Schema({
             type: Number,
             required: true,
           },
+          sellerPrice: {
+            type: Number
+          },
         },
       ],
       totalAmount: {
