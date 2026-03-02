@@ -12,6 +12,7 @@ import cloudinary, { upload as multerUpload } from "../config/cloudinary.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import verifyAdmin from "../middleware/adminAuth.js";
+import adminOrManagerAuth from "../middleware/adminOrManagerAuth.js";
 
 const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key_change_me";
@@ -30,6 +31,11 @@ const paginate = (items, page = 1, limit = 50) => {
   const total = items ? items.length : 0;
   return { items: items || [], total, page, limit };
 };
+
+const isManager = (req) => req.actor?.role === "manager";
+const getAssignedUserIds = (req) => req.manager?.assignedUserIds || [];
+const getAssignedSellerIds = (req) => req.manager?.assignedSellerIds || [];
+const isAssigned = (ids, id) => ids.some((x) => String(x) === String(id));
 
 // --- VIEW ROUTES (Serve EJS Pages) ---
 
@@ -122,7 +128,7 @@ const dashboardCache = {
   expiresAt: 0,
 };
 
-router.get("/dashboard", verifyAdmin, async (req, res) => {
+router.get("/dashboard", adminOrManagerAuth, async (req, res) => {
   try {
     // Query params
     const daysParam = parseInt(req.query.days, 10);
@@ -136,13 +142,21 @@ router.get("/dashboard", verifyAdmin, async (req, res) => {
       return sendSuccess(res, "Dashboard analytics (cached)", dashboardCache.data);
     }
 
+    const assignedUserIds = isManager(req) ? getAssignedUserIds(req) : null;
+    const assignedSellerIds = isManager(req) ? getAssignedSellerIds(req) : null;
+
+    const userFilter = isManager(req) ? { _id: { $in: assignedUserIds } } : {};
+    const sellerFilter = isManager(req) ? { _id: { $in: assignedSellerIds } } : {};
+    const productFilter = isManager(req) ? { sellerId: { $in: assignedSellerIds } } : {};
+    const orderFilter = isManager(req) ? { userId: { $in: assignedUserIds } } : {};
+
     // Summary counts (Use real DB data)
     const [userCount, productCount, sellerCount, managerCount, orderCount] = await Promise.all([
-      User.countDocuments({}),
-      Product.countDocuments({}),
-      Seller.countDocuments({}),
-      Manager.countDocuments({}),
-      Order.countDocuments({}),
+      User.countDocuments(userFilter),
+      Product.countDocuments(productFilter),
+      Seller.countDocuments(sellerFilter),
+      isManager(req) ? 0 : Manager.countDocuments({}),
+      Order.countDocuments(orderFilter),
     ]);
 
     // Revenue and orders totals
@@ -150,6 +164,7 @@ router.get("/dashboard", verifyAdmin, async (req, res) => {
     let totalOrders = 0;
     try {
       const revenueAgg = await Order.aggregate([
+        { $match: orderFilter },
         { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" }, totalOrders: { $sum: 1 } } },
       ]);
       totalRevenue = revenueAgg[0]?.totalRevenue || 0;
@@ -208,7 +223,7 @@ router.get("/dashboard", verifyAdmin, async (req, res) => {
     // Execute aggregations safely
     try {
       const usersDaily = await User.aggregate([
-        { $match: { createdAt: { $gte: start, $lte: end } } },
+        { $match: { ...userFilter, createdAt: { $gte: start, $lte: end } } },
         { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
         { $sort: { _id: 1 } },
       ]);
@@ -217,7 +232,7 @@ router.get("/dashboard", verifyAdmin, async (req, res) => {
 
     try {
       const productsDaily = await Product.aggregate([
-        { $match: { createdAt: { $gte: start, $lte: end } } },
+        { $match: { ...productFilter, createdAt: { $gte: start, $lte: end } } },
         { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
         { $sort: { _id: 1 } },
       ]);
@@ -226,7 +241,7 @@ router.get("/dashboard", verifyAdmin, async (req, res) => {
 
     try {
       const ordersDaily = await Order.aggregate([
-        { $match: { createdAt: { $gte: start, $lte: end } } },
+        { $match: { ...orderFilter, createdAt: { $gte: start, $lte: end } } },
         { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 }, revenue: { $sum: "$totalAmount" } } },
         { $sort: { _id: 1 } },
       ]);
@@ -269,20 +284,24 @@ router.get("/dashboard", verifyAdmin, async (req, res) => {
 
 // --- CUSTOMER ROUTES ---
 
-router.get("/customers", verifyAdmin, async (req, res) => {
+router.get("/customers", adminOrManagerAuth, async (req, res) => {
   try {
-    const customers = await User.find({});
+    const filter = isManager(req) ? { _id: { $in: getAssignedUserIds(req) } } : {};
+    const customers = await User.find(filter);
     return sendSuccess(res, "Customers fetched", paginate(customers));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch customers", error);
   }
 });
 
-router.get("/customers/:id", verifyAdmin, async (req, res) => {
+router.get("/customers/:id", adminOrManagerAuth, async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id) || id === 'details') {
       return sendError(res, 400, "Invalid user id");
+    }
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
     }
     const user = await User.findById(id);
     if (!user) return sendError(res, 404, "User not found");
@@ -292,11 +311,14 @@ router.get("/customers/:id", verifyAdmin, async (req, res) => {
   }
 });
 
-router.delete("/customers/:id", verifyAdmin, async (req, res) => {
+router.delete("/customers/:id", adminOrManagerAuth, async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
       return sendError(res, 400, "Invalid user id");
+    }
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
     }
     const user = await User.findById(id);
     if (!user) {
@@ -314,25 +336,30 @@ router.delete("/customers/:id", verifyAdmin, async (req, res) => {
 
 // --- PRODUCT ROUTES ---
 
-router.get("/products", verifyAdmin, async (req, res) => {
+router.get("/products", adminOrManagerAuth, async (req, res) => {
   try {
-    const products = await Product.find({}).populate("sellerId");
+    const filter = isManager(req) ? { sellerId: { $in: getAssignedSellerIds(req) } } : {};
+    const products = await Product.find(filter).populate("sellerId");
     return sendSuccess(res, "Products fetched", paginate(products));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch products", error);
   }
 });
 
-router.delete("/products/:id", verifyAdmin, async (req, res) => {
+router.delete("/products/:id", adminOrManagerAuth, async (req, res) => {
   try {
     const id = req.params.id;
     if (!isValidObjectId(id)) {
       return sendError(res, 400, "Invalid product id");
     }
-    const product = await Product.findByIdAndDelete(id);
+    const product = await Product.findById(id);
     if (!product) {
       return sendError(res, 404, "Product not found", null, { code: "PRODUCT_NOT_FOUND" });
     }
+    if (isManager(req) && !isAssigned(getAssignedSellerIds(req), product.sellerId)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
+    await product.deleteOne();
     // Best-effort detach from seller's products if such relation exists
     await Seller.updateMany({}, { $pull: { products: id } });
     return sendSuccess(res, "Product deleted successfully", {});
@@ -343,7 +370,7 @@ router.delete("/products/:id", verifyAdmin, async (req, res) => {
 });
 
 // Approve/Disapprove - Canonical Route
-router.put("/products/:id/approval", verifyAdmin, async (req, res) => {
+router.put("/products/:id/approval", adminOrManagerAuth, async (req, res) => {
   try {
     const id = req.params.id;
     const { approved } = req.body;
@@ -355,6 +382,9 @@ router.put("/products/:id/approval", verifyAdmin, async (req, res) => {
     if (!product) {
       return sendError(res, 404, "Product not found", null, { code: "PRODUCT_NOT_FOUND" });
     }
+    if (isManager(req) && !isAssigned(getAssignedSellerIds(req), product.sellerId)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
     product.verified = !!approved;
     await product.save();
     return sendSuccess(res, `Product ${approved ? 'approved' : 'disapproved'} successfully`, {});
@@ -364,19 +394,25 @@ router.put("/products/:id/approval", verifyAdmin, async (req, res) => {
 });
 
 // Legacy backward compatibility for approvals (GET)
-router.get("/product/approve/:id", verifyAdmin, async (req, res) => {
+router.get("/product/approve/:id", adminOrManagerAuth, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return sendError(res, 404, "Not Found");
+    if (isManager(req) && !isAssigned(getAssignedSellerIds(req), product.sellerId)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
     product.verified = true;
     await product.save();
     return sendSuccess(res, "Product approved", {});
   } catch (e) { return sendError(res, 500, "Error", e); }
 });
-router.get("/product/disapprove/:id", verifyAdmin, async (req, res) => {
+router.get("/product/disapprove/:id", adminOrManagerAuth, async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return sendError(res, 404, "Not Found");
+    if (isManager(req) && !isAssigned(getAssignedSellerIds(req), product.sellerId)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
     product.verified = false;
     await product.save();
     return sendSuccess(res, "Product disapproved", {});
@@ -386,20 +422,24 @@ router.get("/product/disapprove/:id", verifyAdmin, async (req, res) => {
 
 // --- SELLER ROUTES ---
 
-router.get("/sellers", verifyAdmin, async (req, res) => {
+router.get("/sellers", adminOrManagerAuth, async (req, res) => {
   try {
-    const sellers = await Seller.find({});
+    const filter = isManager(req) ? { _id: { $in: getAssignedSellerIds(req) } } : {};
+    const sellers = await Seller.find(filter);
     return sendSuccess(res, "Sellers fetched", paginate(sellers));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch sellers", error);
   }
 });
 
-router.delete("/sellers/:id", verifyAdmin, async (req, res) => {
+router.delete("/sellers/:id", adminOrManagerAuth, async (req, res) => {
   try {
     const { id } = req.params;
     if (!isValidObjectId(id)) {
       return sendError(res, 400, "Invalid seller id");
+    }
+    if (isManager(req) && !isAssigned(getAssignedSellerIds(req), id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
     }
     const seller = await Seller.findById(id);
     if (!seller) {
@@ -415,9 +455,12 @@ router.delete("/sellers/:id", verifyAdmin, async (req, res) => {
   }
 });
 
-router.put("/sellers/:id/approve", verifyAdmin, async (req, res) => {
+router.put("/sellers/:id/approve", adminOrManagerAuth, async (req, res) => {
   try {
     const id = req.params.id;
+    if (isManager(req) && !isAssigned(getAssignedSellerIds(req), id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
     const seller = await Seller.findById(id);
     if (!seller) return sendError(res, 404, "Seller not found");
     seller.identityVerification.status = "Verified";
@@ -427,9 +470,12 @@ router.put("/sellers/:id/approve", verifyAdmin, async (req, res) => {
 });
 
 // Legacy
-router.get("/seller/approve/:id", verifyAdmin, async (req, res) => {
+router.get("/seller/approve/:id", adminOrManagerAuth, async (req, res) => {
   try {
     const id = req.params.id;
+    if (isManager(req) && !isAssigned(getAssignedSellerIds(req), id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
     const seller = await Seller.findById(id);
     if (!seller) return sendError(res, 404, "Seller not found");
     seller.identityVerification.status = "Verified";
@@ -488,10 +534,120 @@ router.delete("/industries/:id", verifyAdmin, async (req, res) => {
 
 router.get("/managers", verifyAdmin, async (req, res) => {
   try {
-    const managers = await Manager.find().select("email createdAt");
-    return sendSuccess(res, "Managers fetched", paginate(managers));
+    const managers = await Manager.find().select(
+      "email createdAt assignedUserIds assignedSellerIds pendingUserQuota pendingSellerQuota"
+    );
+
+    const withCounts = managers.map((m) => ({
+      _id: m._id,
+      email: m.email,
+      createdAt: m.createdAt,
+      assignedUserCount: m.assignedUserIds?.length || 0,
+      assignedSellerCount: m.assignedSellerIds?.length || 0,
+      pendingUserQuota: m.pendingUserQuota || 0,
+      pendingSellerQuota: m.pendingSellerQuota || 0,
+    }));
+
+    return sendSuccess(res, "Managers fetched", paginate(withCounts));
   } catch (error) {
     return sendError(res, 500, "Failed to fetch managers", error);
+  }
+});
+
+const buildAssignedIdSet = (managers, field) => {
+  const ids = new Set();
+  for (const m of managers) {
+    const list = m[field] || [];
+    for (const id of list) ids.add(String(id));
+  }
+  return ids;
+};
+
+const distributeIdsRoundRobin = (ids, managers) => {
+  const buckets = new Map();
+  managers.forEach((m) => buckets.set(String(m._id), []));
+  let i = 0;
+  for (const id of ids) {
+    const manager = managers[i % managers.length];
+    buckets.get(String(manager._id)).push(id);
+    i += 1;
+  }
+  return buckets;
+};
+
+router.post('/managers/backfill-assignments', verifyAdmin, async (req, res) => {
+  try {
+    const { users = true, sellers = true } = req.body || {};
+    const managers = await Manager.find().sort({ createdAt: 1 });
+    if (!managers.length) return sendError(res, 400, 'No managers available');
+
+    let usersAssigned = 0;
+    let sellersAssigned = 0;
+
+    if (users) {
+      const assignedUserIds = buildAssignedIdSet(managers, 'assignedUserIds');
+      const unassignedUsers = await User.find({ _id: { $nin: Array.from(assignedUserIds) } }).select('_id');
+      const userIds = unassignedUsers.map((u) => u._id);
+      const userBuckets = distributeIdsRoundRobin(userIds, managers);
+
+      await Promise.all(
+        Array.from(userBuckets.entries()).map(([managerId, ids]) => {
+          if (!ids.length) return null;
+          usersAssigned += ids.length;
+          return Manager.updateOne(
+            { _id: managerId },
+            { $addToSet: { assignedUserIds: { $each: ids } } }
+          );
+        })
+      );
+
+      await Promise.all(
+        Array.from(userBuckets.entries()).map(([managerId, ids]) => {
+          if (!ids.length) return null;
+          return User.updateMany(
+            { _id: { $in: ids } },
+            { $set: { managerId } }
+          );
+        })
+      );
+    }
+
+    if (sellers) {
+      const assignedSellerIds = buildAssignedIdSet(managers, 'assignedSellerIds');
+      const unassignedSellers = await Seller.find({ _id: { $nin: Array.from(assignedSellerIds) } }).select('_id');
+      const sellerIds = unassignedSellers.map((s) => s._id);
+      const sellerBuckets = distributeIdsRoundRobin(sellerIds, managers);
+
+      await Promise.all(
+        Array.from(sellerBuckets.entries()).map(([managerId, ids]) => {
+          if (!ids.length) return null;
+          sellersAssigned += ids.length;
+          return Manager.updateOne(
+            { _id: managerId },
+            { $addToSet: { assignedSellerIds: { $each: ids } } }
+          );
+        })
+      );
+
+      await Promise.all(
+        Array.from(sellerBuckets.entries()).map(([managerId, ids]) => {
+          if (!ids.length) return null;
+          return Seller.updateMany(
+            { _id: { $in: ids } },
+            { $set: { managerId } }
+          );
+        })
+      );
+    }
+
+    return sendSuccess(res, 'Backfill complete', {
+      managers: managers.length,
+      usersAssigned,
+      sellersAssigned,
+    });
+  } catch (error) {
+    console.error('Backfill assignments error:', error);
+    return sendError(res, 500, 'Failed to backfill assignments', error);
   }
 });
 
@@ -515,6 +671,27 @@ router.post('/managers', verifyAdmin, async (req, res) => {
     return sendError(res, 500, 'Error creating manager', error);
   }
 });
+router.put('/managers/:id/password', verifyAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body || {};
+    if (!isValidObjectId(id)) return sendError(res, 400, 'Invalid manager id');
+    if (!password || String(password).length < 6) {
+      return sendError(res, 400, 'Password must be at least 6 characters.');
+    }
+
+    const manager = await Manager.findById(id);
+    if (!manager) return sendError(res, 404, 'Manager not found');
+
+    manager.password = password;
+    await manager.save();
+
+    return sendSuccess(res, 'Manager password updated', {});
+  } catch (error) {
+    console.error('Update manager password error:', error);
+    return sendError(res, 500, 'Failed to update manager password', error);
+  }
+});
 // Legacy
 router.post('/create/manager', verifyAdmin, async (req, res) => {
   try {
@@ -533,8 +710,86 @@ router.delete('/managers/:id', verifyAdmin, async (req, res) => {
     const managerId = req.params.id;
     const manager = await Manager.findById(managerId);
     if (!manager) return sendError(res, 404, 'Manager not found');
+    const assignedUserIds = (manager.assignedUserIds || []).map((id) => String(id));
+    const assignedSellerIds = (manager.assignedSellerIds || []).map((id) => String(id));
+
     await manager.deleteOne();
-    return sendSuccess(res, 'Manager deleted successfully', {});
+
+    const remainingManagers = await Manager.find().sort({ createdAt: 1 });
+    if (!remainingManagers.length) {
+      if (assignedUserIds.length) {
+        await User.updateMany(
+          { _id: { $in: assignedUserIds } },
+          { $set: { managerId: null } }
+        );
+      }
+      if (assignedSellerIds.length) {
+        await Seller.updateMany(
+          { _id: { $in: assignedSellerIds } },
+          { $set: { managerId: null } }
+        );
+      }
+      return sendSuccess(res, 'Manager deleted. No remaining managers to reassign.', {
+        usersReassigned: 0,
+        sellersReassigned: 0
+      });
+    }
+
+    let usersReassigned = 0;
+    let sellersReassigned = 0;
+
+    if (assignedUserIds.length) {
+      const userBuckets = distributeIdsRoundRobin(assignedUserIds, remainingManagers);
+      await Promise.all(
+        Array.from(userBuckets.entries()).map(([toManagerId, ids]) => {
+          if (!ids.length) return null;
+          usersReassigned += ids.length;
+          return Manager.updateOne(
+            { _id: toManagerId },
+            { $addToSet: { assignedUserIds: { $each: ids } } }
+          );
+        })
+      );
+
+      await Promise.all(
+        Array.from(userBuckets.entries()).map(([toManagerId, ids]) => {
+          if (!ids.length) return null;
+          return User.updateMany(
+            { _id: { $in: ids } },
+            { $set: { managerId: toManagerId } }
+          );
+        })
+      );
+    }
+
+    if (assignedSellerIds.length) {
+      const sellerBuckets = distributeIdsRoundRobin(assignedSellerIds, remainingManagers);
+      await Promise.all(
+        Array.from(sellerBuckets.entries()).map(([toManagerId, ids]) => {
+          if (!ids.length) return null;
+          sellersReassigned += ids.length;
+          return Manager.updateOne(
+            { _id: toManagerId },
+            { $addToSet: { assignedSellerIds: { $each: ids } } }
+          );
+        })
+      );
+
+      await Promise.all(
+        Array.from(sellerBuckets.entries()).map(([toManagerId, ids]) => {
+          if (!ids.length) return null;
+          return Seller.updateMany(
+            { _id: { $in: ids } },
+            { $set: { managerId: toManagerId } }
+          );
+        })
+      );
+    }
+
+    return sendSuccess(res, 'Manager deleted and assignments redistributed', {
+      usersReassigned,
+      sellersReassigned
+    });
   } catch (error) {
     return sendError(res, 500, 'Failed to delete manager', error);
   }
@@ -546,7 +801,8 @@ router.delete('/managers/:id', verifyAdmin, async (req, res) => {
 // Helper function for grouping orders (reused)
 async function getOrdersGrouped(req, res) {
   try {
-    const orders = await Order.find({})
+    const filter = isManager(req) ? { userId: { $in: getAssignedUserIds(req) } } : {};
+    const orders = await Order.find(filter)
       .populate({ path: 'userId', select: 'firstname lastname email' })
       .populate({ path: 'products.productId', select: 'title image price' });
 
@@ -581,13 +837,16 @@ async function getOrdersGrouped(req, res) {
   }
 }
 
-router.get("/orders", verifyAdmin, getOrdersGrouped);
-router.post("/orders", verifyAdmin, getOrdersGrouped); // Keep for compatibility
+router.get("/orders", adminOrManagerAuth, getOrdersGrouped);
+router.post("/orders", adminOrManagerAuth, getOrdersGrouped); // Keep for compatibility
 
-router.get("/orders/:userId", verifyAdmin, async (req, res) => {
+router.get("/orders/:userId", adminOrManagerAuth, async (req, res) => {
   try {
     const userId = req.params.userId;
     if (!isValidObjectId(userId)) return sendError(res, 400, 'Invalid user id');
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), userId)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
 
     const user = await User.findById(userId).populate({
       path: 'orders',
@@ -601,7 +860,7 @@ router.get("/orders/:userId", verifyAdmin, async (req, res) => {
   }
 });
 
-router.put('/orders/:orderId/status', verifyAdmin, async (req, res) => {
+router.put('/orders/:orderId/status', adminOrManagerAuth, async (req, res) => {
   try {
     const { orderId } = req.params;
     const { orderStatus } = req.body;
@@ -612,6 +871,9 @@ router.put('/orders/:orderId/status', verifyAdmin, async (req, res) => {
 
     const order = await Order.findById(orderId);
     if (!order) return sendError(res, 404, 'Order not found');
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), order.userId)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
 
     order.orderStatus = orderStatus;
     await order.save();
@@ -621,7 +883,7 @@ router.put('/orders/:orderId/status', verifyAdmin, async (req, res) => {
   }
 });
 
-router.get('/orders/user/:orderId', verifyAdmin, async (req, res) => {
+router.get('/orders/user/:orderId', adminOrManagerAuth, async (req, res) => {
   try {
     const orderId = req.params.orderId;
     if (!isValidObjectId(orderId)) return sendError(res, 400, 'Invalid order id');
@@ -632,6 +894,9 @@ router.get('/orders/user/:orderId', verifyAdmin, async (req, res) => {
       .populate({ path: 'products.productId', select: 'title price image' });
 
     if (!order) return sendError(res, 404, 'Order not found');
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), order.userId?._id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
 
     const userData = await User.findById(order.userId._id)
       .select('name email')
@@ -656,9 +921,10 @@ router.get('/orders/user/:orderId', verifyAdmin, async (req, res) => {
 
 // --- SECOND HAND / SELL PRODUCT ROUTES ---
 
-router.get("/secondhand-products", verifyAdmin, async (req, res) => {
+router.get("/secondhand-products", adminOrManagerAuth, async (req, res) => {
   try {
-    const products = await SellProduct.find().populate("user_id", "firstname");
+    const filter = isManager(req) ? { user_id: { $in: getAssignedUserIds(req) } } : {};
+    const products = await SellProduct.find(filter).populate("user_id", "firstname");
 
     const dataWithUsernames = products.map(item => ({
       id: item._id,
@@ -687,9 +953,10 @@ router.get("/secondhand-products", verifyAdmin, async (req, res) => {
 });
 
 // Legacy Alias
-router.get("/dashboard/sellproduct", verifyAdmin, async (req, res) => {
+router.get("/dashboard/sellproduct", adminOrManagerAuth, async (req, res) => {
   try {
-    const products = await SellProduct.find().populate("user_id", "firstname");
+    const filter = isManager(req) ? { user_id: { $in: getAssignedUserIds(req) } } : {};
+    const products = await SellProduct.find(filter).populate("user_id", "firstname");
     const dataWithUsernames = products.map(item => ({
       id: item._id,
       username: item.user_id ? item.user_id.firstname : 'Unknown',
@@ -712,7 +979,7 @@ router.get("/dashboard/sellproduct", verifyAdmin, async (req, res) => {
   } catch (err) { return sendError(res, 500, 'Server Error', err); }
 });
 
-router.put("/secondhand-products/:id/status", verifyAdmin, async (req, res) => {
+router.put("/secondhand-products/:id/status", adminOrManagerAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -729,6 +996,9 @@ router.put("/secondhand-products/:id/status", verifyAdmin, async (req, res) => {
     const sellProduct = await SellProduct.findById(id);
     if (!sellProduct) {
       return sendError(res, 404, "Product not found");
+    }
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), sellProduct.user_id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
     }
 
     if (status === "Verified" && sellProduct.userStatus !== "Verified") {
@@ -752,12 +1022,15 @@ router.put("/secondhand-products/:id/status", verifyAdmin, async (req, res) => {
 });
 
 // Legacy POST for update
-router.post("/dashboard/sellproduct", verifyAdmin, async (req, res) => {
+router.post("/dashboard/sellproduct", adminOrManagerAuth, async (req, res) => {
   const { id, userStatus } = req.body || {};
   try {
     if (!id || !isValidObjectId(id)) return sendError(res, 400, "Valid id is required");
     const sellProduct = await SellProduct.findById(id);
     if (!sellProduct) return sendError(res, 404, "Product not found");
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), sellProduct.user_id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
 
     if (userStatus === "Verified" && sellProduct.userStatus !== "Verified") {
       const userId = sellProduct.user_id;
@@ -772,7 +1045,7 @@ router.post("/dashboard/sellproduct", verifyAdmin, async (req, res) => {
   } catch (err) { return sendError(res, 500, "Error", err); }
 });
 
-router.put("/sellproduct/:id/status", verifyAdmin, async (req, res) => { // Legacy
+router.put("/sellproduct/:id/status", adminOrManagerAuth, async (req, res) => { // Legacy
   res.redirect(307, `/api/v1/admin/secondhand-products/${req.params.id}/status`);
 });
 
@@ -921,7 +1194,7 @@ router.get("/analytics/products", verifyAdmin, async (req, res) => {
   }
 });
 
-router.get("/analytics/users/:userId/purchases", verifyAdmin, async (req, res) => {
+router.get("/analytics/users/:userId/purchases", adminOrManagerAuth, async (req, res) => {
   try {
     const { userId } = req.params;
     const { period } = req.query;
@@ -932,6 +1205,10 @@ router.get("/analytics/users/:userId/purchases", verifyAdmin, async (req, res) =
     }
 
     // Verify user exists
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), userId)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
+
     const user = await User.findById(userId).select("firstname lastname email");
     if (!user) {
       return sendError(res, 404, "User not found", null, { code: "USER_NOT_FOUND" });

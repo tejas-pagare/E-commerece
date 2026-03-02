@@ -1,11 +1,18 @@
 import jwt from 'jsonwebtoken';
 import Manager from '../models/manager.js';
 
+const extractToken = (req) => {
+    const authHeader = req.header('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        return authHeader.replace('Bearer ', '').trim();
+    }
+    return req.cookies?.managerToken || null;
+};
+
 const managerAuth = async (req, res, next) => {
     try {
-        // Get token from header
-        const token = req.header('Authorization');
-        
+        const token = extractToken(req);
+
         if (!token) {
             return res.status(401).json({
                 success: false,
@@ -13,10 +20,8 @@ const managerAuth = async (req, res, next) => {
             });
         }
 
-        // Verify token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // Check if it's a manager token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'JWT_SECRET');
+
         if (!decoded.managerId || decoded.role !== 'manager') {
             return res.status(401).json({
                 success: false,
@@ -24,7 +29,6 @@ const managerAuth = async (req, res, next) => {
             });
         }
 
-        // Find manager
         const manager = await Manager.findById(decoded.managerId);
         if (!manager) {
             return res.status(401).json({
@@ -33,7 +37,6 @@ const managerAuth = async (req, res, next) => {
             });
         }
 
-        // Add manager to request object
         req.manager = manager;
         next();
     } catch (error) {

@@ -14,6 +14,11 @@ const SellerSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  managerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Manager',
+    default: null,
+  },
   password: {
     type: String,
     required: true,

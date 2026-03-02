@@ -31,9 +31,9 @@ const loginController = async (req, res) => {
 
         // Generate JWT token
         const token = jwt.sign(
-            { userId: manager._id, role: "manager" },
-            process.env.JWT_SECRET||"SECRET",
-            { expiresIn: "5h" }
+          { managerId: manager._id, role: "manager" },
+          process.env.JWT_SECRET || "JWT_SECRET",
+          { expiresIn: "5h" }
         );
 
         // Set token in cookie
