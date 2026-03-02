@@ -9,6 +9,7 @@ import Order from '../models/orders.js';
 import mongoose from 'mongoose';
 import User from '../models/user.js';
 import { classifyImage } from '../utils/classifier.js';
+import { assignSellerToManager } from '../utils/managerAssignment.js';
 
 const router = express.Router();
 
@@ -116,7 +117,9 @@ router.post('/signup', upload.fields([{ name: 'profileImage' }, { name: 'aadhaar
       identityVerification: { aadharCard: result2?.secure_url || '', status: 'Pending' },
       address: { street, city, state, pincode, country }
     });
-    await seller.save();
+    const savedSeller = await seller.save();
+
+    await assignSellerToManager(savedSeller._id);
 
     const { password: _pw, ...safeSeller } = seller.toObject();
     return res.status(201).json({ success: true, message: 'Signup successful', seller: safeSeller });

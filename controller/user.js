@@ -3,6 +3,7 @@ import User from '../models/user.js';
 import Product from '../models/product.js';
 import bcrypt from 'bcryptjs';
 import blogPosts from "../data/blogId.json" with {type:"json"}
+import { assignUserToManager } from '../utils/managerAssignment.js';
 const HomePageController = async (req, res) => {
   try {
     const products = await Product.find({verified:true});
@@ -130,7 +131,9 @@ const signupController =  async (req, res) => {
     const user = User.create({
       firstname, lastname, password: hashPassword, email
     });
-    (await user).save()
+    const savedUser = await (await user).save();
+
+    await assignUserToManager(savedUser._id);
 
     if (prefersHtml) {
       return res.redirect("/api/v1/user/login");
