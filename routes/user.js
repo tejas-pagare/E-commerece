@@ -29,7 +29,8 @@ import {
     createReviewController,
     deleteReviewController,
     sellProductController,
-    filterProductsController
+    filterProductsController,
+    getUserDashboardStatsController
 } from '../controller/user.js';
 import User from '../models/user.js';
 import isAuthenticated from '../middleware/isAuthenticated.js';
@@ -298,6 +299,8 @@ router.get("/donated-products", isAuthenticated, getDonatedProductsController);
 // Get user's order history
 router.get("/order-history", isAuthenticated, getOrderHistoryController);
 
+// Get user's dashboard statistics
+router.get("/dashboard-stats", isAuthenticated, getUserDashboardStatsController);
 
 // --- REVIEWS ---
 // Create a new review
