@@ -25,13 +25,22 @@ router.get("/details/:id", async (req, res) => {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
 
+    const productObj = product.toObject();
+    productObj.price = Math.ceil(productObj.price * 1.1);
+
     // Also find related products to send along with the main product
-    const relatedProducts = await Product.find({
+    const relatedProductsRaw = await Product.find({
       category: product.category,
       _id: { $ne: product._id } // Exclude the main product itself
     }).limit(4); // Limit to 4 related products
 
-    res.json({ success: true, product, relatedProducts });
+    const relatedProducts = relatedProductsRaw.map(p => {
+      const pObj = p.toObject();
+      pObj.price = Math.ceil(pObj.price * 1.1);
+      return pObj;
+    });
+
+    res.json({ success: true, product: productObj, relatedProducts });
 
   } catch (error) {
     console.error("Error fetching product details:", error);

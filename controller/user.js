@@ -6,7 +6,13 @@ import blogPosts from "../data/blogId.json" with {type: "json"}
 import { assignUserToManager } from '../utils/managerAssignment.js';
 const HomePageController = async (req, res) => {
   try {
-    const products = await Product.find({ verified: true });
+    const productsRaw = await Product.find({ verified: true });
+    // Apply 10% markup
+    const products = productsRaw.map(p => {
+      const pObj = p.toObject();
+      pObj.price = Math.ceil(pObj.price * 1.1);
+      return pObj;
+    });
     res.render('User/homepage/index.ejs', { title: 'HomePage', products, role: "user" });
 
   } catch (error) {
@@ -199,7 +205,14 @@ const renderCartController = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ cart: user.cart });
+    const cartObj = user.cart.map(item => {
+      const itemObj = item.toObject ? item.toObject() : item;
+      if (itemObj.productId && itemObj.productId.price) {
+        itemObj.productId.price = Math.ceil(itemObj.productId.price * 1.1);
+      }
+      return itemObj;
+    });
+    res.json({ cart: cartObj });
   } catch (error) {
 
   }
@@ -507,7 +520,12 @@ const updateAddressController = async (req, res) => {
 const getAllProductsController = async (req, res) => {
   try {
     const products = await Product.find({}).limit(8).populate('reviews');
-    res.json(products);
+    const markedUpProducts = products.map(p => {
+      const pObj = p.toObject();
+      pObj.price = Math.ceil(pObj.price * 1.1);
+      return pObj;
+    });
+    res.json(markedUpProducts);
   } catch (error) {
     res.status(500).json({
       message: "Error fetching products."
@@ -718,8 +736,16 @@ const getCheckoutDetailsController = async (req, res) => {
     }
 
     let total = 0;
-    user.cart?.forEach((e) => {
-      total += Math.round(e?.productId?.price) * e.quantity;
+    const cartObj = user.cart.map(item => {
+      const itemObj = item.toObject ? item.toObject() : item;
+      if (itemObj.productId && itemObj.productId.price) {
+        itemObj.productId.price = Math.ceil(itemObj.productId.price * 1.1);
+      }
+      return itemObj;
+    });
+
+    cartObj.forEach((e) => {
+      total += Math.round(e?.productId?.price || 0) * e.quantity;
     });
 
     const result = await SellProduct.aggregate([{
@@ -744,7 +770,7 @@ const getCheckoutDetailsController = async (req, res) => {
         lastname: user.lastname,
         email: user.email,
         Address: user.Address,
-        cart: user.cart,
+        cart: cartObj,
         coins: user.coins || 0
       },
       total,
@@ -791,12 +817,16 @@ const processPaymentController = async (req, res) => {
       error: "Cart is empty"
     });
 
-    const products = user.cart.map((item) => ({
-      productId: item.productId._id,
-      quantity: item.quantity,
-      price: item.productId.price,
-      size: item.size
-    }));
+    const products = user.cart.map((item) => {
+      const markedUpPrice = Math.ceil(item.productId.price * 1.1);
+      return {
+        productId: item.productId._id,
+        quantity: item.quantity,
+        price: markedUpPrice,
+        sellerPrice: item.productId.price,
+        size: item.size
+      };
+    });
 
     const result = await SellProduct.aggregate([{
       $match: {
@@ -811,8 +841,8 @@ const processPaymentController = async (req, res) => {
       }
     }]);
 
-    let totalAmount = user.cart.reduce(
-      (acc, item) => acc + item.productId.price * item.quantity,
+    let totalAmount = products.reduce(
+      (acc, item) => acc + item.price * item.quantity,
       0
     );
 
@@ -1220,9 +1250,15 @@ const filterProductsController = async (req, res) => {
 
     const filteredProducts = await Product.find(filter).populate('reviews');
 
+    const markedUpProducts = filteredProducts.map(p => {
+      const pObj = p.toObject();
+      pObj.price = Math.ceil(pObj.price * 1.1);
+      return pObj;
+    });
+
     res.status(200).json({
       success: true,
-      products: filteredProducts
+      products: markedUpProducts
     });
   } catch (error) {
     res.status(500).json({

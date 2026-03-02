@@ -282,6 +282,73 @@ router.get("/dashboard", adminOrManagerAuth, async (req, res) => {
 });
 
 
+router.get("/dashboard-revenue", adminOrManagerAuth, async (req, res) => {
+  try {
+    const { timePeriod } = req.query; // 'week', 'month', 'year', 'all'
+    let filter = {};
+
+    if (timePeriod && timePeriod !== 'all') {
+      const now = new Date();
+      let startDate = new Date(0);
+      if (timePeriod === 'week') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+      } else if (timePeriod === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      } else if (timePeriod === 'year') {
+        startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      }
+      filter.createdAt = { $gte: startDate };
+    }
+
+    const assignedUserIds = isManager(req) ? getAssignedUserIds(req) : null;
+    const orderFilter = isManager(req) ? { ...filter, userId: { $in: assignedUserIds } } : { ...filter };
+
+    // For SellProduct, we need to handle the date field. Typically it's created_at, let's use both to be safe
+    let sellProductDateFilter = {};
+    if (filter.createdAt) {
+      sellProductDateFilter = { created_at: filter.createdAt };
+    }
+    const sellProductFilter = isManager(req) ? { ...sellProductDateFilter, user_id: { $in: assignedUserIds } } : { ...sellProductDateFilter };
+
+
+    const revenueAgg = await Order.aggregate([
+      { $match: orderFilter },
+      { $group: { _id: null, totalRevenue: { $sum: "$totalAmount" } } },
+    ]);
+    const totalUserRevenue = revenueAgg[0]?.totalRevenue || 0;
+
+    // Calculate 0.1x on total user revenue (10% commission)
+    // Order totalAmount is already marked up to 1.1x by the user endpoint.
+    // So the commission is: totalAmount - (totalAmount / 1.1)
+    // Or simpler: We know the seller gets 1.0, user pays 1.1. The commission is the difference.
+    // Our aggregator currently sums `totalAmount`, which is the 1.1x value.
+    // The commission is thus `totalAmount * (0.1 / 1.1)` or approximately `totalAmount / 11`.
+    // Let's implement the precise mathematical breakdown:
+    // If sellerPrice = 100, price = 110. Commission = 10. `110 - (110 / 1.1) = 110 - 100 = 10`.
+    const newProductRevenue = totalUserRevenue - (totalUserRevenue / 1.1);
+
+    const sellProductAgg = await SellProduct.aggregate([
+      { $match: sellProductFilter },
+      { $group: { _id: null, totalCoins: { $sum: "$estimated_value" } } },
+    ]);
+    const totalCoins = sellProductAgg[0]?.totalCoins || 0;
+
+    // Calculate 0.1x on total coins
+    // Unlike orders, SellProduct.estimated_value is stored as the base 1.0x value.
+    // The industry pays 1.1x at checkout. The commission gained by the platform is 10% of the base value.
+    const secondHandRevenue = totalCoins * 0.1;
+
+    return sendSuccess(res, "Dashboard revenue filtered", {
+      newProductRevenue: Math.round(newProductRevenue),
+      secondHandRevenue: Math.round(secondHandRevenue)
+    });
+  } catch (error) {
+    console.error("Dashboard Revenue Error:", error);
+    return sendError(res, 500, "Error loading dashboard revenue", error);
+  }
+});
+
+
 // --- CUSTOMER ROUTES ---
 
 router.get("/customers", adminOrManagerAuth, async (req, res) => {

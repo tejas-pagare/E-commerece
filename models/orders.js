@@ -22,6 +22,9 @@ const orderSchema = new mongoose.Schema({
       price: {
         type: Number,
         required: true,
+      },
+      sellerPrice: {
+        type: Number
       }
     },
   ],
@@ -30,7 +33,7 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Returned"],
     default: "Pending",
-    
+
   },
   trackingId: {
     type: String, // Store tracking number for this seller's shipment
@@ -47,8 +50,8 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    default:"Online",
-    
+    default: "Online",
+
   },
   paymentProvider: {
     type: String,
