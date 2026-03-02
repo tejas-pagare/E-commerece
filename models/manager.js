@@ -21,6 +21,26 @@ const managerSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
+    },
+    assignedUserIds: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
+    ],
+    assignedSellerIds: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Seller'
+        }
+    ],
+    pendingUserQuota: {
+        type: Number,
+        default: 0
+    },
+    pendingSellerQuota: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true
