@@ -4,3 +4,4 @@ node_modules
 pyvenv.cfg
 logs/
 *.log
+access.log
