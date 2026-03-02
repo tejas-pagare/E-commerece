@@ -61,17 +61,7 @@ const accessLogStream = createStream("access.log", {
   path: logsDir,
 });
 app.use(morgan("combined", { stream: accessLogStream }));
-app.use(session({
-  secret: "secret-swiftmart",
-  resave: false,
-  saveUninitialized: false,
-  cookie: { 
-    maxAge: 600000,
-    httpOnly: true,
-    secure: false, // set to true if using HTTPS
-    sameSite: 'lax'
-  },
-}))
+
 app.use(cookieParser());
 app.use(bodyParser.json({
   limit: "2mb",
@@ -128,15 +118,17 @@ app.use((req, res, next) => {
   }
 });
 
-const server = http.createServer(app);
-const io = new SocketIOServer(server, { cors: corsOptions });
-
-io.on("connection", (socket) => {
-  console.log(`Socket connected: ${socket.id}`);
-  socket.on("disconnect", () => {
-    console.log(`Socket disconnected: ${socket.id}`);
-  });
-});
+app.use(session({
+  secret: "secret-swiftmart",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    maxAge: 600000,
+    httpOnly: true,
+    secure: false, // set to true if using HTTPS
+    sameSite: 'lax'
+  },
+}))
 
 // Emit refresh events after successful mutations
 app.use((req, res, next) => {
@@ -165,6 +157,25 @@ app.use("/api/v1/industry", industryRouter);
 app.use("/api/v1/manager", managerRouter);
 
 
+
+
+
+
+
+
+
+const server = http.createServer(app);
+const io = new SocketIOServer(server, { cors: corsOptions });
+
+io.on("connection", (socket) => {
+  console.log(`Socket connected: ${socket.id}`);
+  socket.on("disconnect", () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+  });
+});
+
+
+
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to SwiftMart API" });
 })
@@ -175,6 +186,7 @@ app.get("*", (req, res) => {
     message: "Access denied (Route not found)"
   })
 })
+
 
 
 
