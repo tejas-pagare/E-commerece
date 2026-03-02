@@ -1,4 +1,4 @@
-<% if (role==="user" && !(title && (title.toLowerCase() === "login" || title.toLowerCase() === "signup"))) { %>
+<% if (role==="user" && !(title && (title.toLowerCase()==="login" || title.toLowerCase()==="signup" ))) { %>
     <div>
         <header class="bg-white shadow-md">
             <div class="container mx-auto px-4 py-3">
@@ -6,7 +6,8 @@
                 <div class="flex items-center justify-between mb-3">
                     <!-- Logo -->
                     <div class="flex items-center">
-                        <span class="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">SwiftMart</span>
+                        <span
+                            class="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">SwiftMart</span>
                     </div>
 
                     <!-- Search Bar -->
@@ -14,7 +15,8 @@
                         <div class="relative">
                             <input type="text" placeholder="Search for products"
                                 class="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-150 ease-in-out">
-                            <button class="absolute right-3 top-2.5 text-green-600 hover:text-green-700 transition-colors">
+                            <button
+                                class="absolute right-3 top-2.5 text-green-600 hover:text-green-700 transition-colors">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
@@ -24,20 +26,25 @@
                     <div class="flex items-center space-x-6">
                         <div class="flex items-center space-x-4">
                             <!-- Coins Display -->
-                            <div id="coins-display" class="relative p-2 bg-yellow-50 hover:bg-yellow-100 rounded-full transition-colors flex items-center gap-2 px-3">
+                            <div id="coins-display"
+                                class="relative p-2 bg-yellow-50 hover:bg-yellow-100 rounded-full transition-colors flex items-center gap-2 px-3">
                                 <i class="fas fa-coins text-xl text-yellow-600"></i>
                                 <span id="coin-balance" class="font-semibold text-yellow-700">0</span>
                             </div>
-                            
-                            <a href="/api/v1/user/account" class="relative p-2 hover:bg-green-50 rounded-full transition-colors">
+
+                            <a href="/api/v1/user/account"
+                                class="relative p-2 hover:bg-green-50 rounded-full transition-colors">
                                 <i class="far fa-user text-xl text-gray-700 hover:text-green-600"></i>
                             </a>
-                            <a href="/api/v1/user/cart" class="relative p-2 hover:bg-green-50 rounded-full transition-colors">
+                            <a href="/api/v1/user/cart"
+                                class="relative p-2 hover:bg-green-50 rounded-full transition-colors">
                                 <i class="fas fa-shopping-cart text-xl text-gray-700 hover:text-green-600"></i>
-                                <span class="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">3</span>
+                                <span
+                                    class="absolute -top-1 -right-1 bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-sm">3</span>
                             </a>
                             <form action="/api/v1/user/logout" method="get">
-                                <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-150 ease-in-out shadow-sm">
+                                <button type="submit"
+                                    class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-150 ease-in-out shadow-sm">
                                     Logout
                                 </button>
                             </form>
@@ -55,19 +62,29 @@
                     <a href="/api/v1/user/contact" class="text-gray-700 hover:text-green-600 font-medium transition-colors">About us</a>
                     <a href="/api/v1/user/dashboard" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Dashboard</a>
                     <a href="/api/v1/user/dashboard/sellproduct" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Sustainable Track</a> -->
-                    <button class="hidden md:flex items-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-150 ease-in-out shadow-sm">
+                    <button
+                        class="hidden md:flex items-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-150 ease-in-out shadow-sm">
                         <i class="fas fa-bars mr-2"></i>
                         All Departments
                     </button>
                     <div class="flex items-center space-x-6">
-                        <a href="/api/v1/user/" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Home</a>
-                        <a href="/api/v1/user/store" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Store</a>
-                        <a href="/api/v1/user/vendors" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Vendors</a>
-                        <a href="/api/v1/user/blog" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Blog</a>
-                        <a href="/api/v1/user/sell" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Sell Product</a>
-                        <a href="/api/v1/user/contact" class="text-gray-700 hover:text-green-600 font-medium transition-colors">About us</a>
-                        <a href="/api/v1/user/dashboard" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Dashboard</a>
-                        <a href="/api/v1/user/dashboard/sellproduct" class="text-gray-700 hover:text-green-600 font-medium transition-colors">Sustainable Track</a>
+                        <a href="/api/v1/user/"
+                            class="text-gray-700 hover:text-green-600 font-medium transition-colors">Home</a>
+                        <a href="/api/v1/user/store"
+                            class="text-gray-700 hover:text-green-600 font-medium transition-colors">Store</a>
+                        <a href="/api/v1/user/vendors"
+                            class="text-gray-700 hover:text-green-600 font-medium transition-colors">Vendors</a>
+                        <a href="/api/v1/user/blog"
+                            class="text-gray-700 hover:text-green-600 font-medium transition-colors">Blog</a>
+                        <a href="/api/v1/user/sell"
+                            class="text-gray-700 hover:text-green-600 font-medium transition-colors">Sell Product</a>
+                        <a href="/api/v1/user/contact"
+                            class="text-gray-700 hover:text-green-600 font-medium transition-colors">About us</a>
+                        <a href="/api/v1/user/dashboard"
+                            class="text-gray-700 hover:text-green-600 font-medium transition-colors">Dashboard</a>
+                        <a href="/api/v1/user/dashboard/sellproduct"
+                            class="text-gray-700 hover:text-green-600 font-medium transition-colors">Sustainable
+                            Track</a>
                     </div>
                 </nav>
             </div>
@@ -76,7 +93,7 @@
 
     <script>
         // Fetch and display user's coin balance
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function () {
             try {
                 const response = await fetch('/api/v1/user/account/details', {
                     method: 'GET',
@@ -97,128 +114,154 @@
             }
         });
     </script>
-<% } else if(role==="seller" && !(title && (title.toLowerCase() === "login" || title.toLowerCase() === "signup"))) { %>
-    <div>
-        <header class="bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-gray-100">
-            <div class="container mx-auto px-4">
-                <!-- Top Bar -->
-                <div class="flex items-center justify-between py-3">
-                    <!-- Logo -->
-                    <div class="flex items-center">
-                        <a href="/api/v1/seller" class="focus:outline-none focus:ring-2 focus:ring-green-200 rounded">
-                            <span class="text-2xl font-semibold tracking-tight bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">SwiftMart</span>
-                        </a>
+    <% } else if(role==="seller" && !(title && (title.toLowerCase()==="login" || title.toLowerCase()==="signup" ))) { %>
+        <div>
+            <header class="bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 border-b border-gray-100">
+                <div class="container mx-auto px-4">
+                    <!-- Top Bar -->
+                    <div class="flex items-center justify-between py-3">
+                        <!-- Logo -->
+                        <div class="flex items-center">
+                            <a href="/api/v1/seller"
+                                class="focus:outline-none focus:ring-2 focus:ring-green-200 rounded">
+                                <span
+                                    class="text-2xl font-semibold tracking-tight bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">SwiftMart</span>
+                            </a>
+                        </div>
+
+                        <!-- Right Actions -->
+                        <div class="flex items-center gap-3">
+                            <a href="/api/v1/seller/account"
+                                class="hidden sm:inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
+                                Profile
+                            </a>
+                            <form action="/api/v1/seller/logout" method="get">
+                                <button type="submit"
+                                    class="inline-flex items-center rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 transition-colors">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
-                    <!-- Right Actions -->
-                    <div class="flex items-center gap-3">
-                        <a href="/api/v1/seller/account" class="hidden sm:inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
-                            Profile
+                    <!-- Navigation -->
+                    <nav class="flex items-center gap-2 py-2">
+                        <a href="/api/v1/seller/create" data-nav
+                            class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
+                            Create Product
                         </a>
-                        <form action="/api/v1/seller/logout" method="get">
-                            <button type="submit" class="inline-flex items-center rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 transition-colors">
-                                Logout
-                            </button>
-                        </form>
+                        <a href="/api/v1/seller" data-nav
+                            class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
+                            Listed Products
+                        </a>
+                        <a href="/api/v1/seller/sold-products" data-nav
+                            class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
+                            Sold Products
+                        </a>
+                    </nav>
+                </div>
+            </header>
+            <script>
+                // Active link highlight for seller nav
+                (function () {
+                    try {
+                        const path = window.location.pathname;
+                        document.querySelectorAll('header nav a[data-nav]').forEach(a => {
+                            const href = a.getAttribute('href');
+                            if (!href) return;
+                            // consider startsWith for list pages
+                            if (path === href || (href !== '/api/v1/seller' && path.startsWith(href))) {
+                                a.classList.add('bg-green-50', 'text-green-700', 'border-green-300');
+                                a.setAttribute('aria-current', 'page');
+                            }
+                        });
+                    } catch (e) { /* no-op */ }
+                })();
+            </script>
+        </div>
+        <% } else if(role==="admin" && !(title && (title.toLowerCase()==="login" || title.toLowerCase()==="signup" ))){
+            %>
+            <nav class="bg-gradient-to-r from-green-500 to-green-600 shadow-lg">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center h-16">
+                        <!-- Logo -->
+                        <div class="flex-shrink-0">
+                            <a href="/api/v1/admin"
+                                class="text-white text-2xl font-bold hover:text-green-100 transition-colors">SwiftMart</a>
+                        </div>
+
+                        <!-- Navigation Links -->
+                        <div class="hidden md:flex items-center space-x-6">
+                            <a href="/api/v1/admin/dashboard"
+                                class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
+                            <a href="/api/v1/admin/customers"
+                                class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Customers</a>
+                            <a href="/api/v1/admin/products"
+                                class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Products</a>
+                            <a href="/api/v1/admin/seller"
+                                class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Seller</a>
+                            <a href="/api/v1/admin/blogs/page"
+                                class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Blogs</a>
+                            <a href="/api/v1/admin/order"
+                                class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Order</a>
+                            <a href="/api/v1/admin/manager"
+                                class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Managers</a>
+                            <a href="/api/v1/admin/Delivery"
+                                class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Delivery</a>
+                            <a href="/api/v1/admin/dashboard/sellproduct"
+                                class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Sustainable
+                                Product</a>
+                        </div>
+
+                        <!-- Profile and Logout -->
+                        <div class="flex items-center space-x-4">
+
+                            <form action="/" method="get">
+                                <button type="submit"
+                                    class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Navigation -->
-                <nav class="flex items-center gap-2 py-2">
-                    <a href="/api/v1/seller/create" data-nav
-                       class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
-                        Create Product
-                    </a>
-                    <a href="/api/v1/seller" data-nav
-                       class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
-                        Listed Products
-                    </a>
-                    <a href="/api/v1/seller/sold-products" data-nav
-                       class="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors">
-                        Sold Products
-                    </a>
-                </nav>
-            </div>
-        </header>
-        <script>
-            // Active link highlight for seller nav
-            (function() {
-                try {
-                    const path = window.location.pathname;
-                    document.querySelectorAll('header nav a[data-nav]').forEach(a => {
-                        const href = a.getAttribute('href');
-                        if (!href) return;
-                        // consider startsWith for list pages
-                        if (path === href || (href !== '/api/v1/seller' && path.startsWith(href))) {
-                            a.classList.add('bg-green-50','text-green-700','border-green-300');
-                            a.setAttribute('aria-current','page');
-                        }
-                    });
-                } catch (e) { /* no-op */ }
-            })();
-        </script>
-    </div>
-<% } else if(role==="admin" && !(title && (title.toLowerCase() === "login" || title.toLowerCase() === "signup"))){ %>
-    <nav class="bg-gradient-to-r from-green-500 to-green-600 shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex-shrink-0">
-                    <a href="/api/v1/admin" class="text-white text-2xl font-bold hover:text-green-100 transition-colors">SwiftMart</a>
+                <!-- Mobile menu button -->
+                <div class="md:hidden absolute right-4 top-4">
+                    <button type="button" class="text-white hover:text-green-100 p-2 rounded-md transition-colors"
+                        onclick="toggleMobileMenu()">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden md:flex items-center space-x-6">
-                    <a href="/api/v1/admin/dashboard" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Dashboard</a>
-                    <a href="/api/v1/admin/customers" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Customers</a>
-                    <a href="/api/v1/admin/products" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Products</a>
-                    <a href="/api/v1/admin/seller" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Seller</a>
-                    <a href="/api/v1/admin/blogs/page" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Blogs</a>
-                    <a href="/api/v1/admin/order" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Order</a>
-                    <a href="/api/v1/admin/manager" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Managers</a>
-                    <a href="/api/v1/admin/Delivery" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Delivery</a>
-                    <a href="/api/v1/admin/dashboard/sellproduct" class="text-white hover:text-green-100 px-3 py-2 rounded-md text-sm font-medium transition-colors">Sustainable Product</a>
+                <!-- Mobile menu -->
+                <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg rounded-b-lg">
+                    <div class="px-2 pt-2 pb-3 space-y-1">
+                        <a href="/api/v1/admin/dashboard"
+                            class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Dashboard</a>
+                        <a href="/api/v1/admin/customers"
+                            class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Customers</a>
+                        <a href="/api/v1/admin/products"
+                            class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Products</a>
+                        <a href="/api/v1/admin/seller"
+                            class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Seller</a>
+                        <a href="/api/v1/admin/blogs/page"
+                            class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Blogs</a>
+                        <a href="/api/v1/admin/secondHand"
+                            class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">SecondHandProducts</a>
+                        <a href="/api/v1/admin/order"
+                            class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Order</a>
+                    </div>
                 </div>
+            </nav>
 
-                <!-- Profile and Logout -->
-                <div class="flex items-center space-x-4">
-                    
-                    <form action="/" method="get">
-                        <button type="submit" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out shadow-sm">
-                            Logout
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Mobile menu button -->
-        <div class="md:hidden absolute right-4 top-4">
-            <button type="button" class="text-white hover:text-green-100 p-2 rounded-md transition-colors" onclick="toggleMobileMenu()">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg rounded-b-lg">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="/api/v1/admin/dashboard" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Dashboard</a>
-                <a href="/api/v1/admin/customers" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Customers</a>
-                <a href="/api/v1/admin/products" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Products</a>
-                <a href="/api/v1/admin/seller" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Seller</a>
-                <a href="/api/v1/admin/blogs/page" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Blogs</a>
-                <a href="/api/v1/admin/secondHand" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">SecondHandProducts</a>
-                <a href="/api/v1/admin/order" class="text-gray-700 hover:text-green-600 hover:bg-green-50 block px-3 py-2 rounded-md text-base font-medium transition-colors">Order</a>
-            </div>
-        </div>
-    </nav>
-
-    <script>
-        function toggleMobileMenu() {
-            const mobileMenu = document.getElementById('mobile-menu');
-            mobileMenu.classList.toggle('hidden');
-        }
-    </script>
-<% } %>
+            <script>
+                function toggleMobileMenu() {
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    mobileMenu.classList.toggle('hidden');
+                }
+            </script>
+            <% } %>
