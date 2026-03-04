@@ -2,10 +2,17 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import Product from '../models/product.js';
 import bcrypt from 'bcryptjs';
-import blogPosts from "../data/blogId.json" with {type:"json"}
+import blogPosts from "../data/blogId.json" with {type: "json"}
+import { assignUserToManager } from '../utils/managerAssignment.js';
 const HomePageController = async (req, res) => {
   try {
-    const products = await Product.find({verified:true});
+    const productsRaw = await Product.find({ verified: true });
+    // Apply 10% markup
+    const products = productsRaw.map(p => {
+      const pObj = p.toObject();
+      pObj.price = Math.ceil(pObj.price * 1.1);
+      return pObj;
+    });
     res.render('User/homepage/index.ejs', { title: 'HomePage', products, role: "user" });
 
   } catch (error) {
@@ -106,7 +113,7 @@ const signupPageRenderController = (req, res) => {
   res.render('User/auth/signup.ejs', { title: 'signup', role: "user" })
 
 }
-const signupController =  async (req, res) => {
+const signupController = async (req, res) => {
   try {
     const { firstname, lastname, password, email } = req.body;
     const prefersHtml = req.accepts(['html', 'json']) === 'html';
@@ -130,7 +137,9 @@ const signupController =  async (req, res) => {
     const user = User.create({
       firstname, lastname, password: hashPassword, email
     });
-    (await user).save()
+    const savedUser = await (await user).save();
+
+    await assignUserToManager(savedUser._id);
 
     if (prefersHtml) {
       return res.redirect("/api/v1/user/login");
@@ -165,7 +174,7 @@ const logoutController = (req, res) => {
     path: '/',
     maxAge: 0
   });
-  
+
   // Destroy session if it exists
   if (req.session) {
     req.session.destroy((err) => {
@@ -174,16 +183,16 @@ const logoutController = (req, res) => {
       }
     });
   }
-  
-  const wantsJson = 
-    req.xhr || 
-    req.is('application/json') || 
+
+  const wantsJson =
+    req.xhr ||
+    req.is('application/json') ||
     (req.headers.accept && req.headers.accept.includes('application/json'));
-  
+
   if (wantsJson) {
     return res.status(200).json({ success: true, message: "Logged out successfully" });
   }
-  
+
   return res.redirect("/");
 }
 
@@ -196,7 +205,14 @@ const renderCartController = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-      res.json({ cart: user.cart });
+    const cartObj = user.cart.map(item => {
+      const itemObj = item.toObject ? item.toObject() : item;
+      if (itemObj.productId && itemObj.productId.price) {
+        itemObj.productId.price = Math.ceil(itemObj.productId.price * 1.1);
+      }
+      return itemObj;
+    });
+    res.json({ cart: cartObj });
   } catch (error) {
 
   }
@@ -206,28 +222,28 @@ const renderCartController = async (req, res) => {
 
 //   res.render("User/cart/index.ejs", { title: "Cart", role: "user" });
 // }
-const addToCartController =  async (req, res) => {
+const addToCartController = async (req, res) => {
   try {
     const id = req.params.id;
-    console.log(id) ;
+    console.log(id);
     const userId = req.userId;
     const { size } = req.body;
     if (!id) {
       return res.json({
         message: "No product id provided",
-        success:false
+        success: false
       })
     }
     const product = await Product.findOne({ _id: id });
     if (!product) {
       return res.json({
         message: "No such product",
-        success:false
+        success: false
       })
     }
 
     const user = await User.findById(userId);
-    const productCartCheck = user.cart.find(item => 
+    const productCartCheck = user.cart.find(item =>
       item.productId.equals(product._id) && item.size === size
     );
 
@@ -243,14 +259,14 @@ const addToCartController =  async (req, res) => {
     await user.save();
     res.json({
       message: "Product added",
-      success:true
+      success: true
     })
 
   } catch (error) {
     console.log(error)
     return res.json({
       messag: "Server error",
-      success:false
+      success: false
     })
   }
 }
@@ -262,14 +278,14 @@ const removeFromCartController = async (req, res) => {
     if (!id) {
       return res.json({
         message: "No product id provided",
-        success:false
+        success: false
       })
     }
     const product = await Product.findOne({ _id: id });
     if (!product) {
       return res.json({
         message: "No such product",
-        success:false
+        success: false
       })
     }
 
@@ -284,14 +300,14 @@ const removeFromCartController = async (req, res) => {
     (await user).save();
     res.json({
       message: "Product removed from cart",
-      success:true
+      success: true
     })
 
   } catch (error) {
     console.log(error)
     return res.json({
       messag: "Server error",
-      success:false
+      success: false
     })
   }
 }
@@ -304,14 +320,14 @@ const deleteFromCartController = async (req, res) => {
     if (!id) {
       return res.json({
         message: "No product id provided",
-        success:false
+        success: false
       })
     }
     const product = await Product.findOne({ _id: id });
     if (!product) {
       return res.json({
         message: "No such product",
-        success:false
+        success: false
       })
     }
 
@@ -324,30 +340,30 @@ const deleteFromCartController = async (req, res) => {
     (await user).save();
     res.json({
       message: "Product reomved from cart",
-      success:true
+      success: true
     })
   } catch (error) {
     return res.json({
       messag: "Server error",
-      success:false
+      success: false
     })
   }
 }
 
 
-const accountShowRenderController =async(req, res) => {
+const accountShowRenderController = async (req, res) => {
   const user = await User.findById(req.userId);
-  res.render("User/account/show.ejs", { title: 'Account', role: req.role,user });
+  res.render("User/account/show.ejs", { title: 'Account', role: req.role, user });
 }
-const accountRenderController =async(req, res) => {
+const accountRenderController = async (req, res) => {
   const user = await User.findById(req.userId);
-  res.render("User/account/index.ejs", { title: 'Account', role: req.role,user });
+  res.render("User/account/index.ejs", { title: 'Account', role: req.role, user });
 }
 
 
-const addressRenderController = async(req, res) => {
+const addressRenderController = async (req, res) => {
   const user = await User.findById(req.userId);
-  res.render("User/accountAddress/index.ejs", { title: 'Account Address', role: req.role,user });
+  res.render("User/accountAddress/index.ejs", { title: 'Account Address', role: req.role, user });
 }
 
 const blogController = (req, res) => {
@@ -361,13 +377,13 @@ const blogController = (req, res) => {
   res.render("User/blog_post/article.ejs", { title: "Blog Article", blog, role: req.role });
 }
 
-const shopController = (req,res)=>{
-  res.render("User/Shop/index.ejs", { title: 'Shop', role: req.role});
+const shopController = (req, res) => {
+  res.render("User/Shop/index.ejs", { title: 'Shop', role: req.role });
 }
 
 
-const vendorsController = (req,res)=>{
-  res.render("User/Vendor/index.ejs", { title: 'Vendors', role: req.role});
+const vendorsController = (req, res) => {
+  res.render("User/Vendor/index.ejs", { title: 'Vendors', role: req.role });
 }
 
 const blogRenderController = (req, res) => res.render('User/blog/index.ejs', { title: 'Blog Page', role: req.role })
@@ -417,7 +433,7 @@ const updateAccountController = async (req, res) => {
     }, {
       new: true
     }).select('firstname lastname email');
-    
+
     res.json({
       success: true,
       user: updatedUser
@@ -486,7 +502,7 @@ const updateAddressController = async (req, res) => {
     if (pincode) user.Address.pincode = pincode;
     if (phone) user.Address.phone = phone;
     await user.save();
-    
+
     res.status(200).json({
       message: "Address updated sucessfully",
       success: true,
@@ -504,7 +520,12 @@ const updateAddressController = async (req, res) => {
 const getAllProductsController = async (req, res) => {
   try {
     const products = await Product.find({}).limit(8).populate('reviews');
-    res.json(products);
+    const markedUpProducts = products.map(p => {
+      const pObj = p.toObject();
+      pObj.price = Math.ceil(pObj.price * 1.1);
+      return pObj;
+    });
+    res.json(markedUpProducts);
   } catch (error) {
     res.status(500).json({
       message: "Error fetching products."
@@ -578,7 +599,7 @@ const addItemToCartController = async (req, res) => {
 
     const user = await User.findById(userId);
 
-    const productCartCheck = user.cart.find(item => 
+    const productCartCheck = user.cart.find(item =>
       item.productId.equals(product._id) && item.size === size
     );
 
@@ -592,7 +613,7 @@ const addItemToCartController = async (req, res) => {
       productCartCheck.quantity += 1;
     }
     await user.save();
-    
+
     res.json({
       message: "Product added",
       success: true
@@ -622,14 +643,14 @@ const decreaseCartQuantityController = async (req, res) => {
     }
 
     const user = await User.findById(userId);
-    
-    const productCartCheck = user.cart.find(item => 
+
+    const productCartCheck = user.cart.find(item =>
       item.productId.toString() === id && item.size === size
     );
 
     if (productCartCheck) {
       if (productCartCheck.quantity <= 1) {
-        user.cart = user.cart.filter(item => 
+        user.cart = user.cart.filter(item =>
           !(item.productId.toString() === id && item.size === size)
         );
       } else {
@@ -673,7 +694,7 @@ const deleteItemFromCartController = async (req, res) => {
     const user = await User.findById(userId);
 
     const initialLength = user.cart.length;
-    user.cart = user.cart.filter(item => 
+    user.cart = user.cart.filter(item =>
       !(item.productId.toString() === id && item.size === size)
     );
 
@@ -689,7 +710,7 @@ const deleteItemFromCartController = async (req, res) => {
         success: false
       });
     }
-    
+
   } catch (error) {
     console.log(error);
     return res.json({
@@ -715,8 +736,16 @@ const getCheckoutDetailsController = async (req, res) => {
     }
 
     let total = 0;
-    user.cart?.forEach((e) => {
-      total += Math.round(e?.productId?.price) * e.quantity;
+    const cartObj = user.cart.map(item => {
+      const itemObj = item.toObject ? item.toObject() : item;
+      if (itemObj.productId && itemObj.productId.price) {
+        itemObj.productId.price = Math.ceil(itemObj.productId.price * 1.1);
+      }
+      return itemObj;
+    });
+
+    cartObj.forEach((e) => {
+      total += Math.round(e?.productId?.price || 0) * e.quantity;
     });
 
     const result = await SellProduct.aggregate([{
@@ -741,7 +770,7 @@ const getCheckoutDetailsController = async (req, res) => {
         lastname: user.lastname,
         email: user.email,
         Address: user.Address,
-        cart: user.cart,
+        cart: cartObj,
         coins: user.coins || 0
       },
       total,
@@ -767,7 +796,7 @@ const processPaymentController = async (req, res) => {
     const {
       userId
     } = req;
-    
+
     if (!address ||
       !address.plotno ||
       !address.street ||
@@ -788,12 +817,16 @@ const processPaymentController = async (req, res) => {
       error: "Cart is empty"
     });
 
-    const products = user.cart.map((item) => ({
-      productId: item.productId._id,
-      quantity: item.quantity,
-      price: item.productId.price,
-      size: item.size 
-    }));
+    const products = user.cart.map((item) => {
+      const markedUpPrice = Math.ceil(item.productId.price * 1.1);
+      return {
+        productId: item.productId._id,
+        quantity: item.quantity,
+        price: markedUpPrice,
+        sellerPrice: item.productId.price,
+        size: item.size
+      };
+    });
 
     const result = await SellProduct.aggregate([{
       $match: {
@@ -808,8 +841,8 @@ const processPaymentController = async (req, res) => {
       }
     }]);
 
-    let totalAmount = user.cart.reduce(
-      (acc, item) => acc + item.productId.price * item.quantity,
+    let totalAmount = products.reduce(
+      (acc, item) => acc + item.price * item.quantity,
       0
     );
 
@@ -867,7 +900,7 @@ const processPaymentController = async (req, res) => {
 
     user.cart = [];
     await user.save();
-    
+
     res.status(200).json({
       message: "Payment processed and order placed successfully",
       success: true,
@@ -887,11 +920,28 @@ const processPaymentController = async (req, res) => {
 const getDonatedProductsController = async (req, res) => {
   try {
     const userId = req.userId;
-    const products = await SellProduct.find({ user_id: userId });
+    const { timePeriod } = req.query; // 'week', 'month', 'year', 'all'
+
+    let filter = { user_id: userId };
+
+    if (timePeriod && timePeriod !== 'all') {
+      const now = new Date();
+      let startDate = new Date(0);
+      if (timePeriod === 'week') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+      } else if (timePeriod === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      } else if (timePeriod === 'year') {
+        startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      }
+      filter.created_at = { $gte: startDate };
+    }
+
+    const products = await SellProduct.find(filter);
     const user = await User.findById(userId).select("firstname");
 
     const dataWithImages = products.map(item => ({
-      _id: item._id, 
+      _id: item._id,
       username: user.firstname,
       items: item.items,
       fabric: item.fabric,
@@ -918,11 +968,13 @@ const getDonatedProductsController = async (req, res) => {
 const getOrderHistoryController = async (req, res) => {
   try {
     const userId = req.userId;
+    const { timePeriod } = req.query; // 'week', 'month', 'year', 'all'
+
     const userHistory = await UserHistory.findOne({ userId })
       .populate({
         path: "orders.products.productId",
         model: "Product",
-        select: "title description price category image" 
+        select: "title description price category image"
       })
       .populate({
         path: "orders.orderId",
@@ -931,20 +983,36 @@ const getOrderHistoryController = async (req, res) => {
       });
 
     if (!userHistory) {
-      return res.json({ success: true, orders: [] }); 
+      return res.json({ success: true, orders: [] });
     }
 
-    const formattedOrders = userHistory.orders.map(order => {
-      const originalOrder = order.orderId;
-      
-      const finalDate = order.orderDate || (originalOrder ? originalOrder.createdAt : new Date());
+    let startDate = null;
+    if (timePeriod && timePeriod !== 'all') {
+      const now = new Date();
+      if (timePeriod === 'week') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+      } else if (timePeriod === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      } else if (timePeriod === 'year') {
+        startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      }
+    }
 
-      return {
-        ...order.toObject(),
-        orderId: originalOrder ? originalOrder._id : order.orderId,
-        orderDate: finalDate
-      };
-    });
+    const formattedOrders = userHistory.orders
+      .map(order => {
+        const originalOrder = order.orderId;
+        const finalDate = order.orderDate || (originalOrder ? originalOrder.createdAt : new Date());
+
+        return {
+          ...order.toObject(),
+          orderId: originalOrder ? originalOrder._id : order.orderId,
+          orderDate: finalDate
+        };
+      })
+      .filter(order => {
+        if (!startDate) return true;
+        return new Date(order.orderDate) >= startDate;
+      });
 
     res.json({
       success: true,
@@ -1099,7 +1167,7 @@ const sellProductController = async (req, res) => {
         });
       }
     }
-    
+
     const combination_id = req.body.fabric + req.body.size + req.body.age;
     const estimated_value = combinationPoints[combination_id];
 
@@ -1109,7 +1177,7 @@ const sellProductController = async (req, res) => {
         message: `Invalid combination: ${combination_id}. Please check your input.`
       });
     }
-    
+
     const newProduct = new SellProduct({
       user_id: req.userId,
       items: req.body.items,
@@ -1133,10 +1201,10 @@ const sellProductController = async (req, res) => {
       throw err;
     });
 
-    res.status(201).json({ 
-      success: true, 
+    res.status(201).json({
+      success: true,
       message: "Product submitted successfully. Coins will be added after verification!",
-      product: newProduct 
+      product: newProduct
     });
 
   } catch (error) {
@@ -1182,9 +1250,15 @@ const filterProductsController = async (req, res) => {
 
     const filteredProducts = await Product.find(filter).populate('reviews');
 
+    const markedUpProducts = filteredProducts.map(p => {
+      const pObj = p.toObject();
+      pObj.price = Math.ceil(pObj.price * 1.1);
+      return pObj;
+    });
+
     res.status(200).json({
       success: true,
-      products: filteredProducts
+      products: markedUpProducts
     });
   } catch (error) {
     res.status(500).json({
@@ -1195,4 +1269,90 @@ const filterProductsController = async (req, res) => {
   }
 };
 
-export {loginController ,signupController,logoutController,renderCartController,addToCartController,removeFromCartController,deleteFromCartController,loginPageRenderController,signupPageRenderController,accountRenderController,addressRenderController,blogController,shopController,vendorsController,blogRenderController,HomePageController,accountShowRenderController,getAccountDetailsController,updateAccountController,getAddressDetailsController,updateAddressController,getAllProductsController,getBlogByIdController,getAllBlogsController,addItemToCartController,decreaseCartQuantityController,deleteItemFromCartController,getCheckoutDetailsController,processPaymentController,getDonatedProductsController,getOrderHistoryController,createReviewController,deleteReviewController,sellProductController,filterProductsController}
+// --- GET DASHBOARD STATS CONTROLLER ---
+const getUserDashboardStatsController = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { timePeriod } = req.query; // 'week', 'month', 'year', 'all'
+
+    // Calculate start date based on timePeriod
+    const now = new Date();
+    let startDate = new Date(0); // For 'all'
+    if (timePeriod === 'week') {
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+    } else if (timePeriod === 'month') {
+      startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    } else if (timePeriod === 'year') {
+      startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+    }
+
+    // 1. Fetch Orders within date range
+    const orders = await Order.find({
+      userId,
+      createdAt: { $gte: startDate }
+    }).populate('products.productId');
+
+    let totalOrders = orders.length;
+    let moneySpent = 0;
+
+    // Category aggregation
+    const categoryCounts = {};
+
+    orders.forEach(order => {
+      // Only count completed/processing orders towards money spent
+      if (order.paymentStatus !== 'Failed' && order.paymentStatus !== 'Refunded' && order.orderStatus !== 'Cancelled') {
+        moneySpent += order.totalAmount;
+      }
+
+      order.products.forEach(item => {
+        if (item.productId && item.productId.category) {
+          const cat = item.productId.category;
+          categoryCounts[cat] = (categoryCounts[cat] || 0) + item.quantity;
+        }
+      });
+    });
+
+    // Sort categories by frequency
+    const sortedCategories = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]);
+
+    let topCategory = sortedCategories.length > 0 ? sortedCategories[0][0] : 'None';
+    let secondCategory = sortedCategories.length > 1 ? sortedCategories[1][0] : 'None';
+
+    // 2. Fetch Secondhand clothes within date range
+    const secondhandClothes = await SellProduct.find({
+      user_id: userId,
+      created_at: { $gte: startDate }
+    });
+
+    let clothesGiven = secondhandClothes.length;
+    let coinsGained = 0;
+
+    secondhandClothes.forEach(cloth => {
+      // Users gain virtual coins. For estimated values counting towards total gained.
+      // Usually coins are added after verification/Sold. Even if they are just listed, we might show potential or actual.
+      // Let's sum if adminStatus is 'Sold' or 'Verified', else count it generally if we want to show all. We'll count what is Sold or Verified as "gained". The schema has adminStatus: Pending, Sold
+      if (cloth.adminStatus === 'Sold') {
+        coinsGained += cloth.estimated_value || 0;
+      }
+    });
+
+    res.json({
+      success: true,
+      data: {
+        totalOrders,
+        clothesGiven,
+        moneySpent,
+        coinsGained,
+        topCategory,
+        secondCategory,
+        timePeriod: timePeriod || 'all'
+      }
+    });
+
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+export { loginController, signupController, logoutController, renderCartController, addToCartController, removeFromCartController, deleteFromCartController, loginPageRenderController, signupPageRenderController, accountRenderController, addressRenderController, blogController, shopController, vendorsController, blogRenderController, HomePageController, accountShowRenderController, getAccountDetailsController, updateAccountController, getAddressDetailsController, updateAddressController, getAllProductsController, getBlogByIdController, getAllBlogsController, addItemToCartController, decreaseCartQuantityController, deleteItemFromCartController, getCheckoutDetailsController, processPaymentController, getDonatedProductsController, getOrderHistoryController, createReviewController, deleteReviewController, sellProductController, filterProductsController, getUserDashboardStatsController }

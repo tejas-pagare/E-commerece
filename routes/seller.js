@@ -9,6 +9,7 @@ import Order from '../models/orders.js';
 import mongoose from 'mongoose';
 import User from '../models/user.js';
 import { classifyImage } from '../utils/classifier.js';
+import { assignSellerToManager } from '../utils/managerAssignment.js';
 
 const router = express.Router();
 
@@ -116,7 +117,9 @@ router.post('/signup', upload.fields([{ name: 'profileImage' }, { name: 'aadhaar
       identityVerification: { aadharCard: result2?.secure_url || '', status: 'Pending' },
       address: { street, city, state, pincode, country }
     });
-    await seller.save();
+    const savedSeller = await seller.save();
+
+    await assignSellerToManager(savedSeller._id);
 
     const { password: _pw, ...safeSeller } = seller.toObject();
     return res.status(201).json({ success: true, message: 'Signup successful', seller: safeSeller });
@@ -417,12 +420,12 @@ router.get('/sold-products', isAuthenticated, async (req, res) => {
         $project: {
           id: '$_id',
           name: '$productDetails.title',
-          price: '$products.price',
+          price: { $ifNull: ['$products.sellerPrice', '$products.price'] },
           quantity: '$products.quantity',
           buyerName: '$shippingAddress.fullname',
           orderDate: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
           status: '$orderStatus',
-          totalAmount: { $round: [{ $multiply: ['$products.price', '$products.quantity'] }, 2] }
+          totalAmount: { $round: [{ $multiply: [{ $ifNull: ['$products.sellerPrice', '$products.price'] }, '$products.quantity'] }, 2] }
         }
       },
 
@@ -474,12 +477,12 @@ router.get('/sold-products/data', isAuthenticated, async (req, res) => {
         $project: {
           id: '$_id',
           name: '$productDetails.title',
-          price: '$products.price',
+          price: { $ifNull: ['$products.sellerPrice', '$products.price'] },
           quantity: '$products.quantity',
           buyerName: '$shippingAddress.fullname',
           orderDate: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
           status: '$orderStatus',
-          totalAmount: { $round: [{ $multiply: ['$products.price', '$products.quantity'] }, 2] }
+          totalAmount: { $round: [{ $multiply: [{ $ifNull: ['$products.sellerPrice', '$products.price'] }, '$products.quantity'] }, 2] }
         }
       },
       { $sort: { orderDate: -1 } }
@@ -520,13 +523,13 @@ router.get('/orders/requests', isAuthenticated, async (req, res) => {
             $push: {
               productId: '$productDetails._id',
               title: '$productDetails.title',
-              price: '$products.price',
+              price: { $ifNull: ['$products.sellerPrice', '$products.price'] },
               quantity: '$products.quantity',
               image: '$productDetails.image', // include image URL
-              total: { $multiply: ['$products.price', '$products.quantity'] }
+              total: { $multiply: [{ $ifNull: ['$products.sellerPrice', '$products.price'] }, '$products.quantity'] }
             }
           },
-          totalAmount: { $sum: { $multiply: ['$products.price', '$products.quantity'] } }
+          totalAmount: { $sum: { $multiply: [{ $ifNull: ['$products.sellerPrice', '$products.price'] }, '$products.quantity'] } }
         }
       },
       { $sort: { createdAt: -1 } }
@@ -611,7 +614,7 @@ router.put('/orders/:orderId/seller/status', isAuthenticated, async (req, res) =
       products: order.products.map(p => ({
         productId: p.productId?._id || null,
         title: p.productId?.title || null,
-        price: p.price,
+        price: p.sellerPrice || p.price,
         quantity: p.quantity,
         image: p.productId?.image || null,
         sellerOwned: !!(p.productId && String(p.productId.sellerId) === String(sellerId))

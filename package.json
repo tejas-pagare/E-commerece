@@ -7,7 +7,8 @@
   "scripts": {
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --runInBand",
     "test:win": "set NODE_OPTIONS=--experimental-vm-modules&& node ./node_modules/jest/bin/jest.js --runInBand",
-    "build": "node index.js"
+    "build": "node index.js",
+    "dev": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
