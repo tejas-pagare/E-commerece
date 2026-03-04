@@ -1,5 +1,8 @@
 import express from 'express';
 import { industryAuth } from '../middleware/isAuthenticated.js';
+import { v4 as uuidv4 } from 'uuid';
+import Industry from '../models/Industry.js';
+import SellProduct from '../models/SellProduct.js';
 import { 
     loginController, 
     registerController, 
