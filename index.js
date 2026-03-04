@@ -28,6 +28,7 @@ import csurf from "csurf";
 import { createStream } from "rotating-file-stream";
 import passport from "passport";
 import configurePassport from "./config/passport.js";
+import { swaggerUi, swaggerSpec } from "./swagger.js";
 
 // Fail fast on missing critical env vars
 if (!process.env.JWT_SECRET) {
@@ -157,6 +158,19 @@ app.use((req, res, next) => {
 });
 app.get("/api/v1/csrf-token", (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
+});
+
+// Swagger API Documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "SwiftMart API Documentation"
+}));
+
+// Swagger JSON endpoint
+app.get("/api-docs.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
 });
 
 app.use("/api/v1/user", userController);
