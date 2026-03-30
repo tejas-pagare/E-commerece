@@ -4,58 +4,32 @@
  *   get:
  *     tags: [Seller]
  *     summary: Seller login endpoint info
- *     description: Get information about seller login endpoint
+ *     description: Returns usage information for seller login.
  *     responses:
  *       200:
  *         description: Login endpoint information
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
  *   post:
  *     tags: [Seller]
  *     summary: Seller login
- *     description: Authenticate seller with email and password
+ *     description: Authenticates a seller and sets auth cookie.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
+ *             required: [email, password]
  *             properties:
  *               email:
  *                 type: string
  *                 format: email
- *                 example: seller@example.com
  *               password:
  *                 type: string
- *                 format: password
- *                 example: SecurePass123!
  *     responses:
  *       200:
  *         description: Login successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Login successful
- *                 seller:
- *                   $ref: '#/components/schemas/Seller'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       500:
@@ -66,14 +40,14 @@
  *   get:
  *     tags: [Seller]
  *     summary: Seller signup endpoint info
- *     description: Get information about seller signup endpoint
+ *     description: Returns usage information for seller signup.
  *     responses:
  *       200:
  *         description: Signup endpoint information
  *   post:
  *     tags: [Seller]
  *     summary: Seller registration
- *     description: Register a new seller account with profile and business details
+ *     description: Registers a seller account with profile and identity images.
  *     requestBody:
  *       required: true
  *       content:
@@ -92,28 +66,22 @@
  *             properties:
  *               name:
  *                 type: string
- *                 example: John Seller
+ *               password:
+ *                 type: string
  *               email:
  *                 type: string
  *                 format: email
- *                 example: seller@example.com
- *               password:
- *                 type: string
- *                 format: password
  *               gstn:
  *                 type: string
- *                 example: GST123456789
  *               phoneNumber:
  *                 type: string
- *                 example: +1234567890
- *               storeName:
- *                 type: string
- *                 example: Tech Store
  *               accountNumber:
  *                 type: string
  *               ifscCode:
  *                 type: string
  *               bankName:
+ *                 type: string
+ *               storeName:
  *                 type: string
  *               street:
  *                 type: string
@@ -133,18 +101,7 @@
  *                 format: binary
  *     responses:
  *       201:
- *         description: Seller registered successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: Registration successful
+ *         description: Signup successful
  *       400:
  *         $ref: '#/components/responses/ValidationError'
  *       409:
@@ -157,248 +114,40 @@
  *   get:
  *     tags: [Seller]
  *     summary: Seller logout
- *     description: Logout current seller and clear session
+ *     description: Clears seller auth cookie.
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Logout successful
- *
- * @swagger
- * /api/v1/seller/products:
- *   get:
- *     tags: [Seller]
- *     summary: Get seller products
- *     description: Retrieve all products listed by the current seller
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Products retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 products:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Product'
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
- *   post:
- *     tags: [Seller]
- *     summary: Add new product
- *     description: Create a new product listing
- *     security:
- *       - cookieAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - description
- *               - price
- *               - category
- *               - stock
- *             properties:
- *               name:
- *                 type: string
- *                 example: Smartphone X
- *               description:
- *                 type: string
- *                 example: Latest smartphone with advanced features
- *               price:
- *                 type: number
- *                 example: 599.99
- *               category:
- *                 type: string
- *                 example: Electronics
- *               stock:
- *                 type: integer
- *                 example: 50
- *               images:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
- *     responses:
- *       201:
- *         description: Product created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 product:
- *                   $ref: '#/components/schemas/Product'
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       400:
- *         $ref: '#/components/responses/ValidationError'
- *
- * @swagger
- * /api/v1/seller/products/{id}:
- *   put:
- *     tags: [Seller]
- *     summary: Update product
- *     description: Update an existing product listing
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               description:
- *                 type: string
- *               price:
- *                 type: number
- *               stock:
- *                 type: integer
- *     responses:
- *       200:
- *         description: Product updated successfully
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       404:
- *         $ref: '#/components/responses/NotFoundError'
- *   delete:
- *     tags: [Seller]
- *     summary: Delete product
- *     description: Remove a product listing
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Product ID
- *     responses:
- *       200:
- *         description: Product deleted successfully
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       404:
- *         $ref: '#/components/responses/NotFoundError'
- *
- * @swagger
- * /api/v1/seller/orders:
- *   get:
- *     tags: [Seller]
- *     summary: Get seller orders
- *     description: Retrieve all orders for seller's products
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [pending, processing, shipped, delivered, cancelled]
- *         description: Filter by order status
- *     responses:
- *       200:
- *         description: Orders retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 orders:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Order'
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
- *
- * @swagger
- * /api/v1/seller/dashboard:
- *   get:
- *     tags: [Seller]
- *     summary: Get seller dashboard data
- *     description: Retrieve dashboard statistics and analytics
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Dashboard data retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 stats:
- *                   type: object
- *                   properties:
- *                     totalProducts:
- *                       type: integer
- *                     totalOrders:
- *                       type: integer
- *                     totalRevenue:
- *                       type: number
- *                     pendingOrders:
- *                       type: integer
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
+ *         description: Logged out
  *
  * @swagger
  * /api/v1/seller:
  *   get:
  *     tags: [Seller]
- *     summary: Get seller home/dashboard
- *     description: Main seller dashboard view
+ *     summary: Seller listed products page
+ *     description: Renders seller listed products view.
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Dashboard loaded
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
+ *         description: HTML page rendered
  *
  * @swagger
  * /api/v1/seller/create:
  *   get:
  *     tags: [Seller]
- *     summary: Get product creation page
- *     description: Load product creation form
+ *     summary: Product create page
+ *     description: Renders product creation page.
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Creation page loaded
+ *         description: HTML page rendered
  *   post:
  *     tags: [Seller]
- *     summary: Create new product
- *     description: Create a new product listing with image upload
+ *     summary: Create product
+ *     description: Creates a new product listing with image upload.
  *     security:
  *       - cookieAuth: []
  *     requestBody:
@@ -407,86 +156,52 @@
  *         multipart/form-data:
  *           schema:
  *             type: object
- *             required:
- *               - name
- *               - description
- *               - price
- *               - category
- *               - stock
+ *             required: [title, price, description, category, quantity, img]
  *             properties:
- *               name:
- *                 type: string
- *               description:
+ *               title:
  *                 type: string
  *               price:
  *                 type: number
+ *               description:
+ *                 type: string
  *               category:
  *                 type: string
- *               stock:
+ *               quantity:
  *                 type: integer
+ *               stock:
+ *                 type: boolean
+ *                 description: In-stock flag. You can pass true/false (preferred).
  *               img:
  *                 type: string
  *                 format: binary
  *     responses:
- *       201:
- *         description: Product created successfully
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
+ *       200:
+ *         description: Product created
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  *
  * @swagger
- * /api/v1/seller/update/{id}:
+ * /api/v1/seller/products:
  *   get:
  *     tags: [Seller]
- *     summary: Get product update page
- *     description: Load product update form with existing data
+ *     summary: Get seller products (JSON)
+ *     description: Returns authenticated seller product list as JSON.
  *     security:
  *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
  *     responses:
  *       200:
- *         description: Update page loaded
- *   post:
- *     tags: [Seller]
- *     summary: Update existing product
- *     description: Update product details
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               description:
- *                 type: string
- *               price:
- *                 type: number
- *               stock:
- *                 type: integer
- *     responses:
- *       200:
- *         description: Product updated successfully
+ *         description: Products retrieved
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  *
  * @swagger
  * /api/v1/seller/product/{id}:
  *   get:
  *     tags: [Seller]
- *     summary: Get single product details
- *     description: Retrieve detailed information about a specific seller's product
+ *     summary: Get one seller product
+ *     description: Returns one product if it belongs to current seller.
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -497,13 +212,17 @@
  *           type: string
  *     responses:
  *       200:
- *         description: Product details retrieved
+ *         description: Product retrieved
+ *       403:
+ *         description: Forbidden
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  *   delete:
  *     tags: [Seller]
- *     summary: Delete product
- *     description: Remove a product from seller's listings
+ *     summary: Delete seller product
+ *     description: Deletes a product owned by authenticated seller.
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -514,37 +233,37 @@
  *           type: string
  *     responses:
  *       200:
- *         description: Product deleted successfully
- *       404:
- *         $ref: '#/components/responses/NotFoundError'
+ *         description: Product removed
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  *
  * @swagger
  * /api/v1/seller/account:
  *   get:
  *     tags: [Seller]
- *     summary: Get seller account page
- *     description: View seller account information
+ *     summary: Seller account page
+ *     description: Renders seller account page.
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Account page loaded
+ *         description: HTML page rendered
  *
  * @swagger
  * /api/v1/seller/account/update:
  *   get:
  *     tags: [Seller]
- *     summary: Get account update page
- *     description: Load account update form
+ *     summary: Seller account update page
+ *     description: Renders seller account edit form.
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Update page loaded
+ *         description: HTML page rendered
  *   post:
  *     tags: [Seller]
- *     summary: Update seller account
- *     description: Update seller profile information
+ *     summary: Update seller account (form)
+ *     description: Updates seller name, gstn and email.
  *     security:
  *       - cookieAuth: []
  *     requestBody:
@@ -553,126 +272,85 @@
  *         application/json:
  *           schema:
  *             type: object
+ *             required: [name, gstn, email]
  *             properties:
  *               name:
  *                 type: string
- *               phoneNumber:
+ *               gstn:
  *                 type: string
- *               storeName:
+ *               email:
  *                 type: string
+ *                 format: email
  *     responses:
  *       200:
- *         description: Account updated successfully
+ *         description: Account updated
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  *
  * @swagger
  * /api/v1/seller/account/me:
  *   get:
  *     tags: [Seller]
  *     summary: Get current seller profile
- *     description: Retrieve authenticated seller's profile data
+ *     description: Returns current authenticated seller profile in JSON.
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Profile retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 seller:
- *                   $ref: '#/components/schemas/Seller'
- *   patch:
- *     tags: [Seller]
- *     summary: Patch seller account
- *     description: Partially update seller account information
- *     security:
- *       - cookieAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     responses:
- *       200:
- *         description: Account updated
+ *         description: Profile retrieved
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  *
  * @swagger
  * /api/v1/seller/sold-products:
  *   get:
  *     tags: [Seller]
- *     summary: Get sold products
- *     description: Retrieve list of products that have been sold
+ *     summary: Sold products page
+ *     description: Renders sold products view.
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Sold products retrieved
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 products:
- *                   type: array
- *                   items:
- *                     type: object
+ *         description: HTML page rendered
  *
  * @swagger
  * /api/v1/seller/sold-products/data:
  *   get:
  *     tags: [Seller]
- *     summary: Get sold products data/analytics
- *     description: Retrieve detailed analytics about sold products
+ *     summary: Sold products data
+ *     description: Returns sold products analytics data in JSON.
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Data retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 data:
- *                   type: object
+ *         description: Sold products returned
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  *
  * @swagger
  * /api/v1/seller/orders/requests:
  *   get:
  *     tags: [Seller]
  *     summary: Get order requests
- *     description: Retrieve pending and active order requests for seller's products
+ *     description: Returns seller orders containing seller-owned items.
  *     security:
  *       - cookieAuth: []
  *     responses:
  *       200:
- *         description: Order requests retrieved
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 orders:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Order'
+ *         description: Orders retrieved
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  *
  * @swagger
  * /api/v1/seller/orders/{orderId}/seller/status:
  *   put:
  *     tags: [Seller]
  *     summary: Update order status
- *     description: Update the status of an order by seller
+ *     description: Updates order status when seller owns at least one order item.
  *     security:
  *       - cookieAuth: []
  *     parameters:
@@ -681,22 +359,26 @@
  *         required: true
  *         schema:
  *           type: string
- *         description: Order ID
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - status
+ *             required: [orderStatus]
  *             properties:
- *               status:
+ *               orderStatus:
  *                 type: string
- *                 enum: [processing, shipped, delivered, cancelled]
+ *                 enum: [Pending, Processing, Shipped, Delivered, Cancelled, Returned]
  *     responses:
  *       200:
- *         description: Order status updated successfully
+ *         description: Order status updated
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       403:
+ *         description: Forbidden
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
