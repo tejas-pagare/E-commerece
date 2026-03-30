@@ -59,8 +59,22 @@ const isAuthenticated = async (req, res, next) => {
     let user = "";
     if (decode.role === "user") {
       user = await User.findById(decode.userId);
-    } else {
+    } else if (decode.role === "seller") {
       user = await Seller.findById(decode.userId);
+    } else {
+      // Token is valid but not for user/seller routes; do not clear it.
+      if (isApiRequest) {
+        return res.status(401).json({ success: false, message: "Authentication required" });
+      }
+      const wantsJson =
+        req.xhr ||
+        req.is('application/json') ||
+        (req.headers.accept && req.headers.accept.includes('application/json'));
+
+      if (wantsJson) {
+        return res.status(401).json({ success: false, message: "Authentication required" });
+      }
+      return res.redirect("/");
     }
     
     // If user doesn't exist in database, clear cookie

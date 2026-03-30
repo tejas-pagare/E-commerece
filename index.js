@@ -69,7 +69,7 @@ app.use(cookieParser());
 app.use(bodyParser.json({
   limit: "2mb",
   verify: (req, res, buf) => {
-    if (req.originalUrl === "/api/v1/user/stripe/webhook") {
+    if (req.originalUrl === "/api/v1/user/stripe/webhook" || req.originalUrl === "/api/v1/industry/stripe/webhook") {
       req.rawBody = buf;
     }
   },
@@ -108,7 +108,7 @@ app.use((req, res, next) => {
     return next();
   }
   try {
-    jwt.verify(token, "JWT_SECRET");
+    jwt.verify(token, process.env.JWT_SECRET || "your_jwt_secret_key_change_me");
     return next();
   } catch (err) {
     res.clearCookie("token", {

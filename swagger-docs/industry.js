@@ -163,6 +163,47 @@
  *         description: Checkout completed
  *
  * @swagger
+ * /api/v1/industry/create-checkout-session:
+ *   post:
+ *     tags: [Industry]
+ *     summary: Create Stripe checkout session
+ *     description: Create a Stripe checkout session for the industry cart
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Checkout session created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 checkoutUrl:
+ *                   type: string
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
+ *
+ * @swagger
+ * /api/v1/industry/stripe/webhook:
+ *   post:
+ *     tags: [Industry]
+ *     summary: Stripe webhook for industry payments
+ *     description: Handle Stripe webhook events for industry checkout
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Webhook processed
+ *       400:
+ *         description: Invalid webhook
+ *
+ * @swagger
  * /api/v1/industry/cart:
  *   get:
  *     tags: [Industry]
