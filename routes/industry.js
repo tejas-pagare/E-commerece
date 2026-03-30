@@ -23,9 +23,6 @@ import {
     handleStripeSuccess
 } from '../controller/industry.js';
 
-import SellProduct from '../models/SellProduct.js';
-import Industry from '../models/Industry.js';
-
 const router = express.Router();
 
 router.post('/login', loginController);
