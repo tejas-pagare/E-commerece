@@ -1,13 +1,6 @@
 /**
  * @swagger
  * /api/v1/manager/login:
- *   get:
- *     tags: [Manager]
- *     summary: Get manager login page
- *     description: Display manager login page
- *     responses:
- *       200:
- *         description: Login page rendered
  *   post:
  *     tags: [Manager]
  *     summary: Manager login
@@ -31,20 +24,6 @@
  *     responses:
  *       200:
  *         description: Login successful
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
- *
- * @swagger
- * /api/v1/manager:
- *   get:
- *     tags: [Manager]
- *     summary: Get manager home/dashboard
- *     description: Retrieve manager main dashboard
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Dashboard data retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -52,59 +31,10 @@
  *               properties:
  *                 success:
  *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
+ *                 token:
+ *                   type: string
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
- *
- * @swagger
- * /api/v1/manager/dashboard:
- *   get:
- *     tags: [Manager]
- *     summary: Get manager dashboard
- *     description: Retrieve manager dashboard data and statistics
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Dashboard data retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
- *
- * @swagger
- * /api/v1/manager/sellers:
- *   get:
- *     tags: [Manager]
- *     summary: Get managed sellers
- *     description: Retrieve list of sellers managed by this manager
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Sellers retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 sellers:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/Seller'
  *
  * @swagger
  * /api/v1/manager/sellers/pending:
@@ -177,21 +107,6 @@
  *     responses:
  *       200:
  *         description: Seller verified
- *   post:
- *     tags: [Manager]
- *     summary: Verify seller (POST)
- *     description: Approve seller registration
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Seller verified
  *
  * @swagger
  * /api/v1/manager/seller/reject/{id}:
@@ -212,30 +127,6 @@
  *         description: Seller rejected
  *
  * @swagger
- * /api/v1/manager/products:
- *   get:
- *     tags: [Manager]
- *     summary: Get managed products
- *     description: Retrieve products from managed sellers
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Products retrieved successfully
- *
- * @swagger
- * /api/v1/manager/product:
- *   get:
- *     tags: [Manager]
- *     summary: Get product management page
- *     description: View product management interface
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Product page loaded
- *
- * @swagger
  * /api/v1/manager/products/details:
  *   get:
  *     tags: [Manager]
@@ -252,6 +143,15 @@
  *     responses:
  *       200:
  *         description: Product details retrieved
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
  *
  * @swagger
  * /api/v1/manager/products/pending:
@@ -291,24 +191,9 @@
  *
  * @swagger
  * /api/v1/manager/product/verify/{id}:
- *   get:
- *     tags: [Manager]
- *     summary: Verify product (GET)
- *     description: Approve product listing (legacy)
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Product verified
  *   post:
  *     tags: [Manager]
- *     summary: Verify product (POST)
+ *     summary: Verify product
  *     description: Approve product listing
  *     security:
  *       - cookieAuth: []
@@ -324,24 +209,9 @@
  *
  * @swagger
  * /api/v1/manager/product/reject/{id}:
- *   get:
- *     tags: [Manager]
- *     summary: Reject product (GET)
- *     description: Reject product listing
- *     security:
- *       - cookieAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Product rejected
  *   post:
  *     tags: [Manager]
- *     summary: Reject product (POST)
+ *     summary: Reject product
  *     description: Reject product listing
  *     security:
  *       - cookieAuth: []
@@ -374,57 +244,25 @@
  *         description: Product deleted
  *
  * @swagger
- * /api/v1/manager/customers:
- *   get:
- *     tags: [Manager]
- *     summary: Get customers
- *     description: Retrieve list of customers
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Customers retrieved
- *
- * @swagger
  * /api/v1/manager/customer/details:
  *   get:
  *     tags: [Manager]
  *     summary: Get customer details
- *     description: Retrieve details for a specific customer
+ *     description: Retrieve all customers
  *     security:
  *       - cookieAuth: []
- *     parameters:
- *       - in: query
- *         name: customerId
- *         schema:
- *           type: string
  *     responses:
  *       200:
  *         description: Customer details retrieved
- *
- * @swagger
- * /api/v1/manager/vendors:
- *   get:
- *     tags: [Manager]
- *     summary: Get vendors page
- *     description: View vendors/sellers management page
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Vendors page loaded
- *
- * @swagger
- * /api/v1/manager/order:
- *   get:
- *     tags: [Manager]
- *     summary: Get orders page
- *     description: View orders management interface
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Orders page loaded
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 customers:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
  *
  * @swagger
  * /api/v1/manager/orders:
@@ -482,8 +320,9 @@
  *           schema:
  *             type: object
  *             properties:
- *               status:
+ *               orderStatus:
  *                 type: string
+ *                 enum: [Pending, Processing, Shipped, Delivered, Cancelled, Returned]
  *     responses:
  *       200:
  *         description: Order status updated

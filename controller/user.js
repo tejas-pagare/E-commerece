@@ -1,9 +1,18 @@
 import jwt from 'jsonwebtoken';
+import Stripe from "stripe";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 import User from '../models/user.js';
 import Product from '../models/product.js';
 import bcrypt from 'bcryptjs';
 import blogPosts from "../data/blogId.json" with {type: "json"}
 import { assignUserToManager } from '../utils/managerAssignment.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, "..", "..", ".env") });
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const HomePageController = async (req, res) => {
   try {
     const productsRaw = await Product.find({ verified: true });
@@ -77,6 +86,7 @@ const loginController = async (req, res) => {
     return res.json({
       success: true,
       message: "Login successful",
+      token,
       user: {
         id: userCheck._id,
         firstname: userCheck.firstname,
@@ -856,6 +866,10 @@ const processPaymentController = async (req, res) => {
         totalAmount -= user.coins;
       }
 
+    }
+
+    const useStripeCheckout = paymentMethod === "stripe" && totalAmount > 0;
+    if (!useStripeCheckout) {
       user.coins -= coinsUsed;
     }
 
@@ -865,6 +879,8 @@ const processPaymentController = async (req, res) => {
       totalAmount,
       paymentStatus: totalAmount === 0 ? "Completed" : "Pending",
       paymentMethod: totalAmount === 0 ? "Wallet/Coins" : paymentMethod,
+      paymentProvider: totalAmount === 0 ? "Wallet/Coins" : "Stripe",
+      coinsUsed,
       shippingAddress: {
         fullname: `${user.firstname} ${user.lastname}`,
         plotno: address.plotno,
@@ -877,6 +893,56 @@ const processPaymentController = async (req, res) => {
     });
 
     await newOrder.save();
+
+    if (useStripeCheckout) {
+      if (!stripe) {
+        return res.status(500).json({
+          error: "Stripe is not configured on the server"
+        });
+      }
+
+      try {
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+        const lineItems = user.cart.map((item) => {
+          const markedUpPrice = Math.ceil(item.productId.price * 1.1);
+          return {
+            price_data: {
+              currency: "inr",
+              product_data: {
+                name: item.productId.title || "Product",
+                description: item.productId.description || "",
+              },
+              unit_amount: Math.round(markedUpPrice) * 100,
+            },
+            quantity: item.quantity,
+          };
+        });
+
+        const session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          mode: "payment",
+          line_items: lineItems,
+          client_reference_id: String(user._id),
+          metadata: { orderId: String(newOrder._id) },
+          success_url: `${frontendUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${frontendUrl}/checkout/cancel`,
+        });
+
+        newOrder.stripeSessionId = session.id;
+        await newOrder.save();
+
+        return res.status(200).json({
+          checkoutUrl: session.url,
+          orderId: newOrder._id
+        });
+      } catch (stripeError) {
+        console.error("Stripe checkout session error:", stripeError);
+        return res.status(502).json({
+          error: "Stripe session creation failed",
+          orderId: newOrder._id
+        });
+      }
+    }
 
     let userHistory = await UserHistory.findOne({
       userId: user._id
