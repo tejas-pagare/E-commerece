@@ -12,7 +12,6 @@ export const classifyImage = (imageBuffer) => {
 
         const projectRoot = path.join(__dirname, '..');
         const venvDir = path.join(projectRoot, '.venv');
-        const venvCfgPath = path.join(venvDir, 'pyvenv.cfg');
         const venvWindows = path.join(venvDir, 'Scripts', 'python.exe');
         const venvPosix = path.join(venvDir, 'bin', 'python');
 
@@ -25,92 +24,118 @@ export const classifyImage = (imageBuffer) => {
             'py'
         ].filter(Boolean);
 
-        const spawnWithFallback = (index = 0) => {
+        const parseLastJson = (rawOutput) => {
+            const lines = (rawOutput || '').trim().split('\n');
+            const jsonLines = lines.filter((line) => line.trim().startsWith('{') && line.trim().endsWith('}'));
+            if (!jsonLines.length) return null;
+            return JSON.parse(jsonLines[jsonLines.length - 1]);
+        };
+
+        let settled = false;
+        const safeResolve = (value) => {
+            if (settled) return;
+            settled = true;
+            resolve(value);
+        };
+        const safeReject = (err) => {
+            if (settled) return;
+            settled = true;
+            reject(err);
+        };
+
+        const runWithCandidate = (index) => {
             if (index >= candidates.length) {
-                return reject(new Error("No valid Python executable found. Set ML_PYTHON or ensure python/py is on PATH."));
+                return safeReject(new Error('No valid Python executable found. Set ML_PYTHON or ensure python/py is on PATH.'));
             }
 
             const pythonCmd = candidates[index];
             const child = spawn(pythonCmd, [scriptPath]);
+            let dataString = '';
+            let errorString = '';
+            let movedNext = false;
+
+            const moveToNextCandidate = () => {
+                if (movedNext || settled) return;
+                movedNext = true;
+                runWithCandidate(index + 1);
+            };
 
             child.on('error', (err) => {
                 if (err.code === 'ENOENT') {
-                    return spawnWithFallback(index + 1);
+                    return moveToNextCandidate();
                 }
-                return reject(err);
+                return safeReject(err);
             });
 
-            return child;
-        };
+            child.stdout.on('data', (data) => {
+                dataString += data.toString();
+            });
 
-        // Spawn python process with fallback candidates
-        const pythonProcess = spawnWithFallback();
+            child.stderr.on('data', (data) => {
+                errorString += data.toString();
+            });
 
-        let dataString = '';
-        let errorString = '';
+            child.on('close', (code) => {
+                if (movedNext || settled) return;
 
-        // Send image buffer to python script via stdin
-        pythonProcess.stdin.write(imageBuffer);
-        pythonProcess.stdin.end();
+                if (code !== 0) {
+                    if (index < candidates.length - 1) {
+                        return moveToNextCandidate();
+                    }
 
-        pythonProcess.stdout.on('data', (data) => {
-            dataString += data.toString();
-        });
+                    try {
+                        const result = parseLastJson(dataString);
+                        if (result?.error) {
+                            return safeReject(new Error(result.error));
+                        }
+                    } catch (e) {
+                        // ignore parse errors and return generic classifier error below
+                    }
 
-        pythonProcess.stderr.on('data', (data) => {
-            errorString += data.toString();
-        });
+                    // If a command alias exists but fails to execute script, try next candidate.
+                    const stderrLower = (errorString || '').toLowerCase();
+                    if (stderrLower.includes('not recognized') || stderrLower.includes('no such file or directory')) {
+                        return moveToNextCandidate();
+                    }
 
-        pythonProcess.on('close', (code) => {
-            if (code !== 0) {
-                console.error(`Python script exited with code ${code}`);
-                console.error(`Stderr: ${errorString}`);
-                console.error(`Stdout: ${dataString}`);
-
-                // Try to parse error from stdout if available
-                try {
-                     const lines = dataString.trim().split('\n');
-                     // Find the last JSON line
-                     const jsonLines = lines.filter(line => line.trim().startsWith('{') && line.trim().endsWith('}'));
-                     if (jsonLines.length > 0) {
-                         const lastLine = jsonLines[jsonLines.length - 1];
-                         const result = JSON.parse(lastLine);
-                         if (result.error) {
-                             return reject(new Error(result.error));
-                         }
-                     }
-                } catch (e) {
-                    // ignore parsing errors
+                    return safeReject(new Error('Image classification failed (Check server logs for details)'));
                 }
 
-                // If the script fails (e.g. missing libraries), we reject.
-                // You might want to allow fallback if ML is optional.
-                return reject(new Error('Image classification failed (Check server logs for details)'));
-            }
+                try {
+                    const result = parseLastJson(dataString);
+                    if (!result) {
+                        return safeReject(new Error('Invalid response from classifier'));
+                    }
+                    if (result.error) {
+                        return safeReject(new Error(result.error));
+                    }
+                    return safeResolve(result);
+                } catch (e) {
+                    return safeReject(new Error('Invalid response from classifier'));
+                }
+            });
+
+            child.stdin.on('error', (err) => {
+                if (movedNext || settled) return;
+
+                // Python process may exit before stdin write completes.
+                if (index < candidates.length - 1) {
+                    return moveToNextCandidate();
+                }
+
+                return safeReject(new Error(`Image classification stdin error: ${err.message}`));
+            });
 
             try {
-                // Parse the last line as JSON (in case of warnings printed before)
-                const lines = dataString.trim().split('\n');
-                // Filter for lines that look like JSON
-                const jsonLines = lines.filter(line => line.trim().startsWith('{') && line.trim().endsWith('}'));
-                
-                if (jsonLines.length === 0) {
-                     console.error("No JSON output from Python script. Raw output:", dataString);
-                     return reject(new Error('Invalid response from classifier'));
+                child.stdin.end(imageBuffer);
+            } catch (err) {
+                if (index < candidates.length - 1) {
+                    return moveToNextCandidate();
                 }
-
-                const lastLine = jsonLines[jsonLines.length - 1];
-                const result = JSON.parse(lastLine);
-                
-                if (result.error) {
-                    return reject(new Error(result.error));
-                }
-                
-                resolve(result);
-            } catch (e) {
-                console.error("Failed to parse Python output:", dataString);
-                reject(new Error('Invalid response from classifier'));
+                return safeReject(new Error(`Image classification stdin error: ${err.message}`));
             }
-        });
+        };
+
+        runWithCandidate(0);
     });
 };
