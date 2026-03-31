@@ -351,6 +351,56 @@ router.get("/dashboard-revenue", adminOrManagerAuth, async (req, res) => {
 
 // --- CUSTOMER ROUTES ---
 
+// Backward-compatible aliases for Swagger/legacy clients
+router.get("/users", adminOrManagerAuth, async (req, res) => {
+  try {
+    const filter = isManager(req) ? { _id: { $in: getAssignedUserIds(req) } } : {};
+    const users = await User.find(filter);
+    return sendSuccess(res, "Users fetched", paginate(users));
+  } catch (error) {
+    return sendError(res, 500, "Failed to fetch users", error);
+  }
+});
+
+router.get("/users/:id", adminOrManagerAuth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!isValidObjectId(id) || id === 'details') {
+      return sendError(res, 400, "Invalid user id");
+    }
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
+    const user = await User.findById(id);
+    if (!user) return sendError(res, 404, "User not found");
+    return sendSuccess(res, "User details", { user });
+  } catch (error) {
+    return sendError(res, 500, "Server Error", error);
+  }
+});
+
+router.delete("/users/:id", adminOrManagerAuth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!isValidObjectId(id)) {
+      return sendError(res, 400, "Invalid user id");
+    }
+    if (isManager(req) && !isAssigned(getAssignedUserIds(req), id)) {
+      return sendError(res, 403, "Access denied", null, { code: "NOT_ASSIGNED" });
+    }
+    const user = await User.findById(id);
+    if (!user) {
+      return sendError(res, 404, "No user with given id exists", null, { code: "USER_NOT_FOUND" });
+    }
+
+    await user.deleteOne();
+    return sendSuccess(res, "User deleted successfully", {});
+  } catch (error) {
+    console.log(error);
+    return sendError(res, 500, "Server error", error);
+  }
+});
+
 router.get("/customers", adminOrManagerAuth, async (req, res) => {
   try {
     const filter = isManager(req) ? { _id: { $in: getAssignedUserIds(req) } } : {};
