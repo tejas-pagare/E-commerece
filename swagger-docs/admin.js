@@ -347,7 +347,7 @@
  *
  * @swagger
  * /api/v1/admin/products/{id}:
- *   put:
+ *   x-put-disabled:
  *     tags: [Admin]
  *     summary: Update product
  *     description: Update product details
@@ -450,7 +450,7 @@
  *
  * @swagger
  * /api/v1/admin/blogs/{id}:
- *   put:
+ *   x-put-disabled:
  *     tags: [Admin]
  *     summary: Update blog
  *     description: Update an existing blog post
@@ -483,7 +483,7 @@
  *
  * @swagger
  * /api/v1/admin/industries/{id}:
- *   put:
+ *   x-put-disabled:
  *     tags: [Admin]
  *     summary: Update industry
  *     description: Update an existing industry category
@@ -561,7 +561,7 @@
  *
  * @swagger
  * /api/v1/admin/products/{id}/approval:
- *   put:
+ *   x-put-disabled:
  *     tags: [Admin]
  *     summary: Update product approval status
  *     description: Approve or reject a product listing
@@ -624,7 +624,7 @@
  *
  * @swagger
  * /api/v1/admin/sellers/{id}/approve:
- *   put:
+ *   x-put-disabled:
  *     tags: [Admin]
  *     summary: Approve seller account
  *     description: Approve a seller registration
@@ -757,7 +757,7 @@
  *
  * @swagger
  * /api/v1/admin/orders/{orderId}/status:
- *   put:
+ *   x-put-disabled:
  *     tags: [Admin]
  *     summary: Update order status
  *     description: Update the status of an order
@@ -844,7 +844,7 @@
  *
  * @swagger
  * /api/v1/admin/secondhand-products/{id}/status:
- *   put:
+ *   x-put-disabled:
  *     tags: [Admin]
  *     summary: Update secondhand product status
  *     description: Approve or reject a secondhand product listing
@@ -872,7 +872,7 @@
  *
  * @swagger
  * /api/v1/admin/sellproduct/{id}/status:
- *   put:
+ *   x-put-disabled:
  *     tags: [Admin]
  *     summary: Update sell product status (legacy)
  *     description: Legacy endpoint for updating secondhand product status
