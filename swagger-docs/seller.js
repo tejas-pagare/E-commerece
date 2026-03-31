@@ -121,66 +121,7 @@
  *       200:
  *         description: Logged out
  *
- * @swagger
- * /api/v1/seller:
- *   get:
- *     tags: [Seller]
- *     summary: Seller listed products page
- *     description: Renders seller listed products view.
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: HTML page rendered
- *
- * @swagger
- * /api/v1/seller/create:
- *   get:
- *     tags: [Seller]
- *     summary: Product create page
- *     description: Renders product creation page.
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: HTML page rendered
- *   post:
- *     tags: [Seller]
- *     summary: Create product
- *     description: Creates a new product listing with image upload.
- *     security:
- *       - cookieAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             required: [title, price, description, category, quantity, img]
- *             properties:
- *               title:
- *                 type: string
- *               price:
- *                 type: number
- *               description:
- *                 type: string
- *               category:
- *                 type: string
- *               quantity:
- *                 type: integer
- *               stock:
- *                 type: boolean
- *                 description: In-stock flag. You can pass true/false (preferred).
- *               img:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Product created
- *       400:
- *         $ref: '#/components/responses/ValidationError'
- *       500:
- *         $ref: '#/components/responses/ServerError'
+ * 
  *
  * @swagger
  * /api/v1/seller/products:
@@ -237,57 +178,6 @@
  *       500:
  *         $ref: '#/components/responses/ServerError'
  *
- * @swagger
- * /api/v1/seller/account:
- *   get:
- *     tags: [Seller]
- *     summary: Seller account page
- *     description: Renders seller account page.
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: HTML page rendered
- *
- * @swagger
- * /api/v1/seller/account/update:
- *   get:
- *     tags: [Seller]
- *     summary: Seller account update page
- *     description: Renders seller account edit form.
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: HTML page rendered
- *   post:
- *     tags: [Seller]
- *     summary: Update seller account (form)
- *     description: Updates seller name, gstn and email.
- *     security:
- *       - cookieAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [name, gstn, email]
- *             properties:
- *               name:
- *                 type: string
- *               gstn:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
- *     responses:
- *       200:
- *         description: Account updated
- *       400:
- *         $ref: '#/components/responses/ValidationError'
- *       500:
- *         $ref: '#/components/responses/ServerError'
  *
  * @swagger
  * /api/v1/seller/account/me:
@@ -305,17 +195,6 @@
  *       500:
  *         $ref: '#/components/responses/ServerError'
  *
- * @swagger
- * /api/v1/seller/sold-products:
- *   get:
- *     tags: [Seller]
- *     summary: Sold products page
- *     description: Renders sold products view.
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: HTML page rendered
  *
  * @swagger
  * /api/v1/seller/sold-products/data:
