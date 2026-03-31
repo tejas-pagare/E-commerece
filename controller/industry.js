@@ -35,7 +35,11 @@ const loginController = async (req, res) => {
       return res.redirect("/api/v1/industry/login?error=Invalid email or password");
     }
 
-    const token = jwt.sign({ industry_id: industryCheck._id, role: "industry" }, "JWT_SECRET", { expiresIn: "5h" });
+        const token = jwt.sign(
+            { industry_id: industryCheck._id, role: "industry" },
+            process.env.JWT_SECRET || "your_jwt_secret_key_change_me",
+            { expiresIn: "5h" }
+        );
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -291,6 +295,44 @@ const postCheckoutController = async (req, res) => {
     }
 };
 
+const finalizeIndustryOrder = async (industry) => {
+    const cartItems = industry.cart || [];
+    if (cartItems.length === 0) {
+        return {
+            orders: industry.dashboard || [],
+            totalAmount: (industry.dashboard || []).reduce((acc, item) => acc + (item.amount || 0), 0),
+        };
+    }
+
+    for (const item of cartItems) {
+        const { combination_id, quantity } = item;
+
+        const products = await SellProduct.find({
+            combination_id: combination_id,
+            adminStatus: "Pending"
+        }).limit(quantity);
+
+        const productIdsToUpdate = products.map(p => p._id);
+
+        if (productIdsToUpdate.length > 0) {
+            await SellProduct.updateMany(
+                { _id: { $in: productIdsToUpdate } },
+                { $set: { adminStatus: "Sold" } }
+            );
+        }
+
+        industry.dashboard.push(item);
+    }
+
+    industry.cart = [];
+    await industry.save();
+
+    return {
+        orders: industry.dashboard,
+        totalAmount: industry.dashboard.reduce((acc, item) => acc + (item.amount || 0), 0)
+    };
+};
+
 const createStripeCheckoutSession = async (req, res) => {
     try {
         if (!stripe) {
@@ -333,7 +375,7 @@ const createStripeCheckoutSession = async (req, res) => {
             },
             line_items,
             client_reference_id: String(id),
-            success_url: `${frontendUrl}/industry/checkout?success=true`,
+            success_url: `${frontendUrl}/industry/checkout?success=true&session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${frontendUrl}/industry/checkout?canceled=true`,
         });
 
@@ -342,6 +384,85 @@ const createStripeCheckoutSession = async (req, res) => {
     } catch (error) {
         console.error("Stripe Checkout Error:", error);
         res.status(500).json({ message: "Failed to create checkout session" });
+    }
+};
+
+const handleStripeWebhook = async (req, res) => {
+    if (!stripe) {
+        return res.status(500).json({ message: "Stripe is not configured on the server" });
+    }
+
+    const signature = req.headers["stripe-signature"];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+        return res.status(500).json({ message: "Stripe webhook is not configured" });
+    }
+
+    let event;
+    try {
+        event = stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
+    } catch (err) {
+        return res.status(400).json({ message: "Invalid Stripe signature" });
+    }
+
+    if (event.type !== "checkout.session.completed") {
+        return res.json({ received: true });
+    }
+
+    try {
+        const session = event.data.object;
+        const industryId = session.client_reference_id;
+
+        if (!industryId) {
+            return res.status(400).json({ message: "Missing industry reference" });
+        }
+
+        const industry = await Industry.findById(industryId);
+        if (!industry) {
+            return res.status(404).json({ message: "Industry not found" });
+        }
+
+        await finalizeIndustryOrder(industry);
+
+        return res.json({ received: true });
+    } catch (err) {
+        console.error("Industry webhook error:", err);
+        return res.status(500).json({ message: "Webhook handler failed" });
+    }
+};
+
+const handleStripeSuccess = async (req, res) => {
+    if (!stripe) {
+        return res.status(500).json({ message: "Stripe is not configured on the server" });
+    }
+
+    const sessionId = req.query.session_id;
+    if (!sessionId) {
+        return res.status(400).json({ message: "Missing session_id" });
+    }
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        if (!session || session.payment_status !== "paid") {
+            return res.status(400).json({ message: "Payment not completed" });
+        }
+
+        const industryId = session.client_reference_id;
+        if (!industryId) {
+            return res.status(400).json({ message: "Missing industry reference" });
+        }
+
+        const industry = await Industry.findById(industryId);
+        if (!industry) {
+            return res.status(404).json({ message: "Industry not found" });
+        }
+
+        const result = await finalizeIndustryOrder(industry);
+        return res.json({ success: true, ...result });
+    } catch (err) {
+        console.error("Stripe success handler error:", err);
+        return res.status(500).json({ message: "Failed to finalize order" });
     }
 };
 
@@ -364,15 +485,15 @@ const getCartController = async (req, res) => {
 
 const postCartController = async (req, res) => {
     try {
-        const { 
-            id, 
-            combination_id, 
-            quantity, 
-            fabric, 
-            size, 
-            usageDuration, 
-            estimated_value, 
-            amount 
+        const {
+            id,
+            combination_id,
+            quantity,
+            fabric,
+            size,
+            usageDuration,
+            estimated_value,
+            amount
         } = req.body;
 
         const cartItem = {
@@ -524,5 +645,7 @@ export {
     postCartController,
     deleteCartController,
     getDashboardController,
-    createStripeCheckoutSession
+    createStripeCheckoutSession,
+    handleStripeWebhook,
+    handleStripeSuccess
 };
