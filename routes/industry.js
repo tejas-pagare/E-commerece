@@ -18,11 +18,10 @@ import {
     postCartController,
     deleteCartController,
     getDashboardController,
-    createStripeCheckoutSession
+    createStripeCheckoutSession,
+    handleStripeWebhook,
+    handleStripeSuccess
 } from '../controller/industry.js';
-
-import SellProduct from '../models/SellProduct.js';
-import Industry from '../models/Industry.js';
 
 const router = express.Router();
 
@@ -207,5 +206,11 @@ router.post('/cart/delete', industryAuth, deleteCartController);
 router.get("/dashboard", industryAuth, getDashboardController);
 
 router.post('/create-checkout-session', industryAuth, createStripeCheckoutSession);
+
+// Stripe webhook for completing industry checkout
+router.post('/stripe/webhook', handleStripeWebhook);
+
+// Stripe success handler for redirect flow
+router.get('/stripe/success', handleStripeSuccess);
 
 export default router;
