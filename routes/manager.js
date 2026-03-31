@@ -2,8 +2,11 @@ import express from 'express';
 import Manager from '../models/manager.js';
 import Product from '../models/product.js';
 import Seller from '../models/seller.js';
+import User from '../models/user.js';
+import Order from '../models/orders.js';
 import jwt from 'jsonwebtoken';
 import managerAuth from '../middleware/managerAuth.js';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -44,7 +47,8 @@ const loginController = async (req, res) => {
         });
 
         res.json({
-          success:"ture"
+          success: true,
+          token
         })
 
     } catch (error) {
@@ -293,6 +297,9 @@ router.post("/orders",  async (req, res) => {
       });
 
     const userOrders = orders.reduce((acc, order) => {
+      if (!order.userId || !order.userId._id) {
+        return acc;
+      }
       const userId = order.userId._id;
       if (!acc[userId]) {
         acc[userId] = {
@@ -324,24 +331,30 @@ router.post("/orders",  async (req, res) => {
 router.get("/orders/:userId",  async (req, res) => {
   try {
     const userId = req.params.userId;
-    const user = await User.findById(userId).populate({
-      path: 'orders',
-      populate: {
-        path: 'products.productId',
-        model: 'Product'
-      }
-    });
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid userId'
+      });
+    }
 
-    if (!user) {
+    const userExists = await User.exists({ _id: userId });
+    if (!userExists) {
       return res.status(404).json({
         success: false,
         message: 'User not found'
       });
     }
 
+    const orders = await Order.find({ userId })
+      .populate({
+        path: 'products.productId',
+        model: 'Product'
+      });
+
     res.json({
       success: true,
-      orders: user.orders
+      orders
     });
   } catch (error) {
     console.error('Error fetching user orders:', error);

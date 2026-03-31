@@ -13,6 +13,20 @@ import { assignSellerToManager } from '../utils/managerAssignment.js';
 
 const router = express.Router();
 
+const parseStockToBoolean = (value) => {
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value > 0;
+
+  const normalized = String(value).trim().toLowerCase();
+  if (['true', '1', 'yes', 'y', 'in_stock', 'instock'].includes(normalized)) return true;
+  if (['false', '0', 'no', 'n', 'out_of_stock', 'outofstock'].includes(normalized)) return false;
+
+  const numeric = Number(normalized);
+  if (!Number.isNaN(numeric)) return numeric > 0;
+  return undefined;
+};
+
 // Auth endpoints (React-friendly JSON)
 router.get('/login', (req, res) => {
   return res.status(200).json({
@@ -143,11 +157,19 @@ router.get('/create', isAuthenticated, (req, res) => {
 router.post('/create', upload.single('img'), isAuthenticated, async (req, res) => {
   try {
     const { title, price, description, category, quantity, stock } = req.body;
+    const normalizedStock = parseStockToBoolean(stock);
     const userId = req.userId;
     if (!title || !price || !description || !category || !quantity) {
       return res.json({
         message: 'All fields are required',
         success: false
+      });
+    }
+
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({
+        success: false,
+        message: 'Product image is required'
       });
     }
 
@@ -171,10 +193,13 @@ router.post('/create', upload.single('img'), isAuthenticated, async (req, res) =
 
       } catch (mlError) {
         console.error("ML Verification Error:", mlError);
-        // Fail safely or block? Requirement implies strict verification.
-        return res.status(500).json({
+        const mlMessage = mlError?.message || 'Image verification failed.';
+        const isInputIssue = /image processing failed|no image data received|cannot identify image file|invalid response/i.test(mlMessage);
+
+        return res.status(isInputIssue ? 400 : 500).json({
           success: false,
-          message: "Image verification service unavailable."
+          message: isInputIssue ? 'Image verification failed. Please upload a valid image file.' : 'Image verification service unavailable.',
+          error: mlMessage
         });
       }
     }
@@ -191,6 +216,13 @@ router.post('/create', upload.single('img'), isAuthenticated, async (req, res) =
       uploadStream.end(req.file.buffer);
     });
 
+    if (!result || !result.secure_url) {
+      return res.status(500).json({
+        success: false,
+        message: 'Image upload failed'
+      });
+    }
+
     const newProduct = await Product.create({
       sellerId: userId,
       title,
@@ -199,7 +231,7 @@ router.post('/create', upload.single('img'), isAuthenticated, async (req, res) =
       category,
       image: result.secure_url || 'https://fakestoreapi.com/img/81XH0e8fefL._AC_UY879_.jpg',
       quantity,
-      stock
+      stock: normalizedStock ?? true
     });
 
     const seller = await Seller.findById(userId);
@@ -214,10 +246,11 @@ router.post('/create', upload.single('img'), isAuthenticated, async (req, res) =
       success: true
     });
   } catch (error) {
-    console.log(error);
-    return res.json({
+    console.error('Seller create product error:', error);
+    return res.status(500).json({
+      success: false,
       message: 'Server error',
-      success: false
+      error: error?.message || 'Unknown error'
     });
   }
 });
@@ -226,6 +259,7 @@ router.post('/update/:id', isAuthenticated, async (req, res) => {
   try {
     const id = req.params.id;
     const { title, price, description, image, quantity, stock } = req.body;
+    const normalizedStock = parseStockToBoolean(stock);
     console.log(quantity);
     const product = await Product.findById(id);
     if (title) product.title = title;
@@ -233,7 +267,7 @@ router.post('/update/:id', isAuthenticated, async (req, res) => {
     if (description) product.description = description;
     if (image) product.image = image;
     if (quantity) product.quantity = quantity;
-    if (stock !== (null || undefined)) product.stock = stock;
+    if (normalizedStock !== undefined) product.stock = normalizedStock;
     await product.save();
     return res.json({
       message: 'product updated successfully',
@@ -434,7 +468,7 @@ router.get('/sold-products', isAuthenticated, async (req, res) => {
     ]);
 
     // Render the page with the fetched data
-    res.render('seller/SoldProduct/index', {
+    res.render('seller/SoldProduct/index.ejs', {
       soldProducts: orders || [],
       title: 'Sold Products',
       role: 'seller',
@@ -443,7 +477,7 @@ router.get('/sold-products', isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error('Error fetching sold products:', error);
     // Render the page with empty data in case of error
-    res.render('seller/SoldProduct/index', {
+    res.render('seller/SoldProduct/index.ejs', {
       soldProducts: [],
       title: 'Sold Products',
       role: 'seller',
