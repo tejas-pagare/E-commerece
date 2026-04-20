@@ -13,5 +13,12 @@ const PayoutRequestSchema = new mongoose.Schema({
     processedAt: Date
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Rider's payout history
+PayoutRequestSchema.index({ riderId: 1, requestedAt: -1 });
+
+// Admin: count/filter by status
+PayoutRequestSchema.index({ status: 1 });
+
 const PayoutRequest = mongoose.model("PayoutRequest", PayoutRequestSchema);
 export default PayoutRequest;

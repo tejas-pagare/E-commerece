@@ -77,9 +77,15 @@ const userSchema = new mongoose.Schema({
   }]
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Manager-scoped user queries (manager dashboard, backfill assignments)
+userSchema.index({ managerId: 1 });
+
+// Dashboard daily user-creation aggregation
+userSchema.index({ createdAt: -1 });
+
 // Hash password before saving
 userSchema.pre('save', async function (next) {
-
   this.updatedAt = Date.now();
   next();
 });

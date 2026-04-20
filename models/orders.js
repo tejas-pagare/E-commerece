@@ -85,6 +85,19 @@ const orderSchema = new mongoose.Schema({
 });
 
 
+// ── Indexes ───────────────────────────────────────────────────────
+// User's order history (most frequent query pattern)
+orderSchema.index({ userId: 1, createdAt: -1 });
+
+// Admin/seller dashboard time-series aggregations
+orderSchema.index({ createdAt: -1 });
+
+// Seller order list filtered by status
+orderSchema.index({ orderStatus: 1, createdAt: -1 });
+
+// Stripe session lookup (confirm + webhook)
+orderSchema.index({ stripeSessionId: 1 }, { sparse: true });
+
 orderSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();

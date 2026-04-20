@@ -99,6 +99,10 @@ const industrySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Admin dashboard aggregation on industry createdAt
+industrySchema.index({ createdAt: -1 });
+
 // Hash password before saving
 industrySchema.pre("save", async function (next) {
   this.updatedAt = Date.now();

@@ -5,3 +5,4 @@ pyvenv.cfg
 logs/
 *.log
 access.log
+benchmark/
