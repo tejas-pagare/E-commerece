@@ -1,189 +1,399 @@
-import { jest, describe, beforeAll, beforeEach, it, expect } from '@jest/globals';
-import request from 'supertest';
+/**
+ * Seller Routes – Integration Tests
+ */
+import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
-// ----------------- Mocks declared BEFORE importing the router -----------------
-const SellerMock = jest.fn(() => ({ save: jest.fn().mockResolvedValue({}) }));
-SellerMock.findOne = jest.fn();
-SellerMock.findById = jest.fn();
-SellerMock.findByIdAndUpdate = jest.fn();
-SellerMock.findOneAndUpdate = jest.fn();
+// ─── Mock external dependencies ────────────────────────────────────
 
-const ProductMock = {
-  create: jest.fn(),
-  findById: jest.fn(),
-  findByIdAndDelete: jest.fn()
-};
-
-const OrderMock = { aggregate: jest.fn() };
-
-// cloudinary uploader mock
-const CloudinaryMock = {
-  uploader: {
-    upload_stream: (_opts, cb) => ({ end: () => cb(null, { secure_url: 'http://cdn/mock.jpg' }) })
-  }
-};
-
-// Upload middleware mock (multer wrappers)
-const uploadMock = {
-  fields: () => (req, _res, next) => {
-    if (process.env.MOCK_UPLOAD_MODE === 'missing') {
-      req.files = undefined;
-    } else {
-      req.files = {
-        profileImage: [{ buffer: Buffer.from('p') }],
-        aadhaarImage: [{ buffer: Buffer.from('a') }]
-      };
-    }
-    next();
-  },
-  single: () => (req, _res, next) => {
-    req.file = { buffer: Buffer.from('img') };
-    next();
-  }
-};
-
-jest.unstable_mockModule('../middleware/isAuthenticated.js', () => ({
-  default: (req, _res, next) => {
-    req.userId = 'u1';
-    req.role = 'seller';
-    next();
-  }
+jest.unstable_mockModule('../config/cloudinary.js', () => ({
+  default: { uploader: { upload_stream: jest.fn() } },
+  upload: { single: () => (req, res, next) => next(), fields: () => (req, res, next) => next() }
 }));
 
-jest.unstable_mockModule('../models/seller.js', () => ({ default: SellerMock }));
-jest.unstable_mockModule('../models/product.js', () => ({ default: ProductMock }));
-jest.unstable_mockModule('../models/orders.js', () => ({ default: OrderMock }));
-jest.unstable_mockModule('../config/cloudinary.js', () => ({ default: CloudinaryMock, upload: uploadMock }));
-jest.unstable_mockModule('bcryptjs', () => ({ default: { hash: jest.fn().mockResolvedValue('hashed') } }));
-jest.unstable_mockModule('jsonwebtoken', () => ({ default: { sign: jest.fn(() => 'jwt') }, sign: jest.fn(() => 'jwt') }));
-jest.unstable_mockModule('mongoose', () => {
-  function ObjectId(v) {
-    this.value = v;
-    return v; // behave loosely for equality checks
-  }
-  return { default: { Types: { ObjectId } }, Types: { ObjectId } };
-});
+jest.unstable_mockModule('../config/passport.js', () => ({ default: jest.fn() }));
 
-const express = (await import('express')).default;
-const sellerRouter = (await import('../routes/seller.js')).default;
+jest.unstable_mockModule('../utils/classifier.js', () => ({
+  classifyImage: jest.fn().mockResolvedValue({ is_cloth: true, category: 'T-shirt' })
+}));
 
-let app;
-beforeAll(() => {
-  app = express();
-  app.use(express.json());
-  // Convert res.render to JSON for easier assertions
-  app.use((req, res, next) => {
-    res.render = (view, locals) => res.status(200).json({ view, locals });
-    next();
-  });
-  app.use('/api/v1/seller', sellerRouter);
-});
+jest.unstable_mockModule('../utils/managerAssignment.js', () => ({
+  assignUserToManager: jest.fn().mockResolvedValue(null),
+  assignSellerToManager: jest.fn().mockResolvedValue(null)
+}));
 
-beforeEach(() => {
-  jest.clearAllMocks();
-  delete process.env.MOCK_UPLOAD_MODE;
-});
+// ── Mock Models ─────────────────────────────────────────────────────
 
-describe('Seller routes (ESM)', () => {
-  it('GET /login should render login view', async () => {
-    const res = await request(app).get('/api/v1/seller/login');
-    expect(res.statusCode).toBe(200);
-    expect(res.body.view).toBe('seller/auth/login.ejs');
-    expect(res.body.locals.role).toBe('seller');
-  });
+const mockSeller = {
+  findOne: jest.fn(),
+  findById: jest.fn(),
+  findByIdAndUpdate: jest.fn(),
+  find: jest.fn(),
+  create: jest.fn(),
+};
+jest.unstable_mockModule('../models/seller.js', () => ({ default: mockSeller }));
 
-  it('POST /login success -> redirect to /api/v1/seller and set cookie', async () => {
-    SellerMock.findOne.mockResolvedValue({ _id: 's1' });
-    const res = await request(app).post('/api/v1/seller/login').send({ email: 'a@b.com', password: 'x' });
-    expect(res.statusCode).toBe(302);
-    expect(res.headers.location).toBe('/api/v1/seller');
-    expect(res.headers['set-cookie']).toBeDefined();
-  });
+const mockProduct = {
+  findOne: jest.fn(),
+  findById: jest.fn(),
+  findByIdAndDelete: jest.fn(),
+  create: jest.fn(),
+  find: jest.fn(),
+};
+jest.unstable_mockModule('../models/product.js', () => ({ default: mockProduct }));
 
-  it('POST /login not found -> redirect to login', async () => {
-    SellerMock.findOne.mockResolvedValue(null);
-    const res = await request(app).post('/api/v1/seller/login').send({ email: 'x@y.com', password: 'x' });
-    expect(res.statusCode).toBe(302);
-    expect(res.headers.location).toBe('/api/v1/seller/login');
-  });
+const mockUser = {
+  findById: jest.fn(),
+  findOne: jest.fn(),
+};
+jest.unstable_mockModule('../models/user.js', () => ({ default: mockUser }));
 
-  it('POST /signup missing files -> 400', async () => {
-    process.env.MOCK_UPLOAD_MODE = 'missing';
-    const res = await request(app).post('/api/v1/seller/signup').send({
-      name: 'John', password: 'p', email: 'j@e.com', gstn: 'g', phoneNumber: '9',
-      accountNumber: '1', ifscCode: 'I', bankName: 'B', storeName: 'S', street: 'st', city: 'c', state: 's', pincode: '0', country: 'IN'
+const mockOrder = {
+  find: jest.fn(),
+  findById: jest.fn(),
+  aggregate: jest.fn().mockResolvedValue([]),
+};
+jest.unstable_mockModule('../models/orders.js', () => ({ default: mockOrder }));
+
+// ── Import helpers & router ─────────────────────────────────────────
+
+const { createSellerToken, buildApp, fakeId } = await import('./setup.mjs');
+const { default: sellerRouter } = await import('../routes/seller.js');
+
+import supertest from 'supertest';
+import bcrypt from 'bcryptjs';
+
+const app = buildApp(sellerRouter, '/api/v1/seller');
+const request = supertest(app);
+
+const sellerId = fakeId();
+const sellerToken = createSellerToken(sellerId);
+const authedGet = (url) => request.get(url).set('Cookie', [`token=${sellerToken}`]);
+const authedPost = (url) => request.post(url).set('Cookie', [`token=${sellerToken}`]);
+const authedPut = (url) => request.put(url).set('Cookie', [`token=${sellerToken}`]);
+const authedPatch = (url) => request.patch(url).set('Cookie', [`token=${sellerToken}`]);
+const authedDelete = (url) => request.delete(url).set('Cookie', [`token=${sellerToken}`]);
+
+describe('Seller Routes', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Default: isAuthenticated finds the seller
+    mockSeller.findById.mockResolvedValue({
+      _id: sellerId,
+      name: 'Test Seller',
+      email: 'seller@test.com',
+      storeName: 'Test Store',
+      gstn: 'GST123',
+      password: 'hashed',
+      products: [],
+      toObject: function () { return { ...this } },
+      save: jest.fn().mockResolvedValue(true),
     });
-    expect(res.statusCode).toBe(400);
-    expect(res.body.message).toMatch(/Profile image/);
   });
 
-  it('POST /signup success -> redirect to login', async () => {
-    const res = await request(app).post('/api/v1/seller/signup').send({
-      name: 'John', password: 'p', email: 'j@e.com', gstn: 'g', phoneNumber: '9',
-      accountNumber: '1', ifscCode: 'I', bankName: 'B', storeName: 'S', street: 'st', city: 'c', state: 's', pincode: '0', country: 'IN'
+  // ── AUTH ──────────────────────────────────────────────────────────
+
+  describe('GET /api/v1/seller/login', () => {
+    it('should return 200 with login info', async () => {
+      const res = await request.get('/api/v1/seller/login');
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
     });
-    expect(res.statusCode).toBe(302);
-    expect(res.headers.location).toBe('/api/v1/seller/login');
   });
 
-  it('POST /create should create product and link to seller', async () => {
-    ProductMock.create.mockResolvedValue({ _id: 'p1' });
-    SellerMock.findById.mockResolvedValue({ products: [], save: jest.fn().mockResolvedValue({}) });
-    const res = await request(app).post('/api/v1/seller/create').send({
-      title: 'T', price: 10, description: 'D', category: 'C', quantity: 1, stock: true
+  describe('POST /api/v1/seller/login', () => {
+    it('should return 400 when email/password missing', async () => {
+      const res = await request.post('/api/v1/seller/login').send({});
+      expect(res.status).toBe(400);
     });
-    expect(ProductMock.create).toHaveBeenCalled();
-    expect(SellerMock.findById).toHaveBeenCalledWith('u1');
-    expect(res.statusCode).toBe(200);
-    expect(res.body.success).toBe(true);
+
+    it('should return 401 when seller not found', async () => {
+      mockSeller.findOne.mockResolvedValue(null);
+      const res = await request.post('/api/v1/seller/login').send({
+        email: 'noone@test.com',
+        password: 'password'
+      });
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 401 when password does not match', async () => {
+      const hashedPw = await bcrypt.hash('realpassword', 10);
+      mockSeller.findOne.mockResolvedValue({
+        _id: sellerId,
+        email: 'seller@test.com',
+        password: hashedPw,
+        toObject: function () { return { ...this } },
+      });
+      const res = await request.post('/api/v1/seller/login').send({
+        email: 'seller@test.com',
+        password: 'wrongpassword'
+      });
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 200 with valid credentials', async () => {
+      const hashedPw = await bcrypt.hash('password123', 10);
+      mockSeller.findOne.mockResolvedValue({
+        _id: sellerId,
+        email: 'seller@test.com',
+        password: hashedPw,
+        toObject: function () { return { _id: sellerId, email: 'seller@test.com' } },
+      });
+      const res = await request.post('/api/v1/seller/login').send({
+        email: 'seller@test.com',
+        password: 'password123'
+      });
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.message).toMatch(/login successful/i);
+    });
   });
 
-  it('POST /update/:id updates fields and saves', async () => {
-    const doc = { title: '', price: 0, description: '', image: '', quantity: 0, stock: false, save: jest.fn().mockResolvedValue({}) };
-    ProductMock.findById.mockResolvedValue(doc);
-    const res = await request(app).post('/api/v1/seller/update/p1').send({ title: 'N', price: 2, description: 'D', image: 'I', quantity: 3, stock: true });
-    expect(ProductMock.findById).toHaveBeenCalledWith('p1');
-    expect(doc.title).toBe('N');
-    expect(doc.stock).toBe(true);
-    expect(res.statusCode).toBe(200);
-    expect(res.body.success).toBe(true);
+  describe('GET /api/v1/seller/logout', () => {
+    it('should return 200 and clear cookie', async () => {
+      const res = await authedGet('/api/v1/seller/logout');
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
   });
 
-  it('DELETE /product/:id removes when owned', async () => {
-    SellerMock.findById.mockResolvedValue({ products: ['p1'] });
-    SellerMock.findOneAndUpdate.mockResolvedValue({});
-    ProductMock.findByIdAndDelete.mockResolvedValue({});
-    const res = await request(app).delete('/api/v1/seller/product/p1');
-    expect(res.statusCode).toBe(200);
-    expect(res.body.success).toBe(true);
+  // ── PRODUCTS ─────────────────────────────────────────────────────
+
+  describe('GET /api/v1/seller/products', () => {
+    it('should return 401 without token', async () => {
+      const res = await request.get('/api/v1/seller/products')
+        .set('Accept', 'application/json');
+      expect(res.status).toBe(401);
+    });
+
+    it('should return 200 with seller products', async () => {
+      const populateMock = jest.fn().mockResolvedValue({ products: [{ _id: fakeId(), title: 'Shirt' }] });
+      mockSeller.findById.mockReturnValue({ populate: populateMock });
+      const res = await authedGet('/api/v1/seller/products');
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
   });
 
-  it('DELETE /product/:id errors when not owned', async () => {
-    SellerMock.findById.mockResolvedValue({ products: ['p2'] });
-    const res = await request(app).delete('/api/v1/seller/product/p1');
-    expect(res.statusCode).toBe(200);
-    expect(res.body.message).toMatch(/Error in removing product/);
+  describe('GET /api/v1/seller/product/:id', () => {
+    it('should return 404 when product not found', async () => {
+      const id = fakeId();
+      mockProduct.findById.mockResolvedValue(null);
+      const res = await authedGet(`/api/v1/seller/product/${id}`);
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 403 when seller does not own the product', async () => {
+      const id = fakeId();
+      const otherSellerId = fakeId();
+      mockProduct.findById.mockResolvedValue({
+        _id: id,
+        sellerId: otherSellerId,
+        title: 'Other Product'
+      });
+      const res = await authedGet(`/api/v1/seller/product/${id}`);
+      expect(res.status).toBe(403);
+    });
+
+    it('should return 200 when seller owns the product', async () => {
+      const id = fakeId();
+      mockProduct.findById.mockResolvedValue({
+        _id: id,
+        sellerId: sellerId,
+        title: 'My Product'
+      });
+      const res = await authedGet(`/api/v1/seller/product/${id}`);
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.product.title).toBe('My Product');
+    });
   });
 
-  it('GET /account renders profile', async () => {
-    SellerMock.findById.mockResolvedValue({ name: 'S' });
-    const res = await request(app).get('/api/v1/seller/account');
-    expect(res.statusCode).toBe(200);
-    expect(res.body.view).toBe('Seller/profile/show.ejs');
+  describe('POST /api/v1/seller/update/:id', () => {
+    it('should return 200 on successful update', async () => {
+      const id = fakeId();
+      mockProduct.findById.mockResolvedValue({
+        _id: id,
+        title: 'Old Title',
+        price: 100,
+        description: 'Old desc',
+        save: jest.fn().mockResolvedValue(true)
+      });
+      const res = await authedPost(`/api/v1/seller/update/${id}`).send({
+        title: 'New Title',
+        price: 200
+      });
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
   });
 
-  it('GET / lists products', async () => {
-    SellerMock.findById.mockReturnValue({ populate: jest.fn().mockResolvedValue({ products: [{ _id: 'p1' }] }) });
-    const res = await request(app).get('/api/v1/seller');
-    expect(res.statusCode).toBe(200);
-    expect(res.body.view).toBe('seller/listedProduct/index.ejs');
+  describe('DELETE /api/v1/seller/product/:id', () => {
+    it('should return error when product not in seller list', async () => {
+      const id = fakeId();
+      mockSeller.findById.mockResolvedValue({
+        _id: sellerId,
+        products: [],
+        toObject: function () { return { ...this } },
+      });
+      const res = await authedDelete(`/api/v1/seller/product/${id}`);
+      expect(res.body.message).toMatch(/error/i);
+    });
+
+    it('should return 200 on successful deletion', async () => {
+      const productId = fakeId();
+      const mockSellerFindOneAndUpdate = jest.fn().mockResolvedValue({});
+      mockSeller.findById.mockResolvedValue({
+        _id: sellerId,
+        products: [productId],
+        toObject: function () { return { ...this } },
+      });
+      mockSeller.findOneAndUpdate = mockSellerFindOneAndUpdate;
+      mockProduct.findByIdAndDelete.mockResolvedValue({});
+
+      const res = await authedDelete(`/api/v1/seller/product/${productId}`);
+      expect(res.body.success).toBe(true);
+    });
   });
 
-  it('GET /sold-products renders list', async () => {
-    OrderMock.aggregate.mockResolvedValue([{ id: 'o1', name: 'I', price: 1, quantity: 1, buyerName: 'B', orderDate: '2024-01-01', status: 'Delivered', totalAmount: 1 }]);
-    const res = await request(app).get('/api/v1/seller/sold-products');
-    expect(res.statusCode).toBe(200);
-    expect(res.body.view).toBe('seller/SoldProduct/index');
-    expect(Array.isArray(res.body.locals.soldProducts)).toBe(true);
+  // ── ACCOUNT ──────────────────────────────────────────────────────
+
+  describe('GET /api/v1/seller/account/me', () => {
+    it('should return 200 with seller details', async () => {
+      mockSeller.findById.mockResolvedValue({
+        _id: sellerId,
+        name: 'Test Seller',
+        email: 'seller@test.com',
+        password: 'hashed',
+        toObject: function () { return { _id: this._id, name: this.name, email: this.email, password: this.password } },
+      });
+      const res = await authedGet('/api/v1/seller/account/me');
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.seller).toBeDefined();
+      expect(res.body.seller.password).toBeUndefined(); // Password should be stripped
+    });
+  });
+
+  describe('PATCH /api/v1/seller/account', () => {
+    it('should return 400 when no updatable fields provided', async () => {
+      const res = await authedPatch('/api/v1/seller/account').send({});
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 200 on successful partial update', async () => {
+      mockSeller.findByIdAndUpdate.mockResolvedValue({
+        _id: sellerId,
+        name: 'Updated Name',
+        email: 'seller@test.com',
+        password: 'hashed',
+        toObject: function () { return { _id: this._id, name: this.name, email: this.email, password: this.password } },
+      });
+      const res = await authedPatch('/api/v1/seller/account').send({ name: 'Updated Name' });
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
+  });
+
+  describe('POST /api/v1/seller/account/update', () => {
+    it('should return 400 when required fields missing', async () => {
+      const res = await authedPost('/api/v1/seller/account/update').send({ name: 'Only Name' });
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 200 on successful update', async () => {
+      mockSeller.findByIdAndUpdate.mockResolvedValue({});
+      const res = await authedPost('/api/v1/seller/account/update').send({
+        name: 'New Name',
+        email: 'new@test.com',
+        gstn: 'GSTNEW'
+      });
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
+  });
+
+  // ── SOLD PRODUCTS ────────────────────────────────────────────────
+
+  describe('GET /api/v1/seller/sold-products/data', () => {
+    it('should return 200 with sold products', async () => {
+      mockOrder.aggregate.mockResolvedValue([]);
+      const res = await authedGet('/api/v1/seller/sold-products/data');
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.soldProducts).toBeDefined();
+    });
+  });
+
+  // ── ORDER REQUESTS ───────────────────────────────────────────────
+
+  describe('GET /api/v1/seller/orders/requests', () => {
+    it('should return 200 with order requests', async () => {
+      mockOrder.aggregate.mockResolvedValue([]);
+      const res = await authedGet('/api/v1/seller/orders/requests');
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    });
+  });
+
+  // ── ORDER STATUS UPDATE ──────────────────────────────────────────
+
+  describe('PUT /api/v1/seller/orders/:orderId/seller/status', () => {
+    it('should return 400 for invalid orderId', async () => {
+      const res = await authedPut('/api/v1/seller/orders/bad/seller/status').send({ orderStatus: 'Shipped' });
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 400 for invalid orderStatus', async () => {
+      const orderId = fakeId();
+      const res = await authedPut(`/api/v1/seller/orders/${orderId}/seller/status`).send({ orderStatus: 'BadStatus' });
+      expect(res.status).toBe(400);
+    });
+
+    it('should return 404 when order not found', async () => {
+      const orderId = fakeId();
+      const mockPopulate = jest.fn().mockResolvedValue(null);
+      mockOrder.findById.mockReturnValue({ populate: mockPopulate });
+      const res = await authedPut(`/api/v1/seller/orders/${orderId}/seller/status`).send({ orderStatus: 'Shipped' });
+      expect(res.status).toBe(404);
+    });
+
+    it('should return 403 when seller has no items in order', async () => {
+      const orderId = fakeId();
+      const otherSellerId = fakeId();
+      const mockPopulate = jest.fn().mockResolvedValue({
+        _id: orderId,
+        products: [{ productId: { _id: fakeId(), sellerId: otherSellerId }, quantity: 1 }],
+        orderStatus: 'Pending',
+        save: jest.fn(),
+      });
+      mockOrder.findById.mockReturnValue({ populate: mockPopulate });
+      const res = await authedPut(`/api/v1/seller/orders/${orderId}/seller/status`).send({ orderStatus: 'Shipped' });
+      expect(res.status).toBe(403);
+    });
+
+    it('should return 200 on successful status update', async () => {
+      const orderId = fakeId();
+      const productId = fakeId();
+      const mockPopulate = jest.fn().mockResolvedValue({
+        _id: orderId,
+        products: [{
+          productId: { _id: productId, sellerId: sellerId, title: 'Shirt', image: 'img.jpg' },
+          quantity: 2,
+          price: 500,
+          sellerPrice: 450,
+        }],
+        orderStatus: 'Pending',
+        totalAmount: 1000,
+        shippingAddress: { fullname: 'John' },
+        userId: fakeId(),
+        save: jest.fn().mockResolvedValue(true),
+      });
+      mockOrder.findById.mockReturnValue({ populate: mockPopulate });
+
+      const res = await authedPut(`/api/v1/seller/orders/${orderId}/seller/status`).send({ orderStatus: 'Shipped' });
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.order.orderStatus).toBe('Shipped');
+    });
   });
 });
