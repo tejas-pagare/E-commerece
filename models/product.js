@@ -55,14 +55,26 @@ const productSchema = new mongoose.Schema({
 });
 
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Seller-scoped product listing (seller dashboard, admin/products?sellerId=)
+productSchema.index({ sellerId: 1 });
+
+// Public product listing filtered by verified status (most-read query)
+productSchema.index({ verified: 1, createdAt: -1 });
+
+// Category filter + price range (user/products/filter endpoint)
+productSchema.index({ category: 1, price: 1 });
+
+// Dashboard daily-aggregation on createdAt
+productSchema.index({ createdAt: -1 });
+
+// Related-products query: same category, exclude self (_id covered by default)
+productSchema.index({ category: 1, _id: 1 });
+
 productSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });
-
-productSchema.pre([""],(req,res)=>{
-  
-})
 
 const Product = mongoose.model('Product', productSchema);
 

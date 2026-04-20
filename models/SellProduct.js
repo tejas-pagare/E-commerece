@@ -36,6 +36,19 @@ const SellProductSchema = new mongoose.Schema({
   combination_id: { type: String,  required: true },// important  Cotton_L_duration
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// User's donated/sold products (donated-products endpoint, checkout coins)
+SellProductSchema.index({ user_id: 1, created_at: -1 });
+
+// Industry home: match by combination
+SellProductSchema.index({ combination_id: 1 });
+
+// Admin secondhand management: filter by status
+SellProductSchema.index({ adminStatus: 1 });
+
+// Revenue aggregation time filter
+SellProductSchema.index({ created_at: -1 });
+
 const SellProduct =  mongoose.model("SellProduct", SellProductSchema);
 
 export default SellProduct;

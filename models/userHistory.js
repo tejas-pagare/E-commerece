@@ -50,6 +50,10 @@ const userHistorySchema = new mongoose.Schema({
   ],
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Fast lookup for a user's history (called on every checkout + order-history)
+userHistorySchema.index({ userId: 1 }, { unique: true });
+
 const UserHistory = mongoose.model("UserHistory", userHistorySchema);
 
 export default UserHistory;

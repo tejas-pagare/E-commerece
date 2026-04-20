@@ -46,6 +46,10 @@ const managerSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Fast login lookup + prevent duplicate managers
+managerSchema.index({ email: 1 }, { unique: true });
+
 // Hash password before saving
 managerSchema.pre('save', function(next) {
     if (!this.isModified('password')) return next();

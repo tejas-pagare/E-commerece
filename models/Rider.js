@@ -49,5 +49,12 @@ const RiderSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Admin: count active/verified riders
+RiderSchema.index({ verificationStatus: 1, isActive: 1 });
+
+// Sorted rider list
+RiderSchema.index({ createdAt: -1 });
+
 const Rider = mongoose.model("Rider", RiderSchema);
 export default Rider;

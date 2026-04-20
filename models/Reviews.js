@@ -19,6 +19,12 @@ const reviewSchema = mongoose.Schema({
   }
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Populate reviews by product
+reviewSchema.index({ product: 1 });
+
+// Lookup reviews by user (delete auth check)
+reviewSchema.index({ user: 1 });
 
 const Review  = mongoose.model("Review",reviewSchema);
 export default Review;

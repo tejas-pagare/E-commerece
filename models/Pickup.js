@@ -38,5 +38,15 @@ const PickupSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Rider views their pickups filtered by status
+PickupSchema.index({ riderId: 1, status: 1 });
+
+// User views their pickup requests
+PickupSchema.index({ userId: 1 });
+
+// Admin/rider find available pickups
+PickupSchema.index({ status: 1, createdAt: -1 });
+
 const Pickup = mongoose.model("Pickup", PickupSchema);
 export default Pickup;

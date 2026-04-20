@@ -25,6 +25,9 @@ const sellerHistorySchema = new mongoose.Schema({
   },
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+sellerHistorySchema.index({ sellerId: 1, timestamp: -1 });
+
 const SellerHistory = mongoose.model("SellerHistory", sellerHistorySchema);
 
 export default SellerHistory;

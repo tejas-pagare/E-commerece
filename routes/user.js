@@ -67,6 +67,110 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 // Get all public products
 router.get("/products", cacheMiddleware(120), getAllProductsController);
 
+// --- SEARCH ---
+/**
+ * GET /api/v1/user/products/search
+ *
+ * Query params:
+ *   q          {string}  Search keyword (searches title, description, category)
+ *   category   {string}  Filter by exact category
+ *   minPrice   {number}  Minimum price (before markup)
+ *   maxPrice   {number}  Maximum price (before markup)
+ *   sort       {string}  "price_asc" | "price_desc" | "newest" | "relevance" (default)
+ *   page       {number}  Page number, 1-indexed (default: 1)
+ *   limit      {number}  Results per page, max 50 (default: 20)
+ */
+router.get("/products/search", async (req, res) => {
+    try {
+        const {
+            q = "",
+            category,
+            minPrice,
+            maxPrice,
+            sort = "relevance",
+            page = 1,
+            limit = 20,
+        } = req.query;
+
+        const pageNum  = Math.max(1, parseInt(page)  || 1);
+        const limitNum = Math.min(50, Math.max(1, parseInt(limit) || 20));
+        const skip     = (pageNum - 1) * limitNum;
+
+        // ── Build filter ──────────────────────────────────────────
+        const filter = { verified: true };
+
+        // Keyword search: case-insensitive regex across title, description, category
+        if (q && q.trim()) {
+            const escaped = q.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            const regex   = new RegExp(escaped, "i");
+            filter.$or = [
+                { title:       regex },
+                { description: regex },
+                { category:    regex },
+            ];
+        }
+
+        // Optional category filter (exact match, case-insensitive)
+        if (category) {
+            filter.category = new RegExp(`^${category.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i");
+        }
+
+        // Optional price range (stored price, before 10% markup)
+        if (minPrice !== undefined || maxPrice !== undefined) {
+            filter.price = {};
+            if (minPrice !== undefined) filter.price.$gte = Number(minPrice) / 1.1;
+            if (maxPrice !== undefined) filter.price.$lte = Number(maxPrice) / 1.1;
+        }
+
+        // ── Sort ──────────────────────────────────────────────────
+        let sortObj = { createdAt: -1 }; // default: newest
+        if (sort === "price_asc")  sortObj = { price:  1 };
+        if (sort === "price_desc") sortObj = { price: -1 };
+        if (sort === "newest")     sortObj = { createdAt: -1 };
+        if (sort === "relevance" && q.trim()) sortObj = { score: { $meta: "textScore" } };
+
+        // ── Query ─────────────────────────────────────────────────
+        const [products, total] = await Promise.all([
+            Product.find(filter)
+                .sort(sortObj)
+                .skip(skip)
+                .limit(limitNum)
+                .populate("reviews", "rating")
+                .lean(),
+            Product.countDocuments(filter),
+        ]);
+
+        // Apply 10% markup and compute average rating
+        const results = products.map(p => {
+            const markedUpPrice = Math.ceil(p.price * 1.1);
+            const avgRating = p.reviews?.length
+                ? Math.round((p.reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / p.reviews.length) * 10) / 10
+                : null;
+            return {
+                ...p,
+                price:     markedUpPrice,
+                avgRating,
+                reviewCount: p.reviews?.length ?? 0,
+                reviews:   undefined, // don't expose review IDs in search results
+            };
+        });
+
+        return res.json({
+            success:     true,
+            query:       q || null,
+            total,
+            page:        pageNum,
+            totalPages:  Math.ceil(total / limitNum),
+            limit:       limitNum,
+            results,
+        });
+
+    } catch (err) {
+        console.error("Product search error:", err);
+        return res.status(500).json({ success: false, message: "Search failed" });
+    }
+});
+
 // --- AUTH ---
 // These routes are kept as they handle data submission
 router.post("/login", loginController);

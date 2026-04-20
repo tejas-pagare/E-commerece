@@ -56,9 +56,9 @@ if (process.env.FRONTEND_URL) {
   allowedOrigins.push(process.env.FRONTEND_URL);
 }
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: ["http://localhost:8000", "http://localhost:5174", "http://localhost:5173", process.env.FRONTEND_URL],
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "cache-control", "X-Requested-With"],
 };
 
@@ -138,7 +138,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || "secret-swiftmart",
   resave: false,
   saveUninitialized: false,
-  cookie: { 
+  cookie: {
     maxAge: 600000,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
