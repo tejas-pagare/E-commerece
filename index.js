@@ -45,6 +45,16 @@ if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, "..", ".env") });
+const allowedOrigins = [
+  "http://localhost:8000",
+  "http://localhost:5174",
+  "http://localhost:5173",
+  "https://swiftmartfronted.onrender.com",
+];
+// Add Vercel/custom frontend URL from env
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
 const corsOptions = {
   origin: ["http://localhost:8000", "http://localhost:5174", "http://localhost:5173", process.env.FRONTEND_URL],
   credentials: true,
@@ -88,11 +98,12 @@ const apiLimiter = rateLimit({
 
 app.use("/api/", apiLimiter);
 
+const isProduction = process.env.NODE_ENV === "production";
 const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false, // set to true if using HTTPS
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
   },
 });
 
@@ -115,8 +126,8 @@ app.use((req, res, next) => {
   } catch (err) {
     res.clearCookie("token", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
     });
     return next();
@@ -124,14 +135,14 @@ app.use((req, res, next) => {
 });
 
 app.use(session({
-  secret: "secret-swiftmart",
+  secret: process.env.SESSION_SECRET || "secret-swiftmart",
   resave: false,
   saveUninitialized: false,
   cookie: {
     maxAge: 600000,
     httpOnly: true,
-    secure: false, // set to true if using HTTPS
-    sameSite: 'lax'
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
   },
 }))
 
@@ -212,7 +223,7 @@ app.get("*", (req, res) => {
 
 
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   dbConnection();
   console.log(`Server running on http://localhost:${PORT}`);
