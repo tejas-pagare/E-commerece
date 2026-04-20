@@ -1,9 +1,10 @@
 import express from "express";
 import Product from "../models/product.js";
+import { cacheMiddleware } from "../middleware/redisCache.js";
 
 const router = express.Router();
 
-router.get("/details/:id", async (req, res) => {
+router.get("/details/:id", cacheMiddleware(300), async (req, res) => {
   try {
     const id = req.params.id;
 

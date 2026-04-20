@@ -29,6 +29,8 @@ import { createStream } from "rotating-file-stream";
 import passport from "passport";
 import configurePassport from "./config/passport.js";
 import { swaggerUi, swaggerSpec } from "./swagger.js";
+import { redisAvailable } from "./config/redis.js";
+import { cacheInvalidationMiddleware } from "./middleware/redisCache.js";
 
 // Fail fast on missing critical env vars
 if (!process.env.JWT_SECRET) {
@@ -165,6 +167,9 @@ app.get("/api-docs.json", (req, res) => {
   res.send(swaggerSpec);
 });
 
+// --- Global cache invalidation on mutations ---
+app.use(cacheInvalidationMiddleware);
+
 app.use("/api/v1/user", userController);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/seller", sellerRouter);
@@ -210,5 +215,6 @@ app.get("*", (req, res) => {
 const PORT = 8000;
 server.listen(PORT, () => {
   dbConnection();
-  console.log(`Server running on http://localhost:${PORT}`)
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Redis caching: ${redisAvailable ? '✅ enabled' : '⚠️  disabled (set UPSTASH_REDIS_REST_URL & UPSTASH_REDIS_REST_TOKEN in .env)'}`);
 });

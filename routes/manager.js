@@ -1,4 +1,5 @@
 import express from 'express';
+import { cacheMiddleware } from '../middleware/redisCache.js';
 import Manager from '../models/manager.js';
 import Product from '../models/product.js';
 import Seller from '../models/seller.js';
@@ -196,7 +197,7 @@ router.get("/products",  (req, res) => {
   return res.render("admin/Products/index.ejs", { title: "Products", role: "manager" });
 });
 
-router.get("/products/details",  async (req, res) => {
+router.get("/products/details",  cacheMiddleware(60), async (req, res) => {
   try {
     const products = await Product.find({}).populate("sellerId");
     return res.json({
@@ -263,7 +264,7 @@ console.log(pendingSellers)
   }
 });
 
-router.get("/seller/details",  async (req, res) => {
+router.get("/seller/details",  cacheMiddleware(60), async (req, res) => {
   try {
     const sellers = await Seller.find({});
     res.json({
@@ -426,7 +427,7 @@ router.get('/',  async (req, res) => {
 });
 
 // Get pending sellers
-router.get("/sellers/pending", async (req, res) => {
+router.get("/sellers/pending", cacheMiddleware(60), async (req, res) => {
   try {
     const pendingSellers = await Seller.find({ "identityVerification.status": "Pending" })
       .select('name storeName email gstn createdAt address identityVerification profileImage')
@@ -446,7 +447,7 @@ router.get("/sellers/pending", async (req, res) => {
 });
 
 // Get verified sellers
-router.get("/sellers/verified", async (req, res) => {
+router.get("/sellers/verified", cacheMiddleware(60), async (req, res) => {
   try {
     const verifiedSellers = await Seller.find({ "identityVerification.status": "Verified" })
       .select('name storeName email gstn createdAt address identityVerification bankDetails profileImage')
@@ -466,7 +467,7 @@ router.get("/sellers/verified", async (req, res) => {
 });
 
 // Get seller statistics
-router.get("/sellers/stats", async (req, res) => {
+router.get("/sellers/stats", cacheMiddleware(60), async (req, res) => {
   try {
     const [total, pending, verified] = await Promise.all([
       Seller.countDocuments(),
@@ -561,7 +562,7 @@ router.post("/product/reject/:id",  async (req, res) => {
   }
 });
 // Get pending products
-router.get("/products/pending", async (req, res) => {
+router.get("/products/pending", cacheMiddleware(60), async (req, res) => {
   try {
     const pendingProducts = await Product.find({ verified: false })
       .populate('sellerId', 'name email storeName')
@@ -581,7 +582,7 @@ router.get("/products/pending", async (req, res) => {
 });
 
 // Get verified products
-router.get("/products/verified", async (req, res) => {
+router.get("/products/verified", cacheMiddleware(60), async (req, res) => {
   try {
     const verifiedProducts = await Product.find({ verified: true })
       .populate('sellerId', 'name email storeName')
@@ -601,7 +602,7 @@ router.get("/products/verified", async (req, res) => {
 });
 
 // Get product statistics
-router.get("/products/stats", async (req, res) => {
+router.get("/products/stats", cacheMiddleware(60), async (req, res) => {
   try {
     const [total, pending, verified] = await Promise.all([
       Product.countDocuments(),

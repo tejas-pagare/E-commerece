@@ -1,4 +1,5 @@
 import express from 'express';
+import { cacheMiddleware } from '../middleware/redisCache.js';
 import { industryAuth } from '../middleware/isAuthenticated.js';
 import { v4 as uuidv4 } from 'uuid';
 import Industry from '../models/Industry.js';
@@ -30,7 +31,7 @@ router.post('/signup', registerController);
 
 router.get("/logout", industryAuth, logoutController);
 
-router.get('/home', industryAuth, getHomeController);
+router.get('/home', industryAuth, cacheMiddleware(120), getHomeController);
 // async (req, res) => {
 //     try {
 //         const combinations = await SellProduct.aggregate([
@@ -65,7 +66,7 @@ router.get('/home', industryAuth, getHomeController);
 //     }
 // });
 
-router.get('/fetchhome', industryAuth, fetchHomeController);
+router.get('/fetchhome', industryAuth, cacheMiddleware(120), fetchHomeController);
 //     async (req, res) => {
 //     try {
 //         const combinations = await SellProduct.aggregate([
@@ -203,7 +204,7 @@ router.post('/cart/delete', industryAuth, deleteCartController);
 //     }
 // });
 
-router.get("/dashboard", industryAuth, getDashboardController);
+router.get("/dashboard", industryAuth, cacheMiddleware(60), getDashboardController);
 
 router.post('/create-checkout-session', industryAuth, createStripeCheckoutSession);
 

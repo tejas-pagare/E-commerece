@@ -2,6 +2,7 @@
 import Blog from '../models/blog.js';
 
 import express from 'express';
+import { cacheMiddleware } from '../middleware/redisCache.js';
 // --- UPDATED Controller Imports ---
 // Import all user controllers
 import {
@@ -64,7 +65,7 @@ const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SEC
 // --- API ROUTES ---
 
 // Get all public products
-router.get("/products", getAllProductsController);
+router.get("/products", cacheMiddleware(120), getAllProductsController);
 
 // --- AUTH ---
 // These routes are kept as they handle data submission
@@ -121,7 +122,7 @@ router.post("/account/update/address", isAuthenticated, updateAddressController)
 
 // --- BLOGS ---
 // Get a single blog post by ID
-router.get('/blogs/:id', getBlogByIdController);
+router.get('/blogs/:id', cacheMiddleware(600), getBlogByIdController);
 
 // --- CART ---
 // Get the user's cart (changed from POST to GET)
@@ -384,8 +385,8 @@ router.post('/sell', isAuthenticated, upload.single('photos'), sellProductContro
 
 // --- FILTER ---
 // Get products based on filter criteria
-router.get("/products/filter", filterProductsController);
+router.get("/products/filter", cacheMiddleware(120), filterProductsController);
 
-router.get('/blogs', getAllBlogsController);
+router.get('/blogs', cacheMiddleware(600), getAllBlogsController);
 
 export default router;
