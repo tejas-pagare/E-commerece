@@ -7,9 +7,11 @@ import User from "../models/user.js";
 const configurePassport = () => {
   const clientId = process.env.GOOGLE_CLIENT_ID || "";
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET || "";
+  const baseUrl =
+    process.env.BASE_URL || "http://localhost:8000";
   const callbackUrl =
     process.env.GOOGLE_CALLBACK_URL ||
-    "http://localhost:8000/api/v1/user/auth/google/callback";
+    `${baseUrl}/api/v1/user/auth/google/callback`;
 
   if (!clientId || !clientSecret) {
     return;
