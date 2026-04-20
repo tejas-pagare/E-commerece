@@ -145,6 +145,7 @@ app.use(session({
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
   },
 }))
+//comment
 
 // Emit refresh events after successful mutations
 app.use((req, res, next) => {
@@ -210,7 +211,7 @@ io.on("connection", (socket) => {
 
 
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to SwiftMart API with new message" });
+  res.json({ message: "Welcome to SwiftMart API with new changes" });
 })
 
 app.get("*", (req, res) => {
