@@ -7,8 +7,13 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 
-// The JWT secret used in the actual codebase fallback
-export const JWT_SECRET = 'your_jwt_secret_key_change_me';
+import dotenv from 'dotenv';
+dotenv.config();
+
+// Default or fallback secret string
+export const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_change_me';
+// Ensure the process uses the same secret if not set
+process.env.JWT_SECRET = JWT_SECRET;
 
 // ─── Token Generators ──────────────────────────────────────────────
 
