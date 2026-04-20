@@ -145,7 +145,12 @@ router.post('/signup', upload.fields([{ name: 'profileImage' }, { name: 'aadhaar
 });
 
 router.get('/logout', isAuthenticated, (req, res) => {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/'
+  });
   return res.status(200).json({ success: true, message: 'Logged out' });
 });
 
