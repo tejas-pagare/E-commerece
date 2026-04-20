@@ -12,8 +12,8 @@ const isAuthenticated = async (req, res, next) => {
       // Clear any stale cookies
       res.clearCookie("token", {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : 'lax',
         path: '/'
       });
 
@@ -36,8 +36,8 @@ const isAuthenticated = async (req, res, next) => {
     if (!decode) {
       res.clearCookie("token", {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : 'lax',
         path: '/'
       });
 
@@ -81,8 +81,8 @@ const isAuthenticated = async (req, res, next) => {
     if (!user) {
       res.clearCookie("token", {
         httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : 'lax',
         path: '/'
       });
 
@@ -110,8 +110,8 @@ const isAuthenticated = async (req, res, next) => {
     // Clear cookie on any error
     res.clearCookie("token", {
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : 'lax',
       path: '/'
     });
     
