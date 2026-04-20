@@ -1,4 +1,5 @@
 import express from "express";
+import { cacheMiddleware } from "../middleware/redisCache.js";
 import Rider from "../models/Rider.js";
 import PayoutRequest from "../models/PayoutRequest.js";
 import SellProduct from "../models/SellProduct.js";
@@ -10,7 +11,7 @@ const router = express.Router();
 // --- RIDER MANAGEMENT ---
 
 // Get All Riders (with filtering)
-router.get("/riders", verifyAdmin, async (req, res) => {
+router.get("/riders", verifyAdmin, cacheMiddleware(120), async (req, res) => {
     try {
         const { status } = req.query;
         const query = status ? { verificationStatus: status } : {};
@@ -58,7 +59,7 @@ router.put("/riders/:id/suspend", verifyAdmin, async (req, res) => {
 
 // --- PAYOUTS ---
 
-router.get("/payouts", verifyAdmin, async (req, res) => {
+router.get("/payouts", verifyAdmin, cacheMiddleware(120), async (req, res) => {
     try {
         const { status } = req.query;
         const query = status ? { status } : {};
@@ -104,7 +105,7 @@ router.put("/payouts/:id", verifyAdmin, async (req, res) => {
 
 // --- ANALYTICS ---
 
-router.get("/analytics", verifyAdmin, async (req, res) => {
+router.get("/analytics", verifyAdmin, cacheMiddleware(120), async (req, res) => {
     try {
         const totalRiders = await Rider.countDocuments();
         const activeRiders = await Rider.countDocuments({ verificationStatus: 'Verified', isActive: true });

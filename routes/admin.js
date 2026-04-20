@@ -1,4 +1,5 @@
 import express from "express";
+import { cacheMiddleware } from "../middleware/redisCache.js";
 const router = express.Router();
 import User from "../models/user.js";
 import Product from "../models/product.js";
@@ -121,26 +122,13 @@ router.post("/logout", (req, res) => {
 
 // --- DASHBOARD ROUTE ---
 
-// Simple in-memory cache with TTL
-const dashboardCache = {
-  data: null,
-  key: null,
-  expiresAt: 0,
-};
-
-router.get("/dashboard", adminOrManagerAuth, async (req, res) => {
+router.get("/dashboard", adminOrManagerAuth, cacheMiddleware(60), async (req, res) => {
   try {
     // Query params
     const daysParam = parseInt(req.query.days, 10);
     const days = [7, 30, 90].includes(daysParam) ? daysParam : 30;
     const tz = (req.query.tz === 'local') ? 'local' : 'UTC';
 
-    // Cache key per window and tz
-    const cacheKey = `days:${days}|tz:${tz}`;
-    const nowMs = Date.now();
-    if (dashboardCache.key === cacheKey && dashboardCache.data && dashboardCache.expiresAt > nowMs) {
-      return sendSuccess(res, "Dashboard analytics (cached)", dashboardCache.data);
-    }
 
     const assignedUserIds = isManager(req) ? getAssignedUserIds(req) : null;
     const assignedSellerIds = isManager(req) ? getAssignedSellerIds(req) : null;
@@ -269,11 +257,6 @@ router.get("/dashboard", adminOrManagerAuth, async (req, res) => {
       window: { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10), days, tz },
     };
 
-    // Cache results
-    dashboardCache.data = data;
-    dashboardCache.key = cacheKey;
-    dashboardCache.expiresAt = nowMs + 60 * 1000;
-
     return sendSuccess(res, "Dashboard analytics", data);
   } catch (error) {
     console.error("Dashboard Error:", error);
@@ -282,7 +265,7 @@ router.get("/dashboard", adminOrManagerAuth, async (req, res) => {
 });
 
 
-router.get("/dashboard-revenue", adminOrManagerAuth, async (req, res) => {
+router.get("/dashboard-revenue", adminOrManagerAuth, cacheMiddleware(60), async (req, res) => {
   try {
     const { timePeriod } = req.query; // 'week', 'month', 'year', 'all'
     let filter = {};
@@ -352,7 +335,7 @@ router.get("/dashboard-revenue", adminOrManagerAuth, async (req, res) => {
 // --- CUSTOMER ROUTES ---
 
 // Backward-compatible aliases for Swagger/legacy clients
-router.get("/users", adminOrManagerAuth, async (req, res) => {
+router.get("/users", adminOrManagerAuth, cacheMiddleware(120), async (req, res) => {
   try {
     const filter = isManager(req) ? { _id: { $in: getAssignedUserIds(req) } } : {};
     const users = await User.find(filter);
@@ -401,7 +384,7 @@ router.delete("/users/:id", adminOrManagerAuth, async (req, res) => {
   }
 });
 
-router.get("/customers", adminOrManagerAuth, async (req, res) => {
+router.get("/customers", adminOrManagerAuth, cacheMiddleware(120), async (req, res) => {
   try {
     const filter = isManager(req) ? { _id: { $in: getAssignedUserIds(req) } } : {};
     const customers = await User.find(filter);
@@ -453,7 +436,7 @@ router.delete("/customers/:id", adminOrManagerAuth, async (req, res) => {
 
 // --- PRODUCT ROUTES ---
 
-router.get("/products", adminOrManagerAuth, async (req, res) => {
+router.get("/products", adminOrManagerAuth, cacheMiddleware(120), async (req, res) => {
   try {
     const filter = isManager(req) ? { sellerId: { $in: getAssignedSellerIds(req) } } : {};
     const products = await Product.find(filter).populate("sellerId");
@@ -539,7 +522,7 @@ router.get("/product/disapprove/:id", adminOrManagerAuth, async (req, res) => {
 
 // --- SELLER ROUTES ---
 
-router.get("/sellers", adminOrManagerAuth, async (req, res) => {
+router.get("/sellers", adminOrManagerAuth, cacheMiddleware(120), async (req, res) => {
   try {
     const filter = isManager(req) ? { _id: { $in: getAssignedSellerIds(req) } } : {};
     const sellers = await Seller.find(filter);
@@ -604,7 +587,7 @@ router.get("/seller/approve/:id", adminOrManagerAuth, async (req, res) => {
 
 // --- INDUSTRY ROUTES ---
 
-router.get("/industries", verifyAdmin, async (req, res) => {
+router.get("/industries", verifyAdmin, cacheMiddleware(120), async (req, res) => {
 
   try {
     const industries = await Industry.find({});
@@ -649,7 +632,7 @@ router.delete("/industries/:id", verifyAdmin, async (req, res) => {
 
 // --- MANAGER ROUTES ---
 
-router.get("/managers", verifyAdmin, async (req, res) => {
+router.get("/managers", verifyAdmin, cacheMiddleware(120), async (req, res) => {
   try {
     const managers = await Manager.find().select(
       "email createdAt assignedUserIds assignedSellerIds pendingUserQuota pendingSellerQuota"
@@ -1169,7 +1152,7 @@ router.put("/sellproduct/:id/status", adminOrManagerAuth, async (req, res) => { 
 
 // --- BLOG ROUTES ---
 
-router.get("/blogs", verifyAdmin, async (req, res) => {
+router.get("/blogs", verifyAdmin, cacheMiddleware(120), async (req, res) => {
   try {
     const blogs = await Blog.find({}).sort({ createdAt: -1 });
     return sendSuccess(res, "Blogs fetched", paginate(blogs));
@@ -1210,7 +1193,7 @@ router.get("/delivery", verifyAdmin, async (req, res) => {
 
 // --- ANALYTICS ROUTES ---
 
-router.get("/analytics/products", verifyAdmin, async (req, res) => {
+router.get("/analytics/products", verifyAdmin, cacheMiddleware(300), async (req, res) => {
   try {
     const { period } = req.query;
 
@@ -1311,7 +1294,7 @@ router.get("/analytics/products", verifyAdmin, async (req, res) => {
   }
 });
 
-router.get("/analytics/users/:userId/purchases", adminOrManagerAuth, async (req, res) => {
+router.get("/analytics/users/:userId/purchases", adminOrManagerAuth, cacheMiddleware(300), async (req, res) => {
   try {
     const { userId } = req.params;
     const { period } = req.query;
@@ -1477,7 +1460,7 @@ function dateFormatForInterval(interval) {
 }
 
 // 1. Seller Rankings
-router.get("/analytics/rankings/sellers", verifyAdmin, async (req, res) => {
+router.get("/analytics/rankings/sellers", verifyAdmin, cacheMiddleware(300), async (req, res) => {
   try {
     const { period, metric } = req.query;
     const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 10, 1), 100);
@@ -1555,7 +1538,7 @@ router.get("/analytics/rankings/sellers", verifyAdmin, async (req, res) => {
 });
 
 // 2. Industry Rankings
-router.get("/analytics/rankings/industries", verifyAdmin, async (req, res) => {
+router.get("/analytics/rankings/industries", verifyAdmin, cacheMiddleware(300), async (req, res) => {
   try {
     const { period, metric } = req.query;
     const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 10, 1), 100);
@@ -1626,7 +1609,7 @@ router.get("/analytics/rankings/industries", verifyAdmin, async (req, res) => {
 });
 
 // 3. Seller Performance Timeseries
-router.get("/analytics/sellers/:sellerId/timeseries", verifyAdmin, async (req, res) => {
+router.get("/analytics/sellers/:sellerId/timeseries", verifyAdmin, cacheMiddleware(300), async (req, res) => {
   try {
     const { sellerId } = req.params;
     const { period, metric } = req.query;
@@ -1689,7 +1672,7 @@ router.get("/analytics/sellers/:sellerId/timeseries", verifyAdmin, async (req, r
 });
 
 // 4. Industry Performance Timeseries
-router.get("/analytics/industries/:industryId/timeseries", verifyAdmin, async (req, res) => {
+router.get("/analytics/industries/:industryId/timeseries", verifyAdmin, cacheMiddleware(300), async (req, res) => {
   try {
     const { industryId } = req.params;
     const { period, metric } = req.query;

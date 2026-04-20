@@ -1,4 +1,5 @@
 import express from 'express';
+import { cacheMiddleware } from '../middleware/redisCache.js';
 import isAuthenticated from '../middleware/isAuthenticated.js';
 import Seller from '../models/seller.js';
 import bcrypt from 'bcryptjs';
@@ -360,7 +361,7 @@ router.get('/', isAuthenticated, async (req, res) => {
 });
 
 // API route to fetch listed products as JSON
-router.get('/products', isAuthenticated, async (req, res) => {
+router.get('/products', isAuthenticated, cacheMiddleware(60), async (req, res) => {
   try {
     const userId = req.userId;
     const productListed = await Seller.findById(userId).populate('products');
@@ -377,7 +378,7 @@ router.get('/products', isAuthenticated, async (req, res) => {
 });
 
 // API: get a single product details for editing (JSON)
-router.get('/product/:id', isAuthenticated, async (req, res) => {
+router.get('/product/:id', isAuthenticated, cacheMiddleware(60), async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
@@ -392,7 +393,7 @@ router.get('/product/:id', isAuthenticated, async (req, res) => {
 });
 
 // API: get current seller account details (JSON)
-router.get('/account/me', isAuthenticated, async (req, res) => {
+router.get('/account/me', isAuthenticated, cacheMiddleware(60), async (req, res) => {
   try {
     const seller = await Seller.findById(req.userId);
     if (!seller) return res.status(404).json({ success: false, message: 'Seller not found' });
@@ -487,7 +488,7 @@ router.get('/sold-products', isAuthenticated, async (req, res) => {
 });
 
 // API: sold products as JSON
-router.get('/sold-products/data', isAuthenticated, async (req, res) => {
+router.get('/sold-products/data', isAuthenticated, cacheMiddleware(60), async (req, res) => {
   try {
     const sellerId = req.userId;
     const orders = await Order.aggregate([
@@ -528,7 +529,7 @@ router.get('/sold-products/data', isAuthenticated, async (req, res) => {
 });
 
 // Add: Get order requests for the authenticated seller (JSON)
-router.get('/orders/requests', isAuthenticated, async (req, res) => {
+router.get('/orders/requests', isAuthenticated, cacheMiddleware(60), async (req, res) => {
   try {
     const sellerId = new mongoose.Types.ObjectId(req.userId);
 
