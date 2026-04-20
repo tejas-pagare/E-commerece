@@ -210,7 +210,7 @@ io.on("connection", (socket) => {
 
 
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to SwiftMart API" });
+  res.json({ message: "Welcome to SwiftMart API with new changes" });
 })
 
 app.get("*", (req, res) => {
