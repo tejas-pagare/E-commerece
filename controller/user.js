@@ -75,7 +75,8 @@ const loginController = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 3600000,
     });
 
@@ -171,16 +172,16 @@ const logoutController = (req, res) => {
   // Clear the token cookie with all options to ensure removal
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : 'lax',
     path: '/'
   });
 
   // Also overwrite the cookie immediately to force removal in strict browsers
   res.cookie("token", "", {
     httpOnly: true,
-    secure: false,
-    sameSite: 'lax',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : 'lax',
     path: '/',
     maxAge: 0
   });
