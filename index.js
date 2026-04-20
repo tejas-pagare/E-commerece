@@ -46,9 +46,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, "..", ".env") });
 const corsOptions = {
-  origin: ["http://localhost:8000", "http://localhost:5174", "http://localhost:5173"],
+  origin: ["http://localhost:8000", "http://localhost:5174", "http://localhost:5173", process.env.FRONTEND_URL],
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   allowedHeaders: ["Content-Type", "Authorization", "cache-control", "X-Requested-With"],
 };
 
@@ -127,7 +127,7 @@ app.use(session({
   secret: "secret-swiftmart",
   resave: false,
   saveUninitialized: false,
-  cookie: { 
+  cookie: {
     maxAge: 600000,
     httpOnly: true,
     secure: false, // set to true if using HTTPS
