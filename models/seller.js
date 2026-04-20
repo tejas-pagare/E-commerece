@@ -64,6 +64,16 @@ const SellerSchema = new mongoose.Schema({
   }
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Manager-scoped seller queries
+SellerSchema.index({ managerId: 1 });
+
+// Identity verification filter (admin approvals, manager dashboard)
+SellerSchema.index({ "identityVerification.status": 1 });
+
+// Dashboard seller-creation aggregation
+SellerSchema.index({ createdAt: -1 });
+
 SellerSchema.pre(["deleteOne","deleteMany"], { document: true, query: false }, async function (next) {
   try {
     console.log(`Deleting all products for seller ${this._id}`);

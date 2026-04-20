@@ -22,5 +22,9 @@ const blogSchema = new mongoose.Schema({
   }
 });
 
+// ── Indexes ───────────────────────────────────────────────────────
+// Blog listing sorted by newest first
+blogSchema.index({ createdAt: -1 });
+
 const Blog = mongoose.model("Blog", blogSchema);
 export default Blog;
