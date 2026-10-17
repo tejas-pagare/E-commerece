@@ -185,11 +185,18 @@ router.get(
 
 router.get(
     "/auth/google/callback",
-    passport.authenticate("google", { session: false, failureRedirect: "/login" }),
+    (req, res, next) => {
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+        passport.authenticate("google", {
+            session: false,
+            failureRedirect: `${frontendUrl}/login`,
+        })(req, res, next);
+    },
     async (req, res) => {
+        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
         const user = req.user;
         if (!user) {
-            return res.redirect("/login");
+            return res.redirect(`${frontendUrl}/login`);
         }
 
         const token = jwt.sign(
@@ -205,7 +212,6 @@ router.get(
             maxAge: 3600000,
         });
 
-        const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
         return res.redirect(`${frontendUrl}/`);
     }
 );

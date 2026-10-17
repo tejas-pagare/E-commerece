@@ -33,43 +33,28 @@ const loginController = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const wantsJson =
-      req.xhr ||
-      req.is('application/json') ||
-      (req.headers.accept && req.headers.accept.includes('application/json'));
-    const prefersHtml = !wantsJson;
-    const redirectWithError = (message) =>
-      res.redirect(`/api/v1/user/login?error=${encodeURIComponent(message)}`);
-
     // Always clear any existing auth cookie before processing login
     res.clearCookie("token");
 
     if (!email || !password) {
-      res.clearCookie("token");
-      return prefersHtml
-        ? redirectWithError("Email and password are required")
-        : res.status(400).json({ success: false, message: "Email and password are required" });
+      return res.status(400).json({ success: false, message: "Email and password are required" });
     }
 
     const userCheck = await User.findOne({ email });
     if (!userCheck) {
-      return prefersHtml
-        ? redirectWithError("Invalid email or password")
-        : res.status(401).json({ success: false, message: "Invalid email or password" });
+      return res.status(401).json({ success: false, message: "Invalid email or password" });
     }
 
     const isMatch = userCheck.password
       ? await bcrypt.compare(password, userCheck.password)
       : false;
     if (!isMatch) {
-      return prefersHtml
-        ? redirectWithError("Invalid email or password")
-        : res.status(401).json({ success: false, message: "Invalid email or password" });
+      return res.status(401).json({ success: false, message: "Invalid email or password" });
     }
 
     const token = jwt.sign(
       { userId: userCheck._id, role: "user" },
-      "JWT_SECRET",
+      process.env.JWT_SECRET || "JWT_SECRET",
       { expiresIn: "5h" }
     );
 
@@ -79,10 +64,6 @@ const loginController = async (req, res) => {
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 3600000,
     });
-
-    if (prefersHtml) {
-      return res.redirect("/api/v1/user/");
-    }
 
     return res.json({
       success: true,
@@ -96,16 +77,8 @@ const loginController = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log(error);
+    console.error("Login error:", error);
     res.clearCookie("token");
-    const wantsJson =
-      req.xhr ||
-      req.is('application/json') ||
-      (req.headers.accept && req.headers.accept.includes('application/json'));
-    const prefersHtml = !wantsJson;
-    if (prefersHtml) {
-      return res.redirect("/api/v1/user/login?error=Something went wrong");
-    }
     return res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
@@ -119,52 +92,38 @@ const loginPageRenderController = (req, res) => {
 
 
 const signupPageRenderController = (req, res) => {
-
-
   res.render('User/auth/signup.ejs', { title: 'signup', role: "user" })
-
 }
+
 const signupController = async (req, res) => {
   try {
     const { firstname, lastname, password, email } = req.body;
-    const prefersHtml = req.accepts(['html', 'json']) === 'html';
-    const redirectWithError = (message) =>
-      res.redirect(`/api/v1/user/signup?error=${encodeURIComponent(message)}`);
 
     if (!firstname || !lastname || !email || !password) {
-      return prefersHtml
-        ? redirectWithError("All fields are required")
-        : res.status(400).json({ success: false, message: "All fields are required" });
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
     const userCheck = await User.findOne({ email });
     if (userCheck) {
-      return prefersHtml
-        ? redirectWithError("Email already in use")
-        : res.status(409).json({ success: false, message: "Email already in use" });
+      return res.status(409).json({ success: false, message: "Email already in use" });
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
-    const user = User.create({
-      firstname, lastname, password: hashPassword, email
+    const user = await User.create({
+      firstname,
+      lastname,
+      password: hashPassword,
+      email,
     });
-    const savedUser = await (await user).save();
 
-    await assignUserToManager(savedUser._id);
+    await assignUserToManager(user._id);
 
-    if (prefersHtml) {
-      return res.redirect("/api/v1/user/login");
-    }
     return res.status(201).json({ success: true, message: "Signup successful" });
   } catch (error) {
-    console.log(error);
-    const prefersHtml = req.accepts(['html', 'json']) === 'html';
-    if (prefersHtml) {
-      return res.redirect("/api/v1/user/signup?error=Something went wrong");
-    }
+    console.error("Signup error:", error);
     return res.status(500).json({ success: false, message: "Something went wrong" });
   }
-}
+};
 
 
 
